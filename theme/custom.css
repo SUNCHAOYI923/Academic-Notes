@@ -1,18 +1,135 @@
-/* 隐藏左侧导航栏 */
-.nav-chapters {
-    display: none !important;
-}
-
-/* 隐藏侧边栏 */
 .sidebar {
     display: none !important;
 }
-
-/* 让主要内容占满全屏 */
 .page-wrapper {
     margin-left: 0 !important;
 }
 
+/* 美化主题切换按钮（可选） */
+.theme-popup {
+    background: rgba(255, 255, 255, 0.1) !important;
+    backdrop-filter: blur(10px) !important;
+    border-radius: 8px !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
+}
+
+/* ===== 主容器 ===== */
 .main {
-    max-width: 100% !important;
+    max-width: 800px !important;
+    width: 100% !important;
+    margin: 0 auto !important;
+    padding: 2rem !important;
+    
+    background: linear-gradient(135deg, #f5f7ff, #e6ecff) !important;
+    border-radius: 20px !important;
+    box-shadow: 0 20px 40px rgba(0, 100, 255, 0.1) !important;
+    
+    font-size: 16px !important;
+    line-height: 1.8 !important;
+}
+
+/* 标题 */
+h1 {
+    background: linear-gradient(135deg, #4A90E2, #7B68EE) !important;
+    -webkit-background-clip: text !important;
+    -webkit-text-fill-color: transparent !important;
+    font-size: 2.5em !important;
+    border-bottom: 3px solid #4A90E2 !important;
+}
+
+h2 {
+    color: #4A90E2 !important;
+    border-left: 5px solid #7B68EE !important;
+    padding-left: 1rem !important;
+}
+
+h3 {
+    color: #6C8EB2 !important;
+}
+
+/* 链接 */
+a {
+    color: #4A90E2 !important;
+    text-decoration: none !important;
+    border-bottom: 2px dashed #7B68EE !important;
+}
+a:hover {
+    color: #7B68EE !important;
+    border-bottom: 2px solid #7B68EE !important;
+}
+
+/* ===== 代码块 ===== */
+pre {
+    background: linear-gradient(145deg, #2C3E50, #34495E) !important;
+    color: #ECF0F1 !important;
+    padding: 1.5em !important;
+    border-radius: 12px !important;
+    border-left: 5px solid #4A90E2 !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2) !important;
+    font-family: 'Consolas', monospace !important;
+    font-size: 14px !important;
+    line-height: 1.6 !important;
+    overflow-x: auto !important;
+}
+
+pre .keyword { color: #FFB6C1; }
+pre .string { color: #F0E68C; }
+pre .comment { color: #95A5A6; }
+pre .function { color: #FFD700; }
+pre .number { color: #B0E0E6; }
+pre .operator { color: #ECF0F1; }
+
+code:not(pre code) {
+    background: #ECF0F1 !important;
+    color: #2C3E50 !important;
+    padding: 0.2em 0.4em !important;
+    border-radius: 4px !important;
+    font-family: 'Consolas', monospace !important;
+    font-size: 0.9em !important;
+}
+
+/* 表格 */
+th {
+    background: linear-gradient(135deg, #4A90E2, #7B68EE) !important;
+    color: white !important;
+    padding: 12px !important;
+}
+
+td {
+    background: #f0f5ff !important;
+    padding: 10px !important;
+    border-bottom: 1px solid #c0d0f0 !important;
+}
+
+tr:nth-child(even) td {
+    background: #e8f0fe !important;
+}
+
+/* 引用块 */
+blockquote {
+    background: #e8f0fe !important;
+    border-left: 5px solid #4A90E2 !important;
+    padding: 1em 1.5em !important;
+    margin: 1.5em 0 !important;
+    border-radius: 0 16px 16px 0 !important;
+    color: #2C3E50 !important;
+}
+
+hr {
+    border: none !important;
+    height: 2px !important;
+    background: linear-gradient(90deg, transparent, #4A90E2, #7B68EE, #4A90E2, transparent) !important;
+    margin: 2em 0 !important;
+}
+
+li {
+    margin-bottom: 0.5em !important;
+}
+
+strong, b {
+    color: #4A90E2 !important;
+}
+
+em, i {
+    color: #7B68EE !important;
 }

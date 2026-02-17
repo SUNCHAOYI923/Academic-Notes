@@ -5,7 +5,6 @@
     margin-left: 0 !important;
 }
 
-/* 美化主题切换按钮（可选） */
 .theme-popup {
     background: rgba(255, 255, 255, 0.1) !important;
     backdrop-filter: blur(10px) !important;
@@ -13,7 +12,6 @@
     border: 1px solid rgba(255,255,255,0.2) !important;
 }
 
-/* ===== 主容器 ===== */
 .main {
     max-width: 800px !important;
     width: 100% !important;

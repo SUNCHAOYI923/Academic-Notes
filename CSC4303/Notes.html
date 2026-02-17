@@ -1,0 +1,733 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>CSC4303 - CUHKSZ CSC Notes</title>
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="../favicon.svg">
+        <link rel="shortcut icon" href="../favicon.png">
+        <link rel="stylesheet" href="../css/variables.css">
+        <link rel="stylesheet" href="../css/general.css">
+        <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="../fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" id="highlight-css" href="../highlight.css">
+        <link rel="stylesheet" id="tomorrow-night-css" href="../tomorrow-night.css">
+        <link rel="stylesheet" id="ayu-highlight-css" href="../ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+        <link rel="stylesheet" href="../theme/custom.css">
+
+
+        <!-- Provide site root and default themes to javascript -->
+        <script>
+            const path_to_root = "../";
+            const default_light_theme = "light";
+            const default_dark_theme = "navy";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="../toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                let theme = localStorage.getItem('mdbook-theme');
+                let sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            const default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? default_dark_theme : default_light_theme;
+            let theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            let sidebar = null;
+            const sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="../toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="default_theme">Auto</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">CUHKSZ CSC Notes</h1>
+
+                    <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
+<h1 id="csc4303-network-programming"><a class="header" href="#csc4303-network-programming">CSC4303 Network Programming</a></h1>
+<h2 id="reference"><a class="header" href="#reference">Reference</a></h2>
+<ul>
+<li>https://book.systemsapproach.org/foundation.html</li>
+</ul>
+<h2 id="network-model"><a class="header" href="#network-model">Network Model</a></h2>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Layer</th><th style="text-align: center">Description</th><th style="text-align: center">Example</th></tr></thead><tbody>
+<tr><td style="text-align: center">Application</td><td style="text-align: center">Programs that use network service</td><td style="text-align: center">HTTP, DNS, CDNs</td></tr>
+<tr><td style="text-align: center">Transport</td><td style="text-align: center">Provides end-to-end data delivery</td><td style="text-align: center">TCP, UDP</td></tr>
+<tr><td style="text-align: center">Network</td><td style="text-align: center">Send packets over multiple networks</td><td style="text-align: center">IP, NAT, BGP</td></tr>
+<tr><td style="text-align: center">Link</td><td style="text-align: center">Send frames over one or more links</td><td style="text-align: center">Ethernet, 802.11</td></tr>
+<tr><td style="text-align: center">Physical</td><td style="text-align: center">Send bits using signals</td><td style="text-align: center">wires, fiber, wireless</td></tr>
+</tbody></table>
+</div>
+<h3 id="transport-layer"><a class="header" href="#transport-layer">Transport Layer</a></h3>
+<h4 id="udp"><a class="header" href="#udp">UDP</a></h4>
+<ul>
+<li>
+<p><strong>Connectionless</strong></p>
+<p>Each packet is independent.</p>
+<pre><code>Sender    Time       Receiver
+  |                     |
+  |----- Packet1 -----&gt; |
+  |                     |
+  |----- Packet2 -----&gt; |
+  |                     |
+</code></pre>
+</li>
+<li>
+<p><strong>Buffering</strong></p>
+<p>UDP buffering is a "temporary storage area" maintained by the operating system for each UDP port, where arriving packets queue up when applications can't process them immediately.</p>
+<pre><code>Application A  Application B   Application C
+    ↓               ↓               ↓
+[Port X]        [Port Y]        [Port Z]      ← Port mapping
+    ↓               ↓               ↓
+[Queue 1]       [Queue 2]       [Queue 3]     ← Independent UDP message queues
+    │               │               │
+    └───────┬───────┴───────┬───────┘
+            ↓               ↓
+    [Port Multiplexer/Demultiplexer]          ← Routes by port number
+            ↓
+    [Incoming UDP packets]
+</code></pre>
+</li>
+<li>
+<p><strong>Header</strong></p>
+<p>Note that the Datagram length up to 64K.</p>
+<pre><code>     32-bit width (4 bytes per row)
+0                  16                31
+┌──────────────────┬──────────────────┐
+│ Source Port      │ Destination Port │ ← Port addressing
+│   (16 bits)      │   (16 bits)      │
+├──────────────────┴──────────────────┤
+│    Length        │    Checksum      │ ← Size &amp; integrity
+│    (16 bits)     │    (16 bits)     │
+├─────────────────────────────────────┤
+│                                     │
+│           Application Data          │
+│                                     │
+└─────────────────────────────────────┘
+</code></pre>
+</li>
+</ul>
+<h4 id="tcp"><a class="header" href="#tcp">TCP</a></h4>
+<ul>
+<li>
+<p><strong>Header</strong></p>
+<pre><code>0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|          Source Port          |       Destination Port        | ← Identifies sockets
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                        Sequence Number (32)                   | ← Byte-based sequencing
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Acknowledgment Number (32)                 | ← Next expected byte
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Data Offset  |  0  |  Flags  |       Window Size (16)        | ← Control &amp; flow control
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|     Checksum (16)             |       Urgent Pointer (16)     | ← Integrity &amp; urgent data
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                         Options (variable)                    |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                           Data                                |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+</code></pre>
+<ul>
+<li>
+<p><strong>Connection Establishment (Setup)</strong></p>
+<ul>
+<li>
+<p><strong>Three-Way Handshake</strong></p>
+<p>Both parties send Initial Sequence Numbers (ISNs) via SYNchronize segments. Each party acknowledges the other's sequence number using ACKnowledge segments.</p>
+  <img src="pic/1.png" width="40%" height="40%">
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Step</th><th style="text-align: center">Initiator (Client)</th><th style="text-align: center">Receiver (Server)</th><th style="text-align: center">Description</th></tr></thead><tbody>
+<tr><td style="text-align: center">First Handshake</td><td style="text-align: center">Sends <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">SYN</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8667em;vertical-align:-0.2222em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord texttt">seq</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span></td><td style="text-align: center">Waits for connection request</td><td style="text-align: center">Client requests to establish a connection and sends its ISN <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>.</td></tr>
+<tr><td style="text-align: center">Second Handshake</td><td style="text-align: center">Waits for acknowledgment</td><td style="text-align: center">Sends <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">SYN</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord texttt">ACK</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8667em;vertical-align:-0.2222em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord texttt">seq</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8055em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord texttt">ack</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> <br> It acknowledges receipt through sequence number <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>.</td><td style="text-align: center">Server agrees to connect, sends its own ISN <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span>, and acknowledges the receipt of <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>.</td></tr>
+<tr><td style="text-align: center">Third Handshake</td><td style="text-align: center">Sends <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">ACK</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8667em;vertical-align:-0.2222em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord texttt">seq</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord texttt">ack</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td><td style="text-align: center">Connection established</td><td style="text-align: center">Client acknowledges the receipt of <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span>, and the connection is formally established.</td></tr>
+</tbody></table>
+</div>
+<p>Three-way handshake prevents a server from wasting resources on stale or duplicate connection requests by requiring the client's final acknowledgment.</p>
+</li>
+<li>
+<p><strong>State Machine</strong></p>
+  <img src="pic/2.png" width="70%" height="70%">
+<ul>
+<li>
+<p>Client Path <code>CLOSED → connect() → SYN_SENT → Receive SYN+ACK → ESTABLISHED</code></p>
+</li>
+<li>
+<p>Server Path <code>CLOSED → listen() → LISTEN → Receive SYN → SYN_RCVD → Receive ACK → ESTABLISHED</code></p>
+</li>
+<li>
+<p>Both parties run instances of this state machine, and TCP allows for simultaneous open.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Connection Release (Teardown)</strong></p>
+<ul>
+<li>
+<p><strong>Four-Way Handshake (symmetric)</strong></p>
+  <img src="pic/3.png" width="40%" height="40%">
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Step</th><th style="text-align: center">Initiator (Active Closer)</th><th style="text-align: center">Receiver (Passive Closer)</th><th style="text-align: center">Description</th></tr></thead><tbody>
+<tr><td style="text-align: center">First Wave</td><td style="text-align: center">Sends <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">FIN</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8667em;vertical-align:-0.2222em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord texttt">seq</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">u</span></span></span></span></td><td style="text-align: center">Waits for close request</td><td style="text-align: center">Initiator has finished sending data and requests to close its sending channel.</td></tr>
+<tr><td style="text-align: center">Second Wave</td><td style="text-align: center">Waits for remaining data</td><td style="text-align: center">Sends <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">ACK</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord texttt">ack</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">u</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td><td style="text-align: center">Receiver acknowledges the close request <strong>but may still have data to send</strong>.</td></tr>
+<tr><td style="text-align: center">Third Wave</td><td style="text-align: center">Waits for confirmation</td><td style="text-align: center">Sends <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">FIN</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8667em;vertical-align:-0.2222em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord texttt">seq</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span></span></span></span></td><td style="text-align: center">Receiver has finished sending data and requests to close its sending channel.</td></tr>
+<tr><td style="text-align: center">Fourth Wave</td><td style="text-align: center">Sends <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">ACK</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8389em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord texttt">ack</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">v</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td><td style="text-align: center">Connection closed</td><td style="text-align: center">Initiator acknowledges the close request.</td></tr>
+</tbody></table>
+</div></li>
+<li>
+<p><strong>State Machine</strong></p>
+  <img src="pic/4.png" width="70%" height="70%">
+<ul>
+<li>
+<p><strong>Active Closer Path</strong> <code>ESTABLISHED → close() → FIN_WAIT_1 → Receive ACK → FIN_WAIT_2 → Receive FIN → TIME_WAIT → Timeout → CLOSED</code></p>
+</li>
+<li>
+<p><strong>Passive Closer Path</strong> <code>ESTABLISHED → Receive FIN → CLOSE_WAIT → close() → LAST_ACK → Receive ACK → CLOSED</code></p>
+</li>
+<li>
+<p><strong>TIME_WAIT State</strong></p>
+<ul>
+<li>
+<p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">2</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">MSL</span></span></span></span></span> (Maximum Segment Lifetime).</p>
+</li>
+<li>
+<p>Lost ACKs can be recovered.</p>
+</li>
+<li>
+<p>Old segments won't confuse new connections.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Flow Control</strong></p>
+<ul>
+<li>
+<p><strong>Automatic Repeat Query</strong></p>
+<p>ARQ with one message at a time is <strong>Stop-and-Wait</strong>. It allows only a single message to be outstanding from sender.</p>
+</li>
+<li>
+<p><strong>Sliding Window</strong></p>
+<p>It allows <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span></span></span></span> outstanding packets, enabling pipelining to send multiple packets per RTT for improved performance.</p>
+<p>Sender buffers up to <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span></span></span></span> segments until they are acknowledged. The last frame sent minus last ack rec'd should no more than <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span></span></span></span>.</p>
+ <img src="pic/5.png" width="60%" height="60%">
+<ul>
+<li>
+<p><strong>Go-Back-N</strong></p>
+<p>Only buffers next expected packet (LAS). Accepts only sequential packets, discards others, sends <strong>cumulative</strong> ACK.</p>
+</li>
+<li>
+<p><strong>Selective Repeat</strong></p>
+<p>Buffers entire window. Stores out-of-order packets, sends individual ACKs, retransmits only lost packets.</p>
+</li>
+<li>
+<p><strong>Sequence Number</strong></p>
+<p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> bit counter wraps around at <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7477em;vertical-align:-0.0833em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.6644em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>. Let <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">LAR</span></span></span></span></span> be Last Acknowledgement Received, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">LAS</span></span></span></span></span> be Last Acknowledgement Sent.</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Method</th><th style="text-align: center">Sender's Range</th><th style="text-align: center">Receiver's Range</th><th style="text-align: center">Min Number Needed to Avoid Overlap</th></tr></thead><tbody>
+<tr><td style="text-align: center">Go-Back-N</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord text"><span class="mord">LAR</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">LAR</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mclose">]</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">LAS</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td></tr>
+<tr><td style="text-align: center">Selective Repeat</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord text"><span class="mord">LAR</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">LAR</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mclose">]</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord text"><span class="mord">LAS</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord">1</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord text"><span class="mord">LAS</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mclose">]</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">2</span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span></span></span></span></td></tr>
+</tbody></table>
+</div></li>
+</ul>
+</li>
+<li>
+<p><strong>Pacing</strong></p>
+<ul>
+<li>
+<p><strong>ACK Clocking</strong> (sender)</p>
+<p>ACK clocking is a feedback mechanism where the network itself determines the sending pace, preventing queue buildup and ensuring efficient, low-latency data flow.</p>
+</li>
+<li>
+<p><strong>Flow Control</strong> (Receiver)</p>
+<p>Flow control uses the <code>WIN</code> field, calculated as <code>WIN = ReceiveBuffer - (LastByteRcvd - LastByteRead)</code>, to dynamically limit the sender's window, preventing receiver buffer overflow.</p>
+</li>
+</ul>
+<p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8778em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">SEQ</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">length</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">ACK</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">WIN</span></span></span></span></span></p>
+<ul>
+<li>
+<p><strong>Adaptive Timeout</strong></p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Name</th><th style="text-align: center">Formula</th></tr></thead><tbody>
+<tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">SRTT</span></span></span></span></span> (average round‑trip time)</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8917em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord text"><span class="mord">SRTT</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">SRTT</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.4445em;"></span><span class="mord mathnormal" style="margin-right:0.0037em;">α</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8917em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord text"><span class="mord">RTT</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span></span></span></span></td></tr>
+<tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">Svar</span></span></span></span></span> (variability of RTT)</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8917em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord text"><span class="mord">Svar</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">Svar</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.05278em;">β</span><span class="mord">⋅</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8917em;vertical-align:-0.2083em;"></span><span class="mord"><span class="mord text"><span class="mord">RTT</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord"><span class="mord text"><span class="mord">SRTT</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3011em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">n</span><span class="mbin mtight">+</span><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2083em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">∣</span></span></span></span></td></tr>
+<tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">Timeout</span></span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">Timeout</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">SRTT</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">⋅</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8333em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord text"><span class="mord">Svar</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.1514em;"><span style="top:-2.55em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight">n</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td></tr>
+</tbody></table>
+</div></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Congestion Control</strong>
+TCP congestion control uses a sliding window (cwnd), interprets packet loss as a congestion signal, and adjusts the window via AIMD to achieve an efficient and roughly fair bandwidth allocation.</p>
+<ul>
+<li>
+<p><strong>Max-Min fairness</strong></p>
+<p>Increse the rate of one flow will decrease the rate of a smaller flow.</p>
+<blockquote>
+<p>Step 1 Initialize all flows at zero<br />
+Step 2 Increase all flows equally<br />
+Step 3 Freeze bottlenecked flows<br />
+Step 4 Repeat for remaining flows</p>
+</blockquote>
+</li>
+<li>
+<p><strong>Bandwidth allocation</strong></p>
+<p>Network layer provides direct feedback &amp; Transport layer reduces load [Network is distributed, no single party has an overall picture of its state.]</p>
+<ul>
+<li>
+<p><strong>Models</strong></p>
+<ul>
+<li>
+<p>Open loop [reserve] &amp; Closed loop [use feedback to adjust rates]</p>
+</li>
+<li>
+<p>Host support &amp; Network support</p>
+</li>
+<li>
+<p>Window based &amp; Rate based</p>
+</li>
+</ul>
+<p><strong>TCP is a closed loop,host-driven, and window-based</strong></p>
+</li>
+<li>
+<p><strong>AIMD(Additive Increase Multiplicative Decrease)</strong></p>
+<ul>
+<li>
+<p>Hosts additively increase rate while network not congested</p>
+</li>
+<li>
+<p>Hosts multiplicatively decrease rate when congested</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>TCP Tahoe</strong></p>
+<ul>
+<li>
+<p><strong>Slow Start</strong></p>
+<p>For each ACK received: <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">cwnd</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">cwnd</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">cwnd</span></span></span></span></span> doubles every RTT.</p>
+</li>
+<li>
+<p><strong>Later Additive Increase (AI)</strong></p>
+<p>For each ACK received: <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">cwnd</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">←</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">cwnd</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.1901em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8451em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">cwnd</span></span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>, roughly adds 1 packet per RTT.</p>
+</li>
+<li>
+<p><strong>Switching Threshold (Initially Infinity)</strong></p>
+<p>Switch to AI when When <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7335em;vertical-align:-0.0391em;"></span><span class="mord text"><span class="mord">cwnd</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">ssthresh</span></span></span></span></span>, and <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">ssthresh</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2251em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8801em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">cwnd</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> after loss. <strong>Begin with slow start after timeout (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">cwnd</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>).</strong></p>
+</li>
+<li>
+<p><strong>Fast Retransmit</strong></p>
+<p>TCP's cumulative ACKs allow duplicate ACKs to signal lost packets for fast retransmission.(Treat three duplicate ACKs as a loss.)</p>
+</li>
+<li>
+<p><strong>Fast Recovery (TCP Reno)</strong></p>
+<p>Fast recovery keeps data flowing during retransmission by maintaining the ACK clock. It avoids resetting to Slow Start after packet loss. Set <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord text"><span class="mord">ssthresh</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2251em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8801em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">2</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord text mtight"><span class="mord mtight">cwnd</span></span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span> and then continue AI directly.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="udp--tcp"><a class="header" href="#udp--tcp">UDP &amp; TCP</a></h4>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Feature</th><th style="text-align: center">TCP</th><th style="text-align: center">UDP</th></tr></thead><tbody>
+<tr><td style="text-align: center">Mode</td><td style="text-align: center">Connections</td><td style="text-align: center">Datagrams</td></tr>
+<tr><td style="text-align: center">Reliability</td><td style="text-align: center">No loss, no duplicates, in-order delivery</td><td style="text-align: center">May lose, reorder, or duplicate packets</td></tr>
+<tr><td style="text-align: center">Data Size</td><td style="text-align: center">Unlimited</td><td style="text-align: center">Limited</td></tr>
+<tr><td style="text-align: center">Flow Control</td><td style="text-align: center">Flow control matches sender to receiver</td><td style="text-align: center">Send regardless of receiver state</td></tr>
+<tr><td style="text-align: center">Congestion Control</td><td style="text-align: center">Congestion control matches sender to network</td><td style="text-align: center">Send regardless of network state</td></tr>
+</tbody></table>
+</div>
+<h4 id="socket"><a class="header" href="#socket">Socket</a></h4>
+<p>An endpoint for network communication that allows an application to attach to a specific port on the local network interface, enabling data exchange with other applications across the network.</p>
+<img src="pic/6.png" width="60%" height="60%">
+<ul>
+<li>
+<p><strong>Process</strong></p>
+<p>Cilent <code>socket () ------------------------&gt; connect () -&gt; I/O -&gt; close ()</code></p>
+<p>Server <code>socket () -&gt; bind () -&gt; listen () -&gt; accept () -&gt; I/O -&gt; close ()</code></p>
+<ol>
+<li>
+<p>The server blocks in <code>accept()</code> on <code>listenfd</code> for incoming connections.</p>
+</li>
+<li>
+<p>The client calls <code>connect()</code> to initiate the TCP handshake, which also blocks.</p>
+</li>
+<li>
+<p>Upon completion, the server's <code>accept()</code> returns a <code>connfd</code> and the client's <code>connect()</code> returns, establishing a bidirectional channel between <code>clientfd</code> and <code>connfd</code>.</p>
+</li>
+</ol>
+</li>
+<li>
+<p><strong>Create</strong> <code>int socket (int domain, int type, int protocol);</code></p>
+<ul>
+<li>
+<p><strong>domain</strong> AF_INET IPv4 / AF_INET6 IPv6.</p>
+</li>
+<li>
+<p><strong>type</strong> SOCK_STREAM TCP / SOCK_DGRAM UDP.</p>
+</li>
+<li>
+<p><strong>protocol</strong> 0 (automatically select the default protocol).</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Bind</strong> <code>int bind (int sockfd, sockaddr *addr, socklen_t addrlen);</code></p>
+<p>When a <strong>server</strong> binds a socket to a specific address, it establishes that data arriving at that address is read from this socket, and data written to this socket is sent from that address.</p>
+<ul>
+<li>
+<p><strong>socket address</strong></p>
+<pre><code class="language-c">struct sockaddr
+{
+    uint_16 ss_family; // protocol family
+    char ss_data[14]; // address data
+}
+</code></pre>
+</li>
+<li>
+<p><strong>sockaddr_in</strong></p>
+<pre><code class="language-c">struct sockaddr_in
+{
+    uint16_t sin_family; // always AF_INET
+    uint16_t sin_port; // in network byte order
+    struct in_addr sin_addr; // in network byte order
+    unsigned char sin_zero[8]; // pad to sizeof (struct sockaddr), placeholder
+}
+</code></pre>
+<p>Network data is transmitted in big-endian byte order. Use <code>htons()</code> and <code>htonl()</code> to convert host-ordered values into network-ordered short and long integers, respectively.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Listen</strong> <code>int listen (int sockfd, int backlog);</code></p>
+<p><code>listen ()</code> transforms a socket descriptor into a listening socket capable of accepting client connections. The <code>backlog</code> parameter suggests how many pending connections the kernel may queue before refusing new requests (typically around 128).</p>
+</li>
+<li>
+<p><strong>Accept</strong> <code>int accpet (int listenfd, sockaddr *addr, int *addrlen);</code></p>
+<p><code>accept()</code> blocks until a client connects via <code>listenfd</code>, stores the client's address in <code>addr</code>, and returns a <code>connfd</code> for communication using standard Unix I/O functions.</p>
+</li>
+<li>
+<p><strong>Connect</strong> <code>int connect (int clientfd, sockaddr *addr, socklen_t addrlen);</code></p>
+<p>Attempts to establish a connection with server at socket address <code>addr</code>.</p>
+<p>To convert a string-formatted IP address (e.g., <code>SERVER_IP</code>), use <code>inet_pton (int af, const char *src, void *dst)</code> to transform it into binary network format.</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Feature</th><th style="text-align: center"><code>listenfd</code></th><th style="text-align: center"><code>connfd</code></th></tr></thead><tbody>
+<tr><td style="text-align: center"><strong>Purpose</strong></td><td style="text-align: center">Accepts connection requests</td><td style="text-align: center">Handles data exchange with a client</td></tr>
+<tr><td style="text-align: center"><strong>Creation</strong></td><td style="text-align: center">Once at server start</td><td style="text-align: center">Per accepted connection</td></tr>
+<tr><td style="text-align: center"><strong>Lifetime</strong></td><td style="text-align: center">Entire server runtime</td><td style="text-align: center">Duration of client service</td></tr>
+<tr><td style="text-align: center"><strong>Quantity</strong></td><td style="text-align: center">One per port</td><td style="text-align: center">One per active client</td></tr>
+<tr><td style="text-align: center"><strong>Concurrent Use</strong></td><td style="text-align: center">Listens for all clients</td><td style="text-align: center">Dedicated to single client</td></tr>
+</tbody></table>
+</div></li>
+<li>
+<p><strong>Send and Receive</strong></p>
+<p><code>ssize_t read (int fd, void *buf, size_t len);</code> returns the number of bytes actually read (0 indicates the connection is closed, -1 indicates an error).</p>
+<p><code>ssize_t write (int fa, const void *buf, size_t len);</code> returns the number of bytes actually written (-1 indicates an error).</p>
+</li>
+<li>
+<p><strong>Close</strong> <code>int close (int sockfd)</code></p>
+</li>
+<li>
+<p><strong>Concurrency</strong></p>
+<ul>
+<li>
+<p><strong>Threading/Process</strong> Race conditions increase complexity!</p>
+</li>
+<li>
+<p><strong>I/O Multiplexing</strong></p>
+<ul>
+<li>
+<p><code>select()</code></p>
+</li>
+<li>
+<p><code>poll()</code></p>
+<p><code>poll()</code> is a system call used to monitor multiple file descriptors concurrently for I/O readiness. Unlike <code>select()</code>, it imposes <strong>no fixed limit</strong> on the number of file descriptors that can be monitored.</p>
+<pre><code class="language-c">struct pollfd
+{
+    int fd; // file descriptor
+    short events; // requested events
+    short revents; // returned events
+}   
+</code></pre>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="network-layer"><a class="header" href="#network-layer">Network Layer</a></h3>
+<h4 id="internet-protocol-ip"><a class="header" href="#internet-protocol-ip">Internet Protocol (IP)</a></h4>
+<ul>
+<li><strong>IPV4 Header</strong></li>
+</ul>
+<pre><code>0                   1                   2                   3
+0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|Version| IHL   |Type of Service|        Total Length (16)      | ← Basic identification (IHL : Header)
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|        Identification (16)    |Flags|   Fragment Offset (13)  | ← Fragmentation control
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|  Time to Live |    Protocol   |        Header Checksum (16)   | ← Routing &amp; integrity (Time to Live : TTL)
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                       Source Address (32)                     | ← Sender IP
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Destination Address (32)                   | ← Receiver IP
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                    Options (if any, variable)                 | ← Optional features
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+|                           Payload (Data)                      |
++-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+</code></pre>
+<ul>
+<li>
+<p><strong>IP Addresses</strong> An IP address is assigned to each network interface. Consequently, routers possess multiple interfaces, while most hosts have just one or two (wired and wireless).</p>
+</li>
+<li>
+<p><strong>IP Prefixes</strong> In a prefix of length L, the top L bits are identical across all addresses. In CIDR notation, such a prefix is denoted as <code>IP address/prefix length</code> (e.g. <code>128.13.0.0/16</code> is <code>128.13.0.0</code> to <code>128.13.255.255</code>.)</p>
+</li>
+<li>
+<p><strong>IP Forwarding</strong> It uses longest prefix matching to select the most specific route.</p>
+</li>
+<li>
+<p><strong>IP fragmentation</strong></p>
+<ul>
+<li><strong>MTU</strong> Max Transfer Size</li>
+<li><strong>MSS</strong> Maximum Segment Size</li>
+</ul>
+  <img src="pic/7.png" width="50%" height="50%">
+<p>Each fragment is encapsulated with its own IP header.</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Field</th><th style="text-align: center">Size (bits)</th><th style="text-align: center">Purpose</th></tr></thead><tbody>
+<tr><td style="text-align: center"><strong>Identification</strong></td><td style="text-align: center">16</td><td style="text-align: center">Unique identifier for the original datagram; <strong>all fragments</strong> of the same datagram share this value.</td></tr>
+<tr><td style="text-align: center"><strong>Flags</strong></td><td style="text-align: center">3</td><td style="text-align: center">Control bits for fragmentation<br><strong>DF (Don't Fragment)</strong> If set 1, routers must not fragment the packet.<br><strong>MF (More Fragments)</strong> If set 1, more fragments follow, otherwise indicates that it is the last fragment.</td></tr>
+<tr><td style="text-align: center"><strong>Fragment Offset</strong></td><td style="text-align: center">13</td><td style="text-align: center">Indicates the position of this fragment's data <strong>in 8‑byte units</strong> relative to the start of the original datagram.</td></tr>
+</tbody></table>
+</div></li>
+</ul>
+<h4 id="dynamic-host-configuration-protocol-dhcp-application-layer"><a class="header" href="#dynamic-host-configuration-protocol-dhcp-application-layer">Dynamic Host Configuration Protocol (DHCP) [Application Layer]</a></h4>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Step</th><th style="text-align: left">Message</th><th style="text-align: left">IP Header (Src → Dst)</th><th style="text-align: left">Ethernet (Src → Dst)</th><th style="text-align: left">Purpose</th></tr></thead><tbody>
+<tr><td style="text-align: center">1</td><td style="text-align: left"><strong>DISCOVER</strong></td><td style="text-align: left"><code>0.0.0.0</code> → <code>255.255.255.255</code></td><td style="text-align: left"><code>Client MAC</code> → <code>FF:FF:FF:FF:FF:FF</code></td><td style="text-align: left">Client broadcasts to find DHCP servers</td></tr>
+<tr><td style="text-align: center">2</td><td style="text-align: left"><strong>OFFER</strong></td><td style="text-align: left"><code>Server's IP</code> → <code>255.255.255.255</code></td><td style="text-align: left"><code>Server MAC</code> → <code>FF:FF:FF:FF:FF:FF</code></td><td style="text-align: left">Server proposes IP configuration</td></tr>
+<tr><td style="text-align: center">3</td><td style="text-align: left"><strong>REQUEST</strong></td><td style="text-align: left"><code>0.0.0.0</code> → <code>255.255.255.255</code></td><td style="text-align: left"><code>Client MAC</code> → <code>FF:FF:FF:FF:FF:FF</code></td><td style="text-align: left">Client accepts the offer</td></tr>
+<tr><td style="text-align: center">4</td><td style="text-align: left"><strong>ACK</strong></td><td style="text-align: left"><code>Server's IP</code> → <code>255.255.255.255</code></td><td style="text-align: left"><code>Server MAC</code> → <code>FF:FF:FF:FF:FF:FF</code></td><td style="text-align: left">Server confirms and finalizes lease</td></tr>
+</tbody></table>
+</div>
+<h4 id="address-resolution-protocol-arp"><a class="header" href="#address-resolution-protocol-arp">Address Resolution Protocol (ARP)</a></h4>
+<p>Every network device possesses a unique MAC (Media Access Control) address, which operates at the link layer.</p>
+<p>ARP resolves IP to MAC addresses locally. A node <strong>broadcasts</strong> an ARP request, receives a <strong>private</strong> reply, and <strong>caches</strong> the mapping in its ARP table.</p>
+<h4 id="internet-control-message-protocol-icmp"><a class="header" href="#internet-control-message-protocol-icmp">Internet Control Message Protocol (ICMP)</a></h4>
+<p>When an error occurs, an ICMP error report is sent back to the source IP address and the problematic packet is discarded. The source host must then rectify the issue.</p>
+<ul>
+<li>
+<p><strong>Message Format</strong></p>
+<ul>
+<li>
+<p><strong>IP Header</strong> <code>Src = router, Dst = A, Protocol = 1</code></p>
+</li>
+<li>
+<p><strong>ICMP Header</strong> <code>Type = X, Code = Y</code></p>
+</li>
+<li>
+<p><strong>ICMP Data</strong> <code>Src = A, Dst = B, ...</code></p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Type</strong></p>
+</li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Name</th><th style="text-align: center">Code</th><th style="text-align: center">Usage</th></tr></thead><tbody>
+<tr><td style="text-align: center">Dest. Unreachable (Net or Host)</td><td style="text-align: center"><code>3/0</code> or <code>3/1</code></td><td style="text-align: center">Lack of connectivity</td></tr>
+<tr><td style="text-align: center">Dest. Unreachable (Fragment)</td><td style="text-align: center"><code>3/4</code></td><td style="text-align: center">Path MTU Discovery</td></tr>
+<tr><td style="text-align: center">Time Exceeded (Transit)</td><td style="text-align: center"><code>11/0</code></td><td style="text-align: center">Traceroute (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">TTL</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>)</td></tr>
+<tr><td style="text-align: center">Echo Request or Reply</td><td style="text-align: center"><code>8/0</code> or <code>0/0</code></td><td style="text-align: center">Ping</td></tr>
+</tbody></table>
+</div>
+<ul>
+<li><strong>Traceroute</strong></li>
+</ul>
+<p>Traceroute sends probe packets with incrementing TTL. Each router that decrements TTL to zero replies with an ICMP Time Exceeded error, revealing its address.</p>
+<h4 id="network-address-translation-nat"><a class="header" href="#network-address-translation-nat">Network Address Translation (NAT)</a></h4>
+<p>NAT maps multiple private IP:port pairs to a single public IP with unique external ports via a stateful translation table, enabling many internal devices to share one external address.</p>
+<h4 id="routing-and-forwarding"><a class="header" href="#routing-and-forwarding">Routing and Forwarding</a></h4>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+                            <a rel="prev" href="../CSC3060/Notes.html" class="mobile-nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+                    <a rel="prev" href="../CSC3060/Notes.html" class="nav-chapters previous" title="Previous chapter" aria-label="Previous chapter" aria-keyshortcuts="Left">
+                        <i class="fa fa-angle-left"></i>
+                    </a>
+
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="../elasticlunr.min.js"></script>
+        <script src="../mark.min.js"></script>
+        <script src="../searcher.js"></script>
+
+        <script src="../clipboard.min.js"></script>
+        <script src="../highlight.js"></script>
+        <script src="../book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+
+    </div>
+    </body>
+</html>

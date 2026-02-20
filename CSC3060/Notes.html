@@ -387,7 +387,78 @@
 <p>Use <code>-mfma -ffp-contract=fast</code> to enable FMA.</p>
 <h1 id="chapter-3-machine-level-representation-of-programs"><a class="header" href="#chapter-3-machine-level-representation-of-programs">Chapter 3 Machine-Level Representation of Programs</a></h1>
 <h2 id="machine-level-representation-of-programs"><a class="header" href="#machine-level-representation-of-programs">Machine-Level Representation of Programs</a></h2>
-<h3 id="size-of-data-type-in-ia32"><a class="header" href="#size-of-data-type-in-ia32">Size of Data Type in IA32</a></h3>
+<h3 id="risc"><a class="header" href="#risc">RISC</a></h3>
+<h4 id="principles"><a class="header" href="#principles">Principles</a></h4>
+<ol>
+<li>Simplicity favors regularity</li>
+<li>Smaller is faster</li>
+<li>Make common cases fast</li>
+<li>Good design demands good compromises</li>
+</ol>
+<p>[RSA should be scalable, flexible, and extensible.]</p>
+<h4 id="instruction-types-in-rv32i"><a class="header" href="#instruction-types-in-rv32i">Instruction Types in RV32I</a></h4>
+<p><img src="pic/13.png" width="50%" height="60%"><img src="pic/14.png" width="50%" height="50%"></p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Types</th><th style="text-align: center">Instructions</th></tr></thead><tbody>
+<tr><td style="text-align: center">ALU</td><td style="text-align: center"><code>add</code>, <code>sub</code>, <code>and</code>, <code>or</code>, <code>xor</code>, <code>slt</code>, <code>sltu</code>, <code>sll</code>, <code>srl</code>, <code>sra</code>, and all with immediate (No <code>subi</code> in RV32I)</td></tr>
+<tr><td style="text-align: center">Control Instructions</td><td style="text-align: center"><code>beq</code>, <code>bne</code>, <code>blt</code>, <code>bge</code>, <code>bltu</code>, <code>bgeu</code>, <code>jal</code>, <code>jalr</code></td></tr>
+<tr><td style="text-align: center">Memory Instructions</td><td style="text-align: center"><code>lw</code> (No <code>lwu</code> in RV32I), <code>lh</code>, <code>lb</code>, <code>sw</code>, <code>sh</code>, <code>sb</code>, <code>lbu</code>, <code>lhu</code></td></tr>
+<tr><td style="text-align: center">Privileged Instructions</td><td style="text-align: center">Interrupt, Memory Management, System Calls, Control and Status Registers (CSR), Mode Change</td></tr>
+</tbody></table>
+</div>
+<ul>
+<li>
+<p>Three operand instruction format.</p>
+</li>
+<li>
+<p>X0 is always zero.</p>
+</li>
+<li>
+<p>32 means Address cability/Integer register length.</p>
+</li>
+<li>
+<p>Immediate</p>
+<ul>
+<li><strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">R</span></span></span></span></span> type</strong> No immediate.</li>
+<li><strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.75em;vertical-align:-0.1389em;"></span><span class="mord text"><span class="mord texttt">B,I</span></span></span></span></span> type</strong> 12 bits immediate. Shift instructions are I-type but repurpose the immediate field as a 5-bit shift amount for RV32I (6-bit for RV64I). <code>inst[30]</code> distinguishes arithmetic from logical right shift, while <code>inst[31:26]</code> are fixed to zero except <code>inst[30]</code>.</li>
+<li><strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">S</span></span></span></span></span> type</strong> The 12‑bit immediate is split into high 7 bits (immediate) and low 5 bits (immed). (maintain regularity)</li>
+<li><strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">J</span></span></span></span></span> type</strong> 20 bits immediate.</li>
+</ul>
+</li>
+<li>
+<p>LUI loads a 20‑bit immediate into the upper bits of a register; AUIPC adds a 20‑bit immediate to the current PC for position‑independent addressing. (When the lower 12 bits of a 32‑bit constant are <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">0x800</span></span></span></span></span>, <code>addi</code> sign‑extends them, causing an incorrect result. The assembler automatically adjusts the upper 20 bits when using the <code>li</code> pseudo‑instruction.)</p>
+</li>
+</ul>
+<h4 id="data-alignment"><a class="header" href="#data-alignment">Data Alignment</a></h4>
+<ul>
+<li>No cache line crossing</li>
+<li>No double TLB (Translation Lookaside Buffer) misses</li>
+<li>No double page faults come from a single memory instruction execution</li>
+<li>Better cache line utilization</li>
+</ul>
+<h4 id="stack--frame-alignments"><a class="header" href="#stack--frame-alignments">Stack / Frame Alignments</a></h4>
+<ul>
+<li>Defined by ABI (e.g., RISC‑V psABI: 16‑byte)</li>
+<li>CRT aligns <code>sp</code> before <code>main ()</code></li>
+</ul>
+<h4 id="compiler-reordering"><a class="header" href="#compiler-reordering">Compiler Reordering</a></h4>
+<ul>
+<li>
+<p>Independent Variables (Rearrangement Allowed)</p>
+</li>
+<li>
+<p>Struct Fields (Rearrangement Forbidden)</p>
+<ul>
+<li>Binary compatibility</li>
+<li>Pointer arithmetic</li>
+<li>Interoperability</li>
+</ul>
+</li>
+</ul>
+<h4 id="pc-relative-addressing"><a class="header" href="#pc-relative-addressing">PC-relative Addressing</a></h4>
+<p>Branch instructions use PC‑relative addressing with a 12‑bit signed offset (in 2‑byte units). Since branch targets are always multiples of 2, encoding in 2‑byte units doubles the reachable range without losing information.</p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Target Address</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">PC</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.06em;vertical-align:-0.31em;"></span><span class="mord text"><span class="mord">sign_extend</span></span><span class="mopen">(</span><span class="mord">12</span><span class="mord text"><span class="mord">-bit immediate</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span></span></p>
+<h3 id="cisc"><a class="header" href="#cisc">CISC</a></h3>
+<h4 id="size-of-data-type-in-ia32"><a class="header" href="#size-of-data-type-in-ia32">Size of Data Type in IA32</a></h4>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">C declaration</th><th style="text-align: center">Intel data type</th><th style="text-align: center">Assembly-code suffix</th><th style="text-align: center">Size (bytes)</th></tr></thead><tbody>
 <tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">char</span></span></span></span></span></td><td style="text-align: center">Byte</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">b</span></span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td></tr>
 <tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">short</span></span></span></span></span></td><td style="text-align: center">Word</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord text"><span class="mord texttt">w</span></span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span></td></tr>
@@ -398,9 +469,8 @@
 <tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">double</span></span></span></span></span></td><td style="text-align: center">Double precision</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">l</span></span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span></td></tr>
 </tbody></table>
 </div>
-<h3 id="register"><a class="header" href="#register">Register</a></h3>
+<h4 id="register"><a class="header" href="#register">Register</a></h4>
 <p><img src="pic/5.png" width="50%" height="60%"><img src="pic/6.png" width="40%" height="50%"></p>
-<h3 id="information-access"><a class="header" href="#information-access">Information Access</a></h3>
 <h4 id="operands"><a class="header" href="#operands">Operands</a></h4>
 <ul>
 <li>
@@ -455,20 +525,19 @@
 <ul>
 <li>
 <p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9055em;vertical-align:-0.2222em;"></span><span class="mord text"><span class="mord texttt">pushq</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span></p>
-<pre><code class="language-asm">subq $8 %rsp
+<pre><code class="language-assembly">subq $8 %rsp
 movq %rbq,(%rsp)
 </code></pre>
 </li>
 <li>
 <p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9055em;vertical-align:-0.2222em;"></span><span class="mord text"><span class="mord texttt">popq</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span></p>
-<pre><code class="language-asm">movq (%rsq),%rax
+<pre><code class="language-assembly">movq (%rsq),%rax
 addq $8, %rsp
 </code></pre>
 </li>
 </ul>
 </li>
 </ul>
-<h3 id="arithmetic-and-logical-operations"><a class="header" href="#arithmetic-and-logical-operations">Arithmetic and Logical Operations</a></h3>
 <h4 id="load-effective-address"><a class="header" href="#load-effective-address">Load Effective Address</a></h4>
 <p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9055em;vertical-align:-0.2222em;"></span><span class="mord text"><span class="mord texttt">leaq</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">D</span></span></span></span></p>
 <p>Computes effective address and stores it in destination register</p>
@@ -499,7 +568,6 @@ addq $8, %rsp
 </tbody></table>
 </div>
 <p>Shift instructions can shift by an immediate value, or by a value placed in the single-byte register <code>%cl</code>.</p>
-<h3 id="control"><a class="header" href="#control">Control</a></h3>
 <h4 id="condition-code"><a class="header" href="#condition-code">Condition Code</a></h4>
 <ul>
 <li>
@@ -580,7 +648,6 @@ addq $8, %rsp
 <p><code>do-while</code>, <code>while</code>, and <code>for</code> loops can be implemented by combining conditional tests and jumps.</p>
 <h4 id="switch"><a class="header" href="#switch">Switch</a></h4>
 <p><code>switch</code> is compiled into a jump table. The execution time of the switch statement is irrelevant to the number of cases.</p>
-<h3 id="procedures"><a class="header" href="#procedures">Procedures</a></h3>
 <h4 id="transfer-control"><a class="header" href="#transfer-control">Transfer Control</a></h4>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Instruction</th><th style="text-align: center">Description</th></tr></thead><tbody>
 <tr><td style="text-align: center"><code>call Label</code></td><td style="text-align: center">Procedure Call (Direct)</td></tr>
@@ -591,7 +658,6 @@ addq $8, %rsp
 <h4 id="data-transfer"><a class="header" href="#data-transfer">Data Transfer</a></h4>
 <p>The registers' names depend on the size of the data type being passed.</p>
 <p>If a function has more than 6 integer parameters, the additional arguments must be passed on the <strong>stack</strong>. Note that the argument 7 is located at the top of the stack. All stack-passed arguments are aligned to multiples of 8 bytes.</p>
-<h3 id="array-allocation-and-access"><a class="header" href="#array-allocation-and-access">Array Allocation and Access</a></h3>
 <h4 id="pointer"><a class="header" href="#pointer">Pointer</a></h4>
 <div class="table-wrapper"><table><thead><tr><th>Expression</th><th>Type</th><th>Value</th><th>Assembly Code</th></tr></thead><tbody>
 <tr><td><code>E</code></td><td><code>int*</code></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5806em;vertical-align:-0.15em;"></span><span class="mord"><span class="mord mathnormal">x</span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.3283em;"><span style="top:-2.55em;margin-left:0em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mathnormal mtight" style="margin-right:0.05764em;">E</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.15em;"><span></span></span></span></span></span></span></span></span></span></td><td><code>movq %rdx, %rax</code></td></tr>
@@ -842,22 +908,6 @@ the number of instructions in one second.</p>
 
         </div>
 
-        <!-- Livereload script (if served using the cli tool) -->
-        <script>
-            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
-            const socket = new WebSocket(wsAddress);
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
 
 
 

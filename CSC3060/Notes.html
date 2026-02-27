@@ -368,6 +368,7 @@
 </div>
 <h4 id="floating-point-operations"><a class="header" href="#floating-point-operations">Floating Point Operations</a></h4>
 <p>Lack of Associativity &amp; Lack of Distributivity</p>
+<details><summary>Example Questions</summary>
 <p>Let <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal">x</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal">d</span></span></span></span> are of type <code>int</code>, <code>float</code>, <code>double</code> (Their values are arbitrary, except that neither <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.10764em;">f</span></span></span></span> nor <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6944em;"></span><span class="mord mathnormal">d</span></span></span></span> equals <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">∞</span></span></span></span>, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord">−</span><span class="mord">∞</span></span></span></span>, or <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">NaN</span></span></span></span></span>.). Then:</p>
 <ul>
 <li><code>x == (int)(double) x</code> True</li>
@@ -376,6 +377,21 @@
 <li><code>f == (float)(double) f</code> True</li>
 <li><code>d*d &gt;= 0.0</code> True</li>
 </ul>
+</details>
+<h4 id="precision-ieee-754-2008-standard-formats"><a class="header" href="#precision-ieee-754-2008-standard-formats">Precision (IEEE 754-2008 Standard Formats)</a></h4>
+<div class="table-wrapper"><table><thead><tr><th>Format</th><th>Sign Bits</th><th>Exponent Bits</th><th>Mantissa Bits</th></tr></thead><tbody>
+<tr><td>Quad precision</td><td>1</td><td>15</td><td>112</td></tr>
+<tr><td>Double precision</td><td>1</td><td>11</td><td>52</td></tr>
+<tr><td>Single precision (FP32)</td><td>1</td><td>8</td><td>23</td></tr>
+<tr><td>Half precision (FP16)</td><td>1</td><td>5</td><td>10</td></tr>
+</tbody></table>
+</div><details><summary>bfloat16</summary>
+<ul>
+<li>Format: 1 sign, 8 exponent, 7 mantissa bits</li>
+<li>Same exponent range as FP32 (faster computation, lower power, reduces memory footprint, enables larger models)</li>
+<li>Reduced precision acceptable for AI (AI/LLM is based on predictions – approximation does not require high precision)</li>
+</ul>
+</details>
 <h4 id="fmafmac"><a class="header" href="#fmafmac">FMA/FMAC</a></h4>
 <p>Fused Multiply and Add (FMA) or Fused Multiply and Accumulate (FMAC) combines multiply and add in one instruction (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">A</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span>).</p>
 <ol>
@@ -403,6 +419,16 @@
 <tr><td style="text-align: center">Control Instructions</td><td style="text-align: center"><code>beq</code>, <code>bne</code>, <code>blt</code>, <code>bge</code>, <code>bltu</code>, <code>bgeu</code>, <code>jal</code>, <code>jalr</code></td></tr>
 <tr><td style="text-align: center">Memory Instructions</td><td style="text-align: center"><code>lw</code> (No <code>lwu</code> in RV32I), <code>lh</code>, <code>lb</code>, <code>sw</code>, <code>sh</code>, <code>sb</code>, <code>lbu</code>, <code>lhu</code></td></tr>
 <tr><td style="text-align: center">Privileged Instructions</td><td style="text-align: center">Interrupt, Memory Management, System Calls, Control and Status Registers (CSR), Mode Change</td></tr>
+</tbody></table>
+</div><div class="table-wrapper"><table><thead><tr><th>Format</th><th>Name</th><th>Instructions</th></tr></thead><tbody>
+<tr><td><strong>R-type</strong></td><td>Register</td><td><code>add</code>, <code>sub</code>, <code>sll</code>, <code>srl</code>, <code>sra</code>, <code>xor</code>, <code>or</code>, <code>and</code></td></tr>
+<tr><td><strong>I-type</strong></td><td>Immediate</td><td><code>addi</code>, <code>slli</code>, <code>srli</code>, <code>srai</code>, <code>xori</code>, <code>ori</code>, <code>andi</code></td></tr>
+<tr><td><strong>I-type</strong></td><td>Load</td><td><code>lb</code>, <code>lh</code>, <code>lw</code>, <code>lbu</code>, <code>lhu</code></td></tr>
+<tr><td><strong>I-type</strong></td><td>Jump and Link Register</td><td><code>jalr</code></td></tr>
+<tr><td><strong>S-type</strong></td><td>Store</td><td><code>sb</code>, <code>sh</code>, <code>sw</code></td></tr>
+<tr><td><strong>B-type</strong></td><td>Branch</td><td><code>beq</code>, <code>bne</code>, <code>blt</code>, <code>bge</code>, <code>bltu</code>, <code>bgeu</code></td></tr>
+<tr><td><strong>U-type</strong></td><td>Upper Immediate</td><td><code>lui</code>, <code>auipc</code></td></tr>
+<tr><td><strong>UJ-type</strong></td><td>Unconditional Jump</td><td><code>jal</code></td></tr>
 </tbody></table>
 </div>
 <ul>
@@ -447,6 +473,13 @@
 </ul>
 </li>
 </ul>
+<details><summary>Why do RISC-V loads/stores use <code>base+immediate</code> instead of <code>base+index</code>?</summary>
+<ul>
+<li><strong>Simpler hardware</strong> Only one address adder needed, reducing complexity.</li>
+<li><strong>Faster address generation</strong> Immediate available at decode, no wait for index register.</li>
+<li><strong>Fewer pipeline stalls</strong> Early hazard detection reduces bubbles.</li>
+</ul>
+</details>
 <h4 id="data-alignment"><a class="header" href="#data-alignment">Data Alignment</a></h4>
 <ul>
 <li>No cache line crossing</li>
@@ -477,7 +510,7 @@
 <p>Branch instructions use PC‑relative addressing with a 12‑bit signed offset (in 2‑byte units). Since branch targets are always multiples of 2, encoding in 2‑byte units doubles the reachable range without losing information.</p>
 <p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Target Address</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">PC</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.06em;vertical-align:-0.31em;"></span><span class="mord text"><span class="mord">sign_extend</span></span><span class="mopen">(</span><span class="mord">12</span><span class="mord text"><span class="mord">-bit immediate</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span></span></p>
 <h4 id="calling-convention"><a class="header" href="#calling-convention">Calling Convention</a></h4>
-<div class="table-wrapper"><table><thead><tr><th>RV Registers</th><th>ABI Name</th><th>Preserved across calls?</th><th>Purpose</th></tr></thead><tbody>
+<div class="table-wrapper"><table><thead><tr><th>RV Registers</th><th>ABI Name</th><th>Caller/Callee</th><th>Purpose</th></tr></thead><tbody>
 <tr><td>x0</td><td><code>zero</code></td><td>—</td><td>Always zero</td></tr>
 <tr><td>x1</td><td><code>ra</code></td><td>Caller</td><td>Return address</td></tr>
 <tr><td>x2</td><td><code>sp</code></td><td>Callee</td><td>Stack pointer</td></tr>

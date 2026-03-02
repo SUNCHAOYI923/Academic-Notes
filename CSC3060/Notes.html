@@ -385,7 +385,7 @@
 <tr><td>Single precision (FP32)</td><td>1</td><td>8</td><td>23</td></tr>
 <tr><td>Half precision (FP16)</td><td>1</td><td>5</td><td>10</td></tr>
 </tbody></table>
-</div><details><summary>bfloat16</summary>
+</div><details><summary><strong>bfloat16</strong></summary>
 <ul>
 <li>Format: 1 sign, 8 exponent, 7 mantissa bits</li>
 <li>Same exponent range as FP32 (faster computation, lower power, reduces memory footprint, enables larger models)</li>
@@ -403,7 +403,7 @@
 <p>Use <code>-mfma -ffp-contract=fast</code> to enable FMA.</p>
 <h1 id="chapter-3-machine-level-representation-of-programs"><a class="header" href="#chapter-3-machine-level-representation-of-programs">Chapter 3 Machine-Level Representation of Programs</a></h1>
 <h2 id="machine-level-representation-of-programs"><a class="header" href="#machine-level-representation-of-programs">Machine-Level Representation of Programs</a></h2>
-<h3 id="risc"><a class="header" href="#risc">RISC</a></h3>
+<h3 id="risc-optimized-for-processor-speed"><a class="header" href="#risc-optimized-for-processor-speed">RISC [optimized for processor speed]</a></h3>
 <h4 id="principles"><a class="header" href="#principles">Principles</a></h4>
 <ol>
 <li>Simplicity favors regularity</li>
@@ -413,14 +413,15 @@
 </ol>
 <p>[RSA should be scalable, flexible, and extensible.]</p>
 <h4 id="instruction-types-in-rv32i"><a class="header" href="#instruction-types-in-rv32i">Instruction Types in RV32I</a></h4>
-<p><img src="pic/13.png" width="50%" height="60%"><img src="pic/14.png" width="50%" height="50%"></p>
+<img src="pic/14.png" width="50%" height="50%">
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Types</th><th style="text-align: center">Instructions</th></tr></thead><tbody>
 <tr><td style="text-align: center">ALU</td><td style="text-align: center"><code>add</code>, <code>sub</code>, <code>and</code>, <code>or</code>, <code>xor</code>, <code>slt</code>, <code>sltu</code>, <code>sll</code>, <code>srl</code>, <code>sra</code>, and all with immediate (No <code>subi</code> in RV32I)</td></tr>
 <tr><td style="text-align: center">Control Instructions</td><td style="text-align: center"><code>beq</code>, <code>bne</code>, <code>blt</code>, <code>bge</code>, <code>bltu</code>, <code>bgeu</code>, <code>jal</code>, <code>jalr</code></td></tr>
 <tr><td style="text-align: center">Memory Instructions</td><td style="text-align: center"><code>lw</code> (No <code>lwu</code> in RV32I), <code>lh</code>, <code>lb</code>, <code>sw</code>, <code>sh</code>, <code>sb</code>, <code>lbu</code>, <code>lhu</code></td></tr>
 <tr><td style="text-align: center">Privileged Instructions</td><td style="text-align: center">Interrupt, Memory Management, System Calls, Control and Status Registers (CSR), Mode Change</td></tr>
 </tbody></table>
-</div><div class="table-wrapper"><table><thead><tr><th>Format</th><th>Name</th><th>Instructions</th></tr></thead><tbody>
+</div><img src="pic/13.png" width="50%" height="60%">
+<div class="table-wrapper"><table><thead><tr><th>Format</th><th>Name</th><th>Instructions</th></tr></thead><tbody>
 <tr><td><strong>R-type</strong></td><td>Register</td><td><code>add</code>, <code>sub</code>, <code>sll</code>, <code>srl</code>, <code>sra</code>, <code>xor</code>, <code>or</code>, <code>and</code></td></tr>
 <tr><td><strong>I-type</strong></td><td>Immediate</td><td><code>addi</code>, <code>slli</code>, <code>srli</code>, <code>srai</code>, <code>xori</code>, <code>ori</code>, <code>andi</code></td></tr>
 <tr><td><strong>I-type</strong></td><td>Load</td><td><code>lb</code>, <code>lh</code>, <code>lw</code>, <code>lbu</code>, <code>lhu</code></td></tr>
@@ -430,7 +431,21 @@
 <tr><td><strong>U-type</strong></td><td>Upper Immediate</td><td><code>lui</code>, <code>auipc</code></td></tr>
 <tr><td><strong>UJ-type</strong></td><td>Unconditional Jump</td><td><code>jal</code></td></tr>
 </tbody></table>
+</div><details> <summary><strong>Instruction Encoding List</strong></summary>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+  <div style="align-self: stretch;">
+    <img src="pic/15.png" style="width: 100%; height: 100%; object-fit: contain;">
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <div style="flex: 1; display: flex; align-items: flex-start;">
+      <img src="pic/16.png" style="width: 100%; max-height: 100%; object-fit: contain;">
+    </div>
+    <div style="flex: 1; display: flex; align-items: flex-end;">
+      <img src="pic/17.png" style="width: 100%; max-height: 100%; object-fit: contain;">
+    </div>
+  </div>
 </div>
+</details>
 <ul>
 <li>
 <p>Three operand instruction format.</p>
@@ -473,11 +488,47 @@
 </ul>
 </li>
 </ul>
+<details><summary><strong>Pseudo Instrcution</strong></summary>
+<div class="table-wrapper"><table><thead><tr><th>Pseudoinstruction</th><th>Actual Instruction Sequence</th><th>Operation</th></tr></thead><tbody>
+<tr><td><code>nop</code></td><td><code>addi x0, x0, 0</code></td><td>No operation</td></tr>
+<tr><td><code>li rd, imm</code></td><td><code>lui rd, imm[31:12] + imm[11]</code><br><code>addi rd, rd, imm[11:0]</code></td><td>Load 32-bit immediate</td></tr>
+<tr><td><code>mv rd, rs</code></td><td><code>addi rd, rs, 0</code></td><td>Copy register</td></tr>
+<tr><td><code>not rd, rs</code></td><td><code>xori rd, rs, -1</code></td><td>Bitwise NOT</td></tr>
+<tr><td><code>neg rd, rs</code></td><td><code>sub rd, x0, rs</code></td><td>Two's complement negation</td></tr>
+<tr><td><code>seqz rd, rs</code></td><td><code>sltiu rd, rs, 1</code></td><td>Set if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td></tr>
+<tr><td><code>snez rd, rs</code></td><td><code>sltu rd, x0, rs</code></td><td>Set if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel"><span class="mrel"><span class="mord vbox"><span class="thinbox"><span class="rlap"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="inner"><span class="mord"><span class="mrel"></span></span></span><span class="fix"></span></span></span></span></span><span class="mrel">=</span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td></tr>
+<tr><td><code>sltz rd, rs</code></td><td><code>slt rd, rs, x0</code></td><td>Set if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td></tr>
+<tr><td><code>sgtz rd, rs</code></td><td><code>slt rd, x0, rs</code></td><td>Set if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td></tr>
+<tr><td><code>beqz rs, offset</code></td><td><code>beq rs, x0, offset</code></td><td>Branch if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.3669em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td></tr>
+<tr><td><code>bnez rs, offset</code></td><td><code>bne rs, x0, offset</code></td><td>Branch if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel"><span class="mrel"><span class="mord vbox"><span class="thinbox"><span class="rlap"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="inner"><span class="mord"><span class="mrel"></span></span></span><span class="fix"></span></span></span></span></span><span class="mrel">=</span></span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td></tr>
+<tr><td><code>blez rs, offset</code></td><td><code>bge x0, rs, offset</code></td><td>Branch if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td></tr>
+<tr><td><code>bgez rs, offset</code></td><td><code>bge rs, x0, offset</code></td><td>Branch if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td></tr>
+<tr><td><code>bltz rs, offset</code></td><td><code>blt rs, x0, offset</code></td><td>Branch if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td></tr>
+<tr><td><code>bgtz rs, offset</code></td><td><code>blt x0, rs, offset</code></td><td>Branch if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td></tr>
+<tr><td><code>bgt rs, rt, offset</code></td><td><code>blt rt, rs, offset</code></td><td>Branch if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">rs</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">t</span></span></span></span></td></tr>
+<tr><td><code>ble rs, rt, offset</code></td><td><code>bge rt, rs, offset</code></td><td>Branch if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mord mathnormal">rs</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">t</span></span></span></span></td></tr>
+<tr><td><code>bgtu rs, rt, offset</code></td><td><code>bltu rt, rs, offset</code></td><td>Branch if unsigned <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mord mathnormal">rs</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">t</span></span></span></span></td></tr>
+<tr><td><code>bleu rs, rt, offset</code></td><td><code>bgeu rt, rs, offset</code></td><td>Branch if unsigned <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mord mathnormal">rs</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6151em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">r</span><span class="mord mathnormal">t</span></span></span></span></td></tr>
+<tr><td><code>j offset</code></td><td><code>jal x0, offset</code></td><td>Unconditional jump</td></tr>
+<tr><td><code>jal offset</code></td><td><code>jal x1, offset</code></td><td>Jump and link (return address in <code>x1</code>)</td></tr>
+<tr><td><code>jr rs</code></td><td><code>jalr x0, 0(rs)</code></td><td>Jump to address in <code>rs</code></td></tr>
+<tr><td><code>jalr rs</code></td><td><code>jalr x1, 0(rs)</code></td><td>Jump and link to address in <code>rs</code></td></tr>
+<tr><td><code>ret</code></td><td><code>jalr x0, 0(x1)</code></td><td>Return from subroutine</td></tr>
+<tr><td><code>call offset</code></td><td><code>auipc x1, offset[31:12] + offset[11]</code><br><code>jalr x1, offset[11:0](x1)</code></td><td>Far call to subroutine</td></tr>
+</tbody></table>
+</div></details>
 <details><summary>Why do RISC-V loads/stores use <code>base+immediate</code> instead of <code>base+index</code>?</summary>
 <ul>
 <li><strong>Simpler hardware</strong> Only one address adder needed, reducing complexity.</li>
 <li><strong>Faster address generation</strong> Immediate available at decode, no wait for index register.</li>
 <li><strong>Fewer pipeline stalls</strong> Early hazard detection reduces bubbles.</li>
+</ul>
+</details>
+<details><summary>Why do RISC-V instructions place immediate bits in seemingly "random" positions (e.g., B-Type and J-Type)?</summary>
+<ul>
+<li>Fixed sign bit at position 31 across all formats.</li>
+<li>Decoder reuse (B-Type reuses S-Type logic, J-Type reuses U-Type logic).</li>
+<li>Fixed register fields (<code>rs1</code>, <code>rs2</code>, <code>rd</code>) across formats.</li>
 </ul>
 </details>
 <h4 id="data-alignment"><a class="header" href="#data-alignment">Data Alignment</a></h4>
@@ -487,6 +538,27 @@
 <li>No double page faults come from a single memory instruction execution</li>
 <li>Better cache line utilization</li>
 </ul>
+<details><summary>Exercise</summary>
+<pre><code class="language-c">struct S1 {
+    int white;
+    long long count;
+    char c;
+    int red;
+    int blue;
+} A[];
+</code></pre>
+<p>Suppose <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span> is an array of structure <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mord">1</span></span></span></span>, and the starting address of <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal">A</span></span></span></span> is stored in register <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="mord">1</span></span></span></span>. what instruction should be used to access <code>A[100].red</code>?</p>
+<div class="table-wrapper"><table><thead><tr><th>Member</th><th>Size</th><th>Start</th><th>Padding</th><th>End</th><th>Reason</th></tr></thead><tbody>
+<tr><td><code>white</code></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span></td><td><code>int</code> aligns at <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></td></tr>
+<tr><td><code>count</code></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">4</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">15</span></span></span></span></td><td>needs 8-byte align, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span> pad <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span> to <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span></td></tr>
+<tr><td><code>c</code></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">16</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">16</span></span></span></span></td><td><code>char</code> aligns at <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td></tr>
+<tr><td><code>red</code></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">20</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">+</span><span class="mord">3</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">23</span></span></span></span></td><td>needs 4-byte align, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">17</span></span></span></span> pad <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3</span></span></span></span> to <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">20</span></span></span></span></td></tr>
+<tr><td><code>blue</code></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">24</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span></td><td><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">27</span></span></span></span></td><td><code>int</code> aligns at <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span></td></tr>
+</tbody></table>
+</div>
+<p>Current size is <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">28</span></span></span></span>. Largest alignment in struct is <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span>, <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">28</span></span></span></span> is not a multiple of <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span>, so pad <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">4</span></span></span></span> bytes at the end. Total struct size is <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">32</span></span></span></span> bytes.</p>
+<p><code>A[100].red</code> : <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">100</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">32</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">20</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.07847em;">X</span><span class="mord">1</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">3220</span></span></span></span>, so the answer is <code>LW X2, 3220(X1)</code>.</p>
+</details>
 <h4 id="stack--frame-alignments"><a class="header" href="#stack--frame-alignments">Stack / Frame Alignments</a></h4>
 <ul>
 <li>Defined by ABI (e.g., RISC‑V psABI: 16‑byte)</li>
@@ -509,6 +581,23 @@
 <h4 id="pc-relative-addressing"><a class="header" href="#pc-relative-addressing">PC-relative Addressing</a></h4>
 <p>Branch instructions use PC‑relative addressing with a 12‑bit signed offset (in 2‑byte units). Since branch targets are always multiples of 2, encoding in 2‑byte units doubles the reachable range without losing information.</p>
 <p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Target Address</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">PC</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1.06em;vertical-align:-0.31em;"></span><span class="mord text"><span class="mord">sign_extend</span></span><span class="mopen">(</span><span class="mord">12</span><span class="mord text"><span class="mord">-bit immediate</span></span><span class="mclose">)</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span></span></p>
+<h4 id="csr"><a class="header" href="#csr">CSR</a></h4>
+<div class="table-wrapper"><table><thead><tr><th>Name</th><th>Abbreviation</th><th>Description</th></tr></thead><tbody>
+<tr><td>Machine Trap-Vector Base-Address Register</td><td><code>mtvec</code></td><td>Exception handler entry address</td></tr>
+<tr><td>Machine Status Register</td><td><code>mstatus</code></td><td>Global interrupt enable (MIE) and status</td></tr>
+<tr><td>Machine Cause Register</td><td><code>mcause</code></td><td>Reason of last exception/interrupt</td></tr>
+<tr><td>Machine Exception Program Counter</td><td><code>mepc</code></td><td>Saves PC when exception occurs</td></tr>
+<tr><td>Machine Interrupt Enable Register</td><td><code>mie</code></td><td>Enables specific interrupt sources</td></tr>
+<tr><td>Machine Interrupt Pending Register</td><td><code>mip</code></td><td>Shows pending interrupts</td></tr>
+</tbody></table>
+</div>
+<h4 id="exception-handling"><a class="header" href="#exception-handling">Exception Handling</a></h4>
+<ol>
+<li><strong>Save context</strong> Save current PC value to <code>mepc</code> register</li>
+<li><strong>Update status</strong> Update <code>mstatus</code>, disable further interrupts (clear MIE bit) to prevent nesting</li>
+<li><strong>Set cause</strong> Write exception/interrupt reason to <code>mcause</code></li>
+<li><strong>Jump to handler</strong> Jump to exception handler entry point based on <code>mtvec</code> configuration</li>
+</ol>
 <h4 id="calling-convention"><a class="header" href="#calling-convention">Calling Convention</a></h4>
 <div class="table-wrapper"><table><thead><tr><th>RV Registers</th><th>ABI Name</th><th>Caller/Callee</th><th>Purpose</th></tr></thead><tbody>
 <tr><td>x0</td><td><code>zero</code></td><td>—</td><td>Always zero</td></tr>
@@ -526,7 +615,7 @@
 </tbody></table>
 </div>
 <p>Leaf routines use args &amp; caller‑saved only (no save/restore).</p>
-<h3 id="cisc"><a class="header" href="#cisc">CISC</a></h3>
+<h3 id="cisc-optimized-for-compact-code-size"><a class="header" href="#cisc-optimized-for-compact-code-size">CISC [optimized for compact code size]</a></h3>
 <h4 id="size-of-data-type-in-ia32"><a class="header" href="#size-of-data-type-in-ia32">Size of Data Type in IA32</a></h4>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">C declaration</th><th style="text-align: center">Intel data type</th><th style="text-align: center">Assembly-code suffix</th><th style="text-align: center">Size (bytes)</th></tr></thead><tbody>
 <tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">char</span></span></span></span></span></td><td style="text-align: center">Byte</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">b</span></span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span></td></tr>
@@ -919,7 +1008,7 @@ the number of instructions in one second.</p>
 <p>When a branch is mispredicted as taken, the pipeline must squash the incorrectly fetched instructions from the target path and redirect fetching to the correct fall-through address.</p>
 <h4 id="processing-ret"><a class="header" href="#processing-ret">Processing <code>ret</code></a></h4>
 <p>The pipeline must stall until the <code>ret</code> instruction reaches the write-back stage.</p>
-<h4 id="exception-handling"><a class="header" href="#exception-handling">Exception Handling</a></h4>
+<h4 id="exception-handling-1"><a class="header" href="#exception-handling-1">Exception Handling</a></h4>
 <p>When an instruction triggers an exception, all subsequent instructions must be prevented from updating programmer-visible state, and execution must halt once the exception-causing instruction reaches the write-back stage.</p>
 <div class="table-wrapper"><table><thead><tr><th>Condition</th><th>F</th><th>D</th><th>E</th><th>M</th><th>W</th></tr></thead><tbody>
 <tr><td>Handling <code>ret</code></td><td>Stall</td><td>Bubble</td><td>Normal</td><td>Normal</td><td>Normal</td></tr>

@@ -665,6 +665,132 @@ Step 4 Repeat for remaining flows</p>
 <h4 id="network-address-translation-nat"><a class="header" href="#network-address-translation-nat">Network Address Translation (NAT)</a></h4>
 <p>NAT maps multiple private IP:port pairs to a single public IP with unique external ports via a stateful translation table, enabling many internal devices to share one external address.</p>
 <h4 id="routing-and-forwarding"><a class="header" href="#routing-and-forwarding">Routing and Forwarding</a></h4>
+<ul>
+<li>
+<p><strong>Fully Distributed Routing</strong></p>
+<ul>
+<li><strong>No central controller</strong> All routers are equal and make independent decisions.</li>
+<li><strong>Local knowledge only</strong> Routers learn about the network by exchanging messages with directly connected neighbors.</li>
+<li><strong>Concurrent operation</strong></li>
+<li><strong>Failure tolerance</strong> There may be node/link/message failures.</li>
+</ul>
+</li>
+<li>
+<p><strong>Hierarchical Routing</strong></p>
+<p>Introduce a larger routing unit. Route first to the region, then to the IP prefix within the region.</p>
+<ul>
+<li>
+<p><strong>Routing Table</strong></p>
+<ul>
+<li><strong>Static Routing</strong></li>
+<li><strong>Dynamic Routing</strong> RIP (Routing Information Protocol), OSPF (Open Shortest Path First), BGP (Border Gateway Protocol).</li>
+</ul>
+</li>
+<li>
+<p><strong>IP Prefix Aggregation and Subnets</strong></p>
+<p>Routers can change prefix lengths without affecting hosts.</p>
+<ul>
+<li><strong>Subnetting</strong> Split large prefix into smaller ones internally.</li>
+<li><strong>Aggregation</strong> Join small prefixes into one large prefix externally.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="routing"><a class="header" href="#routing">Routing</a></h4>
+<ul>
+<li>
+<p><strong>Sink Tree</strong></p>
+<p>Sink tree for a destination is the union of all shortest paths towards the destination. Each node only stores next hop (parent) towards root.</p>
+</li>
+<li>
+<p><strong>Distance Vector Routing</strong></p>
+<p>Each node shares distance vectors with neighbors, updates paths using shortest heard distance, and forwards via best next hop.</p>
+<p>Slow convergence, count-to-infinity, and routing loops occur because nodes only know neighbor info, not full topology, causing outdated routes to propagate and persist.</p>
+<ul>
+<li><strong>RIP (Routing Information Protocol)</strong></li>
+</ul>
+</li>
+<li>
+<p><strong>Link-State Routing</strong></p>
+<ul>
+<li><strong>Flooding</strong>
+<ul>
+<li>Send an incoming message on to all other neigbors.</li>
+<li>Remember the message so that it is only flooded once.</li>
+</ul>
+</li>
+<li><strong>Dijkstra</strong></li>
+</ul>
+</li>
+</ul>
+<h3 id="application-layer"><a class="header" href="#application-layer">Application Layer</a></h3>
+<h4 id="peer-to-peer"><a class="header" href="#peer-to-peer">Peer to Peer</a></h4>
+<p>Leverage peer resources: computation, storage, bandwidth. Also emerging: mobility, coins (tokens), sensors. Decentralized, scalable architecture.</p>
+<p>Storage networks replicate files anywhere, making search difficult, especially with node churn.</p>
+<ul>
+<li>
+<p><strong>Framework</strong></p>
+<ul>
+<li><strong>Join</strong> How to start participating</li>
+<li><strong>Publish</strong> How to advertise files</li>
+<li><strong>Search</strong> How to find files</li>
+<li><strong>Fetch</strong> How to retrieve files</li>
+</ul>
+</li>
+<li>
+<p><strong>Napster</strong></p>
+<p>Server does all porcessing &amp; Server maintains <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mclose">)</span></span></span></span> state &amp; Single point of failure</p>
+<ul>
+<li><strong>Join</strong> Client contacts central server on startup</li>
+<li><strong>Publish</strong> Reports list of files to central server</li>
+<li><strong>Search</strong> Query server → returns peer storing requested file</li>
+<li><strong>Fetch</strong> Get file directly from peer</li>
+</ul>
+</li>
+<li>
+<p><strong>Gnutella</strong></p>
+<p>Complete decentralization &amp; Query flooding</p>
+<p>Search scope is <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mclose">)</span></span></span></span> &amp; Unpredictable search time &amp; No guarantee of finding files (TTL-limited search only works well for haystacks)</p>
+<ul>
+<li><strong>Join</strong> Client contacts a few existing nodes on startup → these become its "neighbors"</li>
+<li><strong>Publish</strong> No need (no central index)</li>
+<li><strong>Search</strong> Ask neighbors → neighbors ask their neighbors → when/if found, reply back along the path; TTL limits propagation</li>
+<li><strong>Fetch</strong> Get file directly from peer</li>
+</ul>
+</li>
+<li>
+<p><strong>Gnutella/KaZaA [Two-level hierarchy]</strong></p>
+<p>Kept a centralized registration</p>
+<p>Supernodes have better connection to Internet and act as temporary indexing servers for other nodes to help improve the stability fo the network.</p>
+<p>Standard nodes connect to supernodes and report list od files.</p>
+</li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th>Dimension</th><th>Napster</th><th>Gnutella</th><th>Gnutella/KaZaA (Two-Layer)</th></tr></thead><tbody>
+<tr><td><strong>Index</strong></td><td>Central server</td><td>No index</td><td>Supernodes maintain index (temporary central)</td></tr>
+<tr><td><strong>Search</strong></td><td>Query central server</td><td>Flooding (ask neighbors)</td><td>Flooding between supernodes</td></tr>
+<tr><td><strong>Transfer</strong></td><td>Direct peer-to-peer</td><td>Direct peer-to-peer</td><td>Direct peer-to-peer</td></tr>
+<tr><td><strong>Join</strong></td><td>Contact central server</td><td>Find a few neighbors</td><td>Find and connect to a supernode</td></tr>
+</tbody></table>
+</div>
+<ul>
+<li>
+<p><strong>BitTorrent</strong></p>
+<p>Central tracker server needed to bootstrap swarm.</p>
+<ul>
+<li><strong>File swarming</strong> Files split into chunks; download from multiple peers, upload to others simultaneously.</li>
+<li><strong>Tracker</strong> Central server coordinates peers (joins, maintains lists), but doesn't store files.</li>
+<li><strong>Tit-for-tat</strong> Upload to the fastest <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span> peers you download from. Encourages fairness, discourages freeloading.</li>
+<li><strong>Optimistic unchoke</strong> Randomly let new peers download to prevents starvation, discovers better partners.</li>
+<li><strong>Rarest first</strong> Prioritize distributing scarce chunks to improve file availability and resilience.</li>
+<li><strong>Out-of-band search</strong> Find files via Google/torrent sites. Scalable, no single point of failure.</li>
+</ul>
+</li>
+<li>
+<p><strong>DHT (Distributed Hash Table)</strong></p>
+<p>Decentralized system using consistent hashing: keys and nodes hashed onto a ring (Chord). Each key stored on its successor node. Finger tables enable <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mclose">)</span></span></span></span> lookup (Entry <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> which starts from <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span> points to the first node on the ring that is <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal">x</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8247em;"></span><span class="mord"><span class="mord">2</span><span class="msupsub"><span class="vlist-t"><span class="vlist-r"><span class="vlist" style="height:0.8247em;"><span style="top:-3.063em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight">i</span><span class="mbin mtight">−</span><span class="mord mtight">1</span></span></span></span></span></span></span></span></span></span></span></span>), improving from naive <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.02778em;">O</span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mclose">)</span></span></span></span>.</p>
+</li>
+</ul>
 
                     </main>
 

@@ -250,10 +250,6 @@
 <li>
 <p><strong>Addressing and Byte Ordering</strong> Big endian &amp; Little endian</p>
 </li>
-<li>
-<p><strong>ABI</strong>  Application Binary Interface</p>
-<p>It is based on three key components : the computer ISA, the OS, and the calling convention. ABI incompatibility will occur due to differences between operating systems.</p>
-</li>
 </ul>
 <h2 id="integer-representaions"><a class="header" href="#integer-representaions">Integer Representaions</a></h2>
 <h3 id="sizes-of-data-type-in-cc"><a class="header" href="#sizes-of-data-type-in-cc">Sizes of Data Type in C/C++</a></h3>
@@ -519,7 +515,7 @@
 </div></details>
 <details><summary>Why do RISC-V loads/stores use <code>base+immediate</code> instead of <code>base+index</code>?</summary>
 <ul>
-<li><strong>Simpler hardware</strong> Only one address adder needed, reducing complexity.</li>
+<li><strong>Simpler hardware</strong> Only one address needed, reducing complexity.</li>
 <li><strong>Faster address generation</strong> Immediate available at decode, no wait for index register.</li>
 <li><strong>Fewer pipeline stalls</strong> Early hazard detection reduces bubbles.</li>
 </ul>
@@ -531,6 +527,8 @@
 <li>Fixed register fields (<code>rs1</code>, <code>rs2</code>, <code>rd</code>) across formats.</li>
 </ul>
 </details>
+<h4 id="application-binary-interface-abi"><a class="header" href="#application-binary-interface-abi">Application Binary Interface (ABI)</a></h4>
+<p>It is based on three key components : <strong>the computer ISA, the OS, and the calling convention</strong>. ABI incompatibility will occur due to differences between operating systems.</p>
 <h4 id="data-alignment"><a class="header" href="#data-alignment">Data Alignment</a></h4>
 <ul>
 <li>No cache line crossing</li>
@@ -603,8 +601,8 @@
 <tr><td>x0</td><td><code>zero</code></td><td>—</td><td>Always zero</td></tr>
 <tr><td>x1</td><td><code>ra</code></td><td>Caller</td><td>Return address</td></tr>
 <tr><td>x2</td><td><code>sp</code></td><td>Callee</td><td>Stack pointer</td></tr>
-<tr><td>x3</td><td><code>gp</code></td><td>—</td><td>Global pointer (not used in typical code)</td></tr>
-<tr><td>x4</td><td><code>tp</code></td><td>—</td><td>Thread pointer (TLS)</td></tr>
+<tr><td>x3</td><td><code>gp</code></td><td>—</td><td>Global pointer</td></tr>
+<tr><td>x4</td><td><code>tp</code></td><td>—</td><td>Thread pointer</td></tr>
 <tr><td>x5–x7</td><td><code>t0</code>–<code>t2</code></td><td>Caller</td><td>Temporary registers</td></tr>
 <tr><td>x8</td><td><code>s0</code> / <code>fp</code></td><td>Callee</td><td>Saved register / Frame pointer</td></tr>
 <tr><td>x9</td><td><code>s1</code></td><td>Callee</td><td>Saved register</td></tr>
@@ -614,7 +612,16 @@
 <tr><td>x28–x31</td><td><code>t3</code>–<code>t6</code></td><td>Caller</td><td>Temporary registers</td></tr>
 </tbody></table>
 </div>
-<p>Leaf routines use args &amp; caller‑saved only (no save/restore).</p>
+<p>Leaf routines use args &amp; caller‑saved only (no save/restore any registers).</p>
+<details> <summary>Why <strong>caller</strong> registers are allocated to temporaries?</summary>
+Temporaries are short-lived and do not need to survive across function calls.  Placing them in caller‑save registers avoids unnecessary save/restore code.
+</details>
+<details> <summary>Why <strong>callee</strong> registers are allocated to local variables?</summary>
+Local variables live across function calls. Using callee registers ensures they are preserved automatically by the callee, avoiding repeated saves at each call site.
+</details>
+<details> <summary>Why <strong>callee</strong> registers are allocated to CSEs (Common Sub-Expressions)?</summary>
+Local variables and CSEs are tend to live longer (may be as long as the procedure invocation).
+</details>
 <h3 id="cisc-optimized-for-compact-code-size"><a class="header" href="#cisc-optimized-for-compact-code-size">CISC [optimized for compact code size]</a></h3>
 <h4 id="size-of-data-type-in-ia32"><a class="header" href="#size-of-data-type-in-ia32">Size of Data Type in IA32</a></h4>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">C declaration</th><th style="text-align: center">Intel data type</th><th style="text-align: center">Assembly-code suffix</th><th style="text-align: center">Size (bytes)</th></tr></thead><tbody>

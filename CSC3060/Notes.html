@@ -491,8 +491,19 @@
 </li>
 </ul>
 </li>
+<li>
+<p>Regularity</p>
+</li>
 </ul>
-<details><summary><strong>Pseudo Instrcution</strong></summary>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Field</th><th style="text-align: center">Bit Position</th><th style="text-align: center">Note</th></tr></thead><tbody>
+<tr><td style="text-align: center"><strong>Opcode</strong></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">6</span><span class="mclose">]</span></span></span></span></td><td style="text-align: center">Always opcode</td></tr>
+<tr><td style="text-align: center"><strong>rd</strong></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">7</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">11</span><span class="mclose">]</span></span></span></span></td><td style="text-align: center">Destination reg</td></tr>
+<tr><td style="text-align: center"><strong>rs1</strong></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">15</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">19</span><span class="mclose">]</span></span></span></span></td><td style="text-align: center">Source reg 1</td></tr>
+<tr><td style="text-align: center"><strong>rs2</strong></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">20</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">24</span><span class="mclose">]</span></span></span></span></td><td style="text-align: center">Source reg 2</td></tr>
+<tr><td style="text-align: center"><strong>Length</strong></td><td style="text-align: center">-</td><td style="text-align: center">Fixed 16/32 bit</td></tr>
+<tr><td style="text-align: center"><strong>Immediate</strong></td><td style="text-align: center">High bits</td><td style="text-align: center">Uses rd field for branch/store</td></tr>
+</tbody></table>
+</div><details><summary><strong>Pseudo Instrcution</strong></summary>
 <div class="table-wrapper"><table><thead><tr><th>Pseudoinstruction</th><th>Actual Instruction Sequence</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>nop</code></td><td><code>addi x0, x0, 0</code></td><td>No operation</td></tr>
 <tr><td><code>li rd, imm</code></td><td><code>lui rd, imm[31:12] + imm[11]</code><br><code>addi rd, rd, imm[11:0]</code></td><td>Load 32-bit immediate</td></tr>
@@ -674,15 +685,66 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 <li><strong>CISC machines</strong> Lower instruction count, higher CPI, longer cycle time</li>
 <li><strong>RISC machines</strong> Higher instruction count, lower CPI, shorter cycle time</li>
 </ul>
+<h3 id="processor-designs"><a class="header" href="#processor-designs">Processor Designs</a></h3>
+<ol>
+<li>
+<p>Analyze the requirements</p>
+</li>
+<li>
+<p>Data Path Requirements selections</p>
+<ul>
+<li>
+<p><strong>Combinational Components</strong> Adder &amp; MUX &amp; ALU (An adder only does addition (e.g., PC+4). An ALU includes an adder but also performs many other arithmetic/logic operations.)</p>
+</li>
+<li>
+<p><strong>Sequential Components</strong></p>
+<p>Register <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span>-bit storage with Write Enable control. Updates only at clock tick if <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">Write</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>.</p>
+<p>Register File consists of 32 registers with two read ports (rs1/rs2) and one write port (rd).</p>
+<p>Memory. Read (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">WE</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>): Address → Data Out. Write (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">WE</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>): Next clock tick, Data In → Address.</p>
+</li>
+<li>
+<p><strong>Assemble</strong></p>
+<ul>
+<li>
+<p><strong>Instruction Fetch Unit</strong> Fetch the instruction and Update the program counter.</p>
+</li>
+<li>
+<p><strong>Branch Operations</strong> Using ALU subtraction for branches risks overflow corrupting the sign, so RISC-V processors internally use flags or dedicated comparators for correct branch decisions without hardware traps.</p>
+</li>
+<li>
+<p><strong>Add and Subtract</strong></p>
+</li>
+<li>
+<p><strong>Load/Store Operations</strong> A single ALU and register file need two multiplexers: one for ALU's second input, another for register file's write data source.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Control Points and Signals</strong></p>
+</li>
+</ul>
+</li>
+</ol>
 <h2 id="logic-designs"><a class="header" href="#logic-designs">Logic Designs</a></h2>
 <h3 id="major-components"><a class="header" href="#major-components">Major components</a></h3>
 <ul>
 <li>Combinational element</li>
-<li>State (sequntial elements)</li>
+<li>State (sequntial elements) <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">Write</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, cannot write to register (B-type and S-type).</li>
 <li>Clock signals</li>
 </ul>
 <details> <summary>What is the difference between combinational logic and sequential logic?</summary>
 <p>The former one is stateless, output purely depends on the inputs (e.g. ALU). The latter one has states, output depends on the inputs and the states (e.g. register).</p>
+</details>
+<h3 id="abstract-view-of-rv32i-subset"><a class="header" href="#abstract-view-of-rv32i-subset">Abstract View of RV32I Subset</a></h3>
+<img src="pic/18.png" width="80%" height="80%">
+<details><summary> How to select between <code>PC+4</code> and <code>PC+immediate</code>?</summary>
+<p>If a branch is taken or a jal instruction, select <code>pc+immed</code>. Otherwise select <code>PC+4</code>.</p>
+</details>
+<details><summary> How to select data from the memory or the ALU?</summary>
+<p>If load select <code>Mem</code>. If R-type select <code>ALU</code>.</p>
+</details>
+<details><summary> How to select data from Immediate or <code>reg[rs2]</code>?</summary>
+<p>If R-type select <code>rs2</code>. If I-type select <code>immed</code>.</p>
 </details>
                     </main>
 

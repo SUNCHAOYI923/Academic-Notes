@@ -801,7 +801,7 @@ Step 4 Repeat for remaining flows</p>
 <p><strong>Partition</strong></p>
 <ul>
 <li>
-<p><strong>hash partitioning</strong> <code>partition = hash(key) % partition_count</code></p>
+<p><strong>Hash partitioning</strong> <code>partition = hash(key) % partition_count</code></p>
 </li>
 <li>
 <p><strong>Consistent hashing</strong> (better)</p>
@@ -811,6 +811,72 @@ Step 4 Repeat for remaining flows</p>
 </li>
 <li>
 <p><strong>Heterogeneity</strong> More powerful nodes can have more capacity, thus more vnodes.</p>
+</li>
+<li>
+<p><strong>Replication</strong> Dynamo skips nodes to ensure replicas reside on different nodes (set Replication Factor, i.e. <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">RF</span></span></span></span>).</p>
+</li>
+<li>
+<p><strong>Dynamo Reads/Writes</strong> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="mord">/</span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span></span></span></span> is configurable. When <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord mathnormal" style="margin-right:0.00773em;">R</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">+</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.7224em;vertical-align:-0.0391em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">&gt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">RF</span></span></span></span>, the  read and written will overlap, with last write wins (LWW) resolving conflicts.</p>
+</li>
+<li>
+<p><strong>Dynamo API</strong></p>
+<ul>
+<li><code>get (k)</code> returns value(s) and context. It returns multiple versions if conflicts exist. The context contains Timestamps to track version history.</li>
+<li><code>put (k,context,value)</code> uses the provided context to indicate which previous version(s) this new version supersedes or merges.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<h4 id="hypertext-transfer-protocol-http"><a class="header" href="#hypertext-transfer-protocol-http">HyperText Transfer Protocol (HTTP)</a></h4>
+<ul>
+<li><strong>Request</strong></li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Method</th><th style="text-align: center">Description</th></tr></thead><tbody>
+<tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">GET</span></span></span></span></span></td><td style="text-align: center">Read a Web page</td></tr>
+<tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">HEAD</span></span></span></span></span></td><td style="text-align: center">Read a Web page's header</td></tr>
+<tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">POST</span></span></span></span></span></td><td style="text-align: center">Append to a Web page</td></tr>
+<tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">PUT</span></span></span></span></span></td><td style="text-align: center">Store a Web page</td></tr>
+<tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">DELETE</span></span></span></span></span></td><td style="text-align: center">Remove the Web page</td></tr>
+<tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">TRACE</span></span></span></span></span></td><td style="text-align: center">Echo the incoming request</td></tr>
+<tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">CONNECT</span></span></span></span></span></td><td style="text-align: center">Connect through a proxy</td></tr>
+<tr><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">OPTIONS</span></span></span></span></span></td><td style="text-align: center">Query options for a page</td></tr>
+</tbody></table>
+</div>
+<ul>
+<li><strong>Response</strong></li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Meaning</th><th style="text-align: center">Example</th></tr></thead><tbody>
+<tr><td style="text-align: center"><strong>Information</strong></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">100</span></span></span></span></span> Server agrees to handle client's request <br> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">101</span></span></span></span></span> Switching protocols</td></tr>
+<tr><td style="text-align: center"><strong>Success</strong></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">200</span></span></span></span></span> Request succeeded <br> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">201</span></span></span></span></span> New resource created <br> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">204</span></span></span></span></span> No content present</td></tr>
+<tr><td style="text-align: center"><strong>Redirection</strong></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">301</span></span></span></span></span> Page moved permanently <br> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">302</span></span></span></span></span> Temporary redirect <br> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">304</span></span></span></span></span> Cached page still valid</td></tr>
+<tr><td style="text-align: center"><strong>Client error</strong></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">400</span></span></span></span></span> Bad request <br> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">401</span></span></span></span></span> Authentication required <br> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">403</span></span></span></span></span> Forbidden page <br> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">404</span></span></span></span></span> Page not found <br> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">429</span></span></span></span></span> Too many requests</td></tr>
+<tr><td style="text-align: center"><strong>Server error</strong></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">500</span></span></span></span></span> Internal server error <br> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">502</span></span></span></span></span> Bad gateway <br> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">503</span></span></span></span></span> Service unavailable, try again later <br> <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">504</span></span></span></span></span> Gateway timeout</td></tr>
+</tbody></table>
+</div>
+<ul>
+<li>
+<p><strong>Page Load Time (PLT)</strong></p>
+<p>PLT measures web performance from click to page visible, influenced by page structure, HTTP/TCP protocols, and network RTT/bandwidth.</p>
+<p>HTTP/1.0 used one TCP connection per web resource.</p>
+<ul>
+<li>
+<p><strong>Parallel Connections</strong> Browser runs multiple parallel HTTP instances, pulls in completion time of last fetch.</p>
+</li>
+<li>
+<p><strong>Persistent Connections</strong> Parallel connections compete with each other for network resources. Make one TCP connection to one server and use it multiple HTTP requests.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Web Caching and Proxies</strong></p>
+<ul>
+<li>
+<p><strong>Cached Content</strong></p>
+<ul>
+<li><strong>Locally</strong> expiry information (expires header) &amp; heuristics (cacheable, fresh, not modified recently) [Content is then available right away]</li>
+<li><strong>Server</strong> Last-Modified header &amp; ETag” header [Content is available after 1 RTT (if connection open)]</li>
+</ul>
 </li>
 </ul>
 </li>

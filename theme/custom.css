@@ -1,34 +1,30 @@
 .sidebar {
     display: none !important;
 }
+
 .page-wrapper {
     margin-left: 0 !important;
 }
 
-/* 美化主题切换按钮（可选） */
 .theme-popup {
     background: rgba(255, 255, 255, 0.1) !important;
     backdrop-filter: blur(10px) !important;
     border-radius: 8px !important;
-    border: 1px solid rgba(255,255,255,0.2) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
 }
 
-/* ===== 主容器 ===== */
-.main {
-    max-width: 800px !important;
-    width: 100% !important;
+.main, .content, main {
+    max-width: 1200px !important;
+    width: 95% !important;
     margin: 0 auto !important;
-    padding: 2rem !important;
-    
-    background: linear-gradient(135deg, #f5f7ff, #e6ecff) !important;
+    padding: 2.5rem !important;
+    /* background: linear-gradient(135deg, #baa65d34, #a798112a) !important; */
     border-radius: 20px !important;
     box-shadow: 0 20px 40px rgba(0, 100, 255, 0.1) !important;
-    
     font-size: 16px !important;
     line-height: 1.8 !important;
 }
 
-/* 标题 */
 h1 {
     background: linear-gradient(135deg, #4A90E2, #7B68EE) !important;
     -webkit-background-clip: text !important;
@@ -47,19 +43,20 @@ h3 {
     color: #6C8EB2 !important;
 }
 
-/* 链接 */
 a {
     color: #4A90E2 !important;
     text-decoration: none !important;
     border-bottom: 2px dashed #7B68EE !important;
+    transition: all 0.3s ease !important;
 }
+
 a:hover {
     color: #7B68EE !important;
     border-bottom: 2px solid #7B68EE !important;
 }
 
-/* ===== 代码块 ===== */
 pre {
+    position: relative !important;
     background: linear-gradient(145deg, #2C3E50, #34495E) !important;
     color: #ECF0F1 !important;
     padding: 1.5em !important;
@@ -88,7 +85,6 @@ code:not(pre code) {
     font-size: 0.9em !important;
 }
 
-/* 表格 */
 th {
     background: linear-gradient(135deg, #4A90E2, #7B68EE) !important;
     color: white !important;
@@ -105,7 +101,6 @@ tr:nth-child(even) td {
     background: #e8f0fe !important;
 }
 
-/* 引用块 */
 blockquote {
     background: #e8f0fe !important;
     border-left: 5px solid #4A90E2 !important;
@@ -132,4 +127,104 @@ strong, b {
 
 em, i {
     color: #7B68EE !important;
+}
+
+main img, .content img {
+    max-width: 100% !important;
+    border-radius: 12px !important;
+    box-shadow: 0 8px 20px rgba(0, 234, 255, 0.288) !important;
+    display: block !important;
+    margin: 1.5rem auto !important;
+    cursor: zoom-in !important;
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.3s ease !important;
+}
+
+main img:hover, .content img:hover {
+    transform: scale(1.03) !important;
+    box-shadow: 0 15px 35px rgba(0, 100, 255, 0.25) !important;
+}
+
+#my-image-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease;
+    cursor: default;
+}
+
+#my-image-overlay.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+#my-close-btn {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 50px;
+    font-family: sans-serif;
+    font-weight: 300;
+    cursor: pointer;
+    user-select: none;
+    z-index: 1000000;
+    transition: transform 0.2s ease, color 0.2s ease;
+    line-height: 1;
+    padding: 10px;
+}
+
+#my-close-btn:hover {
+    color: #fff;
+    transform: scale(1.2);
+}
+
+#my-zoomed-img {
+    max-width: 90vw;
+    max-height: 90vh;
+    object-fit: contain;
+    border-radius: 8px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+    transform: scale(0.8);
+    transition: transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    cursor: default;
+}
+
+#my-zoomed-img.show {
+    transform: scale(1);
+}
+
+#my-progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    background: linear-gradient(90deg, #4A90E2, #7B68EE);
+    z-index: 9999999;
+    width: 0;
+    transition: width 0.1s;
+    pointer-events: none;
+}
+
+.code-lang-label {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background: rgba(74, 144, 226, 0.2);
+    color: #87CEFA;
+    font-size: 12px;
+    padding: 2px 8px;
+    border-bottom-right-radius: 8px;
+    font-family: Consolas, monospace;
+    font-weight: bold;
+    pointer-events: none;
+    letter-spacing: 1px;
 }

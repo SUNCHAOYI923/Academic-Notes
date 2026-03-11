@@ -878,9 +878,42 @@ Step 4 Repeat for remaining flows</p>
 <li><strong>Server</strong> Last-Modified header &amp; ETag” header [Content is available after 1 RTT (if connection open)]</li>
 </ul>
 </li>
+<li>
+<p><strong>Web Proxies</strong> Place intermediary between clients and server.</p>
+</li>
 </ul>
 </li>
 </ul>
+<h4 id="domain-name-system-dns"><a class="header" href="#domain-name-system-dns">Domain Name System (DNS)</a></h4>
+<p>DNS is a naming service to map between host names and their IP addresses (Distributed directory based on a hierarchical namespace and automated protocol to tie pieces together).</p>
+<img src="pic/9.png" width="80%" height="60%">
+<ul>
+<li>
+<p><strong>Top-Level Domains (TLDS)</strong></p>
+</li>
+<li>
+<p><strong>DNS Resolution</strong> Start with the root nameserver and work down zones.</p>
+</li>
+<li>
+<p><strong>Local Nameservers and Root Nameservers</strong></p>
+<p>Local nameservers handle client queries and recursion, while root nameservers direct them to the appropriate top-level domain servers.</p>
+<p>Root (dot) is served by 13 <strong>server names</strong> (<code>a.root-servers.net</code> to <code>m.root-servers.net</code>)</p>
+</li>
+<li>
+<p><strong>Caching</strong> Cached data periodically times out (set appropriate TTL).</p>
+</li>
+<li>
+<p><strong>DNS Security Extensions (DNSSEC)</strong></p>
+<p>To spoof, Trudy returns a fake DNS response that appears to be true.</p>
+<ul>
+<li>RRSIG for digital signatures of records</li>
+<li>DNSKEY for public keys for validation</li>
+<li>DS for public keys for delegation</li>
+</ul>
+</li>
+</ul>
+<h4 id="content-delivery-networks-cdns"><a class="header" href="#content-delivery-networks-cdns">Content Delivery Networks (CDNs)</a></h4>
+<p>A CDN uses DNS to direct each client to the nearest replica server based on their IP address.</p>
 
                     </main>
 
@@ -905,6 +938,22 @@ Step 4 Repeat for remaining flows</p>
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 
@@ -922,6 +971,7 @@ Step 4 Repeat for remaining flows</p>
         <script src="../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
 
 
     </div>

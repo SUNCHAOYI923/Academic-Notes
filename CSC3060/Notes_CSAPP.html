@@ -222,13 +222,13 @@
 <ul>
 <li>
 <p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9055em;vertical-align:-0.2222em;"></span><span class="mord text"><span class="mord texttt">pushq</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span></p>
-<pre><code class="language-assembly">subq $8 %rsp
+<pre><code class="language-x86asm">subq $8 %rsp
 movq %rbq,(%rsp)
 </code></pre>
 </li>
 <li>
 <p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9055em;vertical-align:-0.2222em;"></span><span class="mord text"><span class="mord texttt">popq</span></span><span class="mspace" style="margin-right:1em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span></p>
-<pre><code class="language-assembly">movq (%rsq),%rax
+<pre><code class="language-x86asm">movq (%rsq),%rax
 addq $8, %rsp
 </code></pre>
 </li>
@@ -611,6 +611,22 @@ the number of instructions in one second.</p>
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 
@@ -628,6 +644,7 @@ the number of instructions in one second.</p>
         <script src="../book.js"></script>
 
         <!-- Custom JS scripts -->
+        <script src="../theme/custom.js"></script>
 
 
     </div>

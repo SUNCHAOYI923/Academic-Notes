@@ -652,12 +652,24 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 </details>
 <h3 id="cisc-optimized-for-compact-code-size"><a class="header" href="#cisc-optimized-for-compact-code-size">CISC [optimized for compact code size]</a></h3>
 <h1 id="chapter-4-processor-architecture--logic-design"><a class="header" href="#chapter-4-processor-architecture--logic-design">Chapter 4 Processor Architecture &amp; Logic Design</a></h1>
+<h2 id="logic-designs"><a class="header" href="#logic-designs">Logic Designs</a></h2>
+<h3 id="major-components"><a class="header" href="#major-components">Major components</a></h3>
+<ul>
+<li>Combinational element</li>
+<li>State (Sequential) elements <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">Write</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, cannot write to register (<strong>B-type and S-type</strong>).</li>
+<li>Clock signals</li>
+</ul>
+<details> <summary>What is the difference between combinational logic and sequential logic?</summary>
+<p>The former one is stateless, output purely depends on the inputs (e.g. ALU). The latter one has states, output depends on the inputs and the states (e.g. register).</p>
+</details>
+<p>The propagation delay of a combinational circuit is determined by the delay of the critical path, which is the longest path of logic gates from any input to any output.</p>
 <h2 id="processor"><a class="header" href="#processor">Processor</a></h2>
-<h3 id="data-path-data-flow"><a class="header" href="#data-path-data-flow">Data Path (Data Flow)</a></h3>
-<p>e.g. ALU, Register, Memory interface, Buses.</p>
-<h3 id="control-instruction-flow"><a class="header" href="#control-instruction-flow">Control (Instruction Flow)</a></h3>
-<p>e.g. PC, Instruction fetch, and Control signal generation.</p>
 <h3 id="core"><a class="header" href="#core">Core</a></h3>
+<h4 id="data-path-data-flow"><a class="header" href="#data-path-data-flow">Data Path (Data Flow)</a></h4>
+<p>e.g. ALU, Register, Memory interface, Buses.</p>
+<h4 id="control-instruction-flow"><a class="header" href="#control-instruction-flow">Control (Instruction Flow)</a></h4>
+<p>e.g. PC, Instruction fetch, and Control signal generation.</p>
+<h4 id="rv32i-data-path-and-control"><a class="header" href="#rv32i-data-path-and-control">RV32I Data Path and Control</a></h4>
 <ul>
 <li><strong>Memory reference instrutions</strong> <code>lw</code>, <code>sw</code></li>
 <li><strong>Arithmetic/logical instrutions</strong> <code>add</code>, <code>sub</code>, <code>and</code>, <code>or</code></li>
@@ -665,6 +677,9 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 </ul>
 <h3 id="instruction-execution-cycle"><a class="header" href="#instruction-execution-cycle">Instruction Execution Cycle</a></h3>
 <h4 id="cycle"><a class="header" href="#cycle">Cycle</a></h4>
+<ul>
+<li>
+<p><strong>Three Stages</strong></p>
 <ul>
 <li><strong>Fetch</strong> Use the PC to supply the instruction address and fetch the instruction from memory.</li>
 <li><strong>Decode</strong> Decode the instruction (and read registers).</li>
@@ -676,15 +691,31 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 </ul>
 </li>
 </ul>
+</li>
+<li>
+<p><strong>Multi-cycle</strong> Instructions are broken down into multiple steps, each taking <strong>one</strong> clock cycle.</p>
+</li>
+</ul>
 <h4 id="time"><a class="header" href="#time">Time</a></h4>
 <p>CPU time is determined by the following:</p>
-<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">CPU Time</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">Instructions count</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Cycles per instruction</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Clock cycle time</span></span></span></span></span></span></p>
+<p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">CPU Time</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord">Instructions count</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mord text"><span class="mord">Cycles per instruction (CPI)</span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text"><span class="mord">Clock cycle time</span></span></span></span></span></span></p>
 <p>Program execution time is determined by the following:</p>
 <p><span class="katex-display"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:2.2253em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3449em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">program</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">time</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:2.2253em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3449em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">program</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">instructions</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.0574em;vertical-align:-0.686em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3714em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">instructions</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">cycles</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.686em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:2.2253em;vertical-align:-0.8804em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:1.3449em;"><span style="top:-2.314em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">cycle</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.677em;"><span class="pstrut" style="height:3em;"></span><span class="mord"><span class="mord text"><span class="mord">time</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.8804em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span></span></p>
 <ul>
 <li><strong>CISC machines</strong> Lower instruction count, higher CPI, longer cycle time</li>
 <li><strong>RISC machines</strong> Higher instruction count, lower CPI, shorter cycle time</li>
 </ul>
+<h3 id="abstract-view-of-rv32i-subset"><a class="header" href="#abstract-view-of-rv32i-subset">Abstract View of RV32I Subset</a></h3>
+<img src="pic/18.png" width="80%" height="80%">
+<details><summary> How to select between <code>PC+4</code> and <code>PC+immediate</code>?</summary>
+<p>If a branch is taken or a jal instruction, select <code>pc+immed</code>. Otherwise select <code>PC+4</code>.</p>
+</details>
+<details><summary> How to select data from the memory or the ALU?</summary>
+<p>If load select <code>Mem</code>. If R-type select <code>ALU</code>.</p>
+</details>
+<details><summary> How to select data from Immediate or <code>reg[rs2]</code>?</summary>
+<p>If R-type select <code>rs2</code>. If I-type select <code>immed</code>.</p>
+</details>
 <h3 id="processor-designs"><a class="header" href="#processor-designs">Processor Designs</a></h3>
 <ol>
 <li>
@@ -709,43 +740,136 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 <p><strong>Instruction Fetch Unit</strong> Fetch the instruction and Update the program counter.</p>
 </li>
 <li>
-<p><strong>Branch Operations</strong> Using ALU subtraction for branches risks overflow corrupting the sign, so RISC-V processors internally use flags or dedicated comparators for correct branch decisions without hardware traps.</p>
+<p><strong>Branch Operations</strong> Using ALU subtraction for branches risks overflow corrupting the sign, so RISC-V processors internally use flags (overflow and carry) or dedicated comparators for correct branch decisions without hardware traps.</p>
 </li>
 <li>
-<p><strong>Add and Subtract</strong></p>
+<p><strong>Add and Subtract</strong> <code>R[rd] &lt;- R[rs1] op R[rs2]</code></p>
 </li>
 <li>
-<p><strong>Load/Store Operations</strong> A single ALU and register file need two multiplexers: one for ALU's second input, another for register file's write data source.</p>
+<p><strong>Load/Store Operations</strong> A single ALU and register file need two multiplexers: one for ALU's second input (e.g. <code>add rd, rs1, rs2</code> and <code>addi rd, rs1, imm</code>), another for register file's write data source (e.g. <code>add x3, x1, x2</code> from ALU and <code>lw x3, 8(x1)</code> from memory).</p>
 </li>
 </ul>
 </li>
 <li>
 <p><strong>Control Points and Signals</strong></p>
-</li>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Control Signal</th><th style="text-align: center">Description</th><th style="text-align: center">Expression</th></tr></thead><tbody>
+<tr><td style="text-align: center"><code>PCsrc</code></td><td style="text-align: center">Select the next PC value <br>PC + 4 [<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>] <br>Branch / jump target address [<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>]</td><td style="text-align: center"><code>(Branch or jal/jalr) ? 1 : 0</code></td></tr>
+<tr><td style="text-align: center"><code>RegWr</code></td><td style="text-align: center">Write enable for register file</td><td style="text-align: center"><code>(Branch or Store) ? 0 : 1</code></td></tr>
+<tr><td style="text-align: center"><code>MemRd</code></td><td style="text-align: center">Enable signal for reading data memory</td><td style="text-align: center"><code>Load ? 1 : 0</code></td></tr>
+<tr><td style="text-align: center"><code>MemWr</code></td><td style="text-align: center">Enable signal for writing data memory</td><td style="text-align: center"><code>Store ? 1 : 0</code></td></tr>
+<tr><td style="text-align: center"><code>ALUsrc</code></td><td style="text-align: center">Select the second ALU input <br> register [<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>] <br> immediate value [<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>]</td><td style="text-align: center"><code>R-type ? 0 : 1</code></td></tr>
+<tr><td style="text-align: center"><code>ALUctr</code></td><td style="text-align: center">Determines the ALU operation</td><td style="text-align: center">/</td></tr>
+<tr><td style="text-align: center"><code>WBsel</code></td><td style="text-align: center">Selects the data written to the register file <br> memory data [<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>] <br> ALU result [<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>] <br> PC + 4 [<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">2</span></span></span></span>]</td><td style="text-align: center"><code>Load: 0; R-type : 1; jal/jalr : 2</code></td></tr>
+</tbody></table>
+</div></li>
 </ul>
 </li>
 </ol>
-<h2 id="logic-designs"><a class="header" href="#logic-designs">Logic Designs</a></h2>
-<h3 id="major-components"><a class="header" href="#major-components">Major components</a></h3>
+<p>On each clock cycle, the single‑cycle processor executes one instruction. State elements update at the rising edge using combinational logic outputs computed during the cycle.</p>
+<h3 id="control"><a class="header" href="#control">Control</a></h3>
+<img src="pic/19.png" width="90%" height="80%">
 <ul>
-<li>Combinational element</li>
-<li>State (sequntial elements) <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">Write</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">0</span></span></span></span>, cannot write to register (B-type and S-type).</li>
-<li>Clock signals</li>
+<li><code>Asel</code> <code>rs1</code> or <code>pc</code> (When use <code>jal</code>, the target is <code>PC + offset</code>.)</li>
+<li><code>Bsel</code> <code>rs2</code> or <code>immed</code>.</li>
 </ul>
-<details> <summary>What is the difference between combinational logic and sequential logic?</summary>
-<p>The former one is stateless, output purely depends on the inputs (e.g. ALU). The latter one has states, output depends on the inputs and the states (e.g. register).</p>
+<details> <summary> Why does RV32I still need a dedicated Branch Comparator despite having an ALU? </summary>
+<ul>
+<li>Use Branch Comparision to avoid substruction overflow.</li>
+<li>RV32I lacks architectural flags, it requires a dedicated comparator to enable single-cycle compare-and-branch operations by combining comparison and jump logic.</li>
+</ul>
 </details>
-<h3 id="abstract-view-of-rv32i-subset"><a class="header" href="#abstract-view-of-rv32i-subset">Abstract View of RV32I Subset</a></h3>
-<img src="pic/18.png" width="80%" height="80%">
-<details><summary> How to select between <code>PC+4</code> and <code>PC+immediate</code>?</summary>
-<p>If a branch is taken or a jal instruction, select <code>pc+immed</code>. Otherwise select <code>PC+4</code>.</p>
-</details>
-<details><summary> How to select data from the memory or the ALU?</summary>
-<p>If load select <code>Mem</code>. If R-type select <code>ALU</code>.</p>
-</details>
-<details><summary> How to select data from Immediate or <code>reg[rs2]</code>?</summary>
-<p>If R-type select <code>rs2</code>. If I-type select <code>immed</code>.</p>
-</details>
+<h2 id="pipelining"><a class="header" href="#pipelining">Pipelining</a></h2>
+<h3 id="five-stages"><a class="header" href="#five-stages">Five Stages</a></h3>
+<ol>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">IF</span></span></span></span></span> Instrcution fetch from (instruction) memory</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">ID</span></span></span></span></span> Instrcution decode &amp; register read</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">EX</span></span></span></span></span> Execute operation or calculate address</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">MEM</span></span></span></span></span> Access (data) memory operand</li>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">WB</span></span></span></span></span> Write the result back to <strong>register</strong></li>
+</ol>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Instructions</th><th style="text-align: center">Detailed Stages</th></tr></thead><tbody>
+<tr><td style="text-align: center">R-Type, I-Type, <code>jal</code>, <code>jarl</code>, <code>lui</code>, <code>auipc</code></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">IF</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">ID</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">EX</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">WB</span></span></span></span></span> (no <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">MEM</span></span></span></span></span>)</td></tr>
+<tr><td style="text-align: center">Store, Branch</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">IF</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">ID</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">EX</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">MEM</span></span></span></span></span> (no <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">WB</span></span></span></span></span>)</td></tr>
+<tr><td style="text-align: center">Load</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">IF</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">ID</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">EX</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">MEM</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">→</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">WB</span></span></span></span></span></td></tr>
+</tbody></table>
+</div>
+<ul>
+<li>Throughput increases as more instructions complete per unit time, but single instruction latency (The time it takes for each instruction to be executed.) does not decrease and may even increase.</li>
+<li>Pipeline rate is limited by the slowest stage.</li>
+<li>Potential/ideal speedup = Number of pipeline stages (number of pipeline steps).</li>
+</ul>
+<h3 id="pipeline-oriented-isa-design"><a class="header" href="#pipeline-oriented-isa-design">Pipeline-oriented ISA Design</a></h3>
+<ul>
+<li>All instructions are fixed length.</li>
+<li>Few and regular instruction formats.</li>
+<li>Only load/store instructions accessing memory.</li>
+<li>Instructions are simple.</li>
+</ul>
+<h3 id="single-cycle--multi-cycle--pipeline"><a class="header" href="#single-cycle--multi-cycle--pipeline">Single Cycle &amp; Multi Cycle &amp; Pipeline</a></h3>
+<img src="pic/20.png" width="60%" height="60%">
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Implementation</th><th style="text-align: center">Clock Cycle Time</th><th style="text-align: center">Instruction Latency</th></tr></thead><tbody>
+<tr><td style="text-align: center">Single-Cycle</td><td style="text-align: center">Sum of all stage latencies</td><td style="text-align: center">1 <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord">×</span></span></span></span> Clock Cycle Time</td></tr>
+<tr><td style="text-align: center">Multi-Cycle</td><td style="text-align: center">Longest stage latency</td><td style="text-align: center">CPI <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord">×</span></span></span></span> Clock Cycle Time</td></tr>
+<tr><td style="text-align: center">Pipelined</td><td style="text-align: center">Longest stage latency</td><td style="text-align: center">Number of Stages <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6667em;vertical-align:-0.0833em;"></span><span class="mord">×</span></span></span></span> Clock Cycle Time</td></tr>
+</tbody></table>
+</div>
+<h3 id="latency"><a class="header" href="#latency">Latency</a></h3>
+<ul>
+<li>Stall</li>
+<li>Long latency pipline (Subsequent instructions can continue to proceed)</li>
+</ul>
+<p>No arithmetic exceptions allow <strong>out‑of‑order retirement</strong>, avoiding stalls for long‑latency instructions.</p>
+<h3 id="pipline-registers"><a class="header" href="#pipline-registers">Pipline Registers</a></h3>
+<p>Without pipeline registers, stages would overwrite each other’s data, causing instruction mix‑ups and loss of control information.</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Pipeline Register</th><th style="text-align: center">Stored Information</th></tr></thead><tbody>
+<tr><td style="text-align: center">IF/ID</td><td style="text-align: center"><code>PC_ID</code>, <code>inst_ID</code> (instrcution code like opcode)</td></tr>
+<tr><td style="text-align: center">ID/EX</td><td style="text-align: center"><code>PC_EX</code>, <code>inst_EX</code>, <code>imm_EX</code>, <code>rs1_EX</code>, <code>rs2_EX</code></td></tr>
+<tr><td style="text-align: center">EX/MEM</td><td style="text-align: center"><code>PC_MEM</code>, <code>inst_MEM</code>, <code>rs2_MEM</code>, <code>alu_MEM</code></td></tr>
+<tr><td style="text-align: center">MEM/WB</td><td style="text-align: center"><code>PC+4_WB</code> (<code>rd = PC + 4</code>), <code>inst_WB</code>, <code>alu_WB</code>, <code>mem_WB</code></td></tr>
+</tbody></table>
+</div>
+<ul>
+<li>
+<p>Control signals are derived from instruction bits, that is, after the ID stage.</p>
+</li>
+<li>
+<p>Control information for later stages are also stored in the pipeline registers.</p>
+</li>
+<li>
+<p><strong>Architecture States</strong> (visible to the programmer and compiler)</p>
+<ul>
+<li>Registers (<strong>general purpose</strong>, fp, vector, flags)</li>
+<li>PC</li>
+<li>Memory</li>
+</ul>
+<p>It was saved during a context switch:</p>
+<ul>
+<li><strong>user-level switch</strong> (e.g. procedure call) saved on the runtime program stack (caller and callee convention).</li>
+<li><strong>system-level switch</strong> (e.g. process switch) saved on the Process Control Block (PCB) or the kernel stack.</li>
+</ul>
+</li>
+<li>
+<p><strong>Micro-architecture states</strong></p>
+<ul>
+<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text" style="color:#df0030;"><span class="mord" style="color:#df0030;">Piplined registers</span></span></span></span></span> Pipelined registers hold transient data between stages for a few cycles.</li>
+<li>Branch predictors</li>
+<li>Caches</li>
+<li>Buffers and Quenes</li>
+<li>Counters</li>
+</ul>
+</li>
+</ul>
+<h2 id="hazards"><a class="header" href="#hazards">Hazards</a></h2>
+<h3 id="structure-hazards"><a class="header" href="#structure-hazards">Structure Hazards</a></h3>
+<p>A conflict arising due to hardware resourece limitations within the pipeline.</p>
+<ul>
+<li>Pipeline stalls</li>
+<li>Multiple resources</li>
+<li>Instruction Reordering</li>
+<li>ISA design</li>
+</ul>
+<h3 id="data-hazards"><a class="header" href="#data-hazards">Data Hazards</a></h3>
+
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">
@@ -775,22 +899,6 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 
         </div>
 
-        <!-- Livereload script (if served using the cli tool) -->
-        <script>
-            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
-            const socket = new WebSocket(wsAddress);
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
 
 
 

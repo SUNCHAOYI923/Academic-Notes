@@ -914,6 +914,25 @@ Step 4 Repeat for remaining flows</p>
 </ul>
 <h4 id="content-delivery-networks-cdns"><a class="header" href="#content-delivery-networks-cdns">Content Delivery Networks (CDNs)</a></h4>
 <p>A CDN uses DNS to direct each client to the nearest replica server based on their IP address.</p>
+<h4 id="remote-prcedure-call-rpc"><a class="header" href="#remote-prcedure-call-rpc">Remote Prcedure Call (RPC)</a></h4>
+<ul>
+<li>
+<p><strong>Interface description languague</strong> Mechanism to pass procedur parameters and return values in a machine-independent way (use IDL compier, marshal and unmarshal).</p>
+</li>
+<li>
+<p><strong>At-Least-Once Scheme</strong> Upon timeout, the client stub retransmits the request. After several failed attempts, it returns an error.</p>
+</li>
+<li>
+<p><strong>At-Most-Once Scheme</strong></p>
+<p>Since identical calls may come from different clients, duplicate detection requires a unique xid per request.</p>
+<p>The client includes "seen all replies <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≤</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span>" with every RPC, allowing the server to discard outdated xids and prevent unbounded state growth.</p>
+<p>A pending flag per executing RPC avoids re-running duplicates.</p>
+<p>To survive crashes, both client and server persist pending/completed RPCs to disk.</p>
+</li>
+<li>
+<p><strong>Exactly-Once</strong> retransmission (At-Least-Once) + deduplication (At-Most-Once) + persistence on both sides for crash recovery. Limitation: not possible with external physical actions.</p>
+</li>
+</ul>
 
                     </main>
 
@@ -938,22 +957,6 @@ Step 4 Repeat for remaining flows</p>
 
         </div>
 
-        <!-- Livereload script (if served using the cli tool) -->
-        <script>
-            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
-            const socket = new WebSocket(wsAddress);
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
 
 
 

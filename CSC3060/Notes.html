@@ -869,6 +869,22 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 <li>ISA design</li>
 </ul>
 <h3 id="data-hazards"><a class="header" href="#data-hazards">Data Hazards</a></h3>
+<p>A conflict arising because the current instruction depends on the result of a previous instruction that has not yet been computed or written back.</p>
+<h4 id="register-access-issues"><a class="header" href="#register-access-issues">Register Access Issues</a></h4>
+<p>Register file should write-then-read in the same cycle.</p>
+<h4 id="alu-result-access-issue"><a class="header" href="#alu-result-access-issue">ALU Result Access Issue</a></h4>
+<p>Instruction depends on WB's Regfile write from previous instruction.</p>
+<ul>
+<li>
+<p><strong>Stall pipeline</strong> at ID stage, stalled for two clock cycles.</p>
+</li>
+<li>
+<p><strong>Data Forwarding (Bypassing)</strong></p>
+</li>
+<li>
+<p><strong>Compiler Code Transformations</strong></p>
+</li>
+</ul>
 
                     </main>
 
@@ -899,6 +915,22 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 

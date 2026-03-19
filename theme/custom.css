@@ -18,7 +18,6 @@
     width: 95% !important;
     margin: 0 auto !important;
     padding: 2.5rem !important;
-    /* background: linear-gradient(135deg, #baa65d34, #a798112a) !important; */
     border-radius: 20px !important;
     box-shadow: 0 20px 40px rgba(0, 100, 255, 0.1) !important;
     font-size: 16px !important;
@@ -227,4 +226,165 @@ main img:hover, .content img:hover {
     font-weight: bold;
     pointer-events: none;
     letter-spacing: 1px;
+}
+
+.lfe-marked details,
+details.lfe-marked,
+article details,
+main details,
+details {
+  display: block;
+  margin: 2em 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  border-radius: 12px !important;
+  background-color: #f8faff !important;
+  box-shadow: 0 4px 12px rgba(0, 35, 70, 0.08), 0 2px 4px rgba(0, 20, 40, 0.06) !important;
+  overflow: hidden;
+  transition: box-shadow 0.2s, background 0.2s !important;
+}
+
+.lfe-marked details:hover,
+details:hover {
+  box-shadow: 0 8px 20px rgba(28, 55, 94, 0.12), 0 3px 6px rgba(0, 20, 40, 0.08) !important;
+  background-color: #f9fcff !important;
+}
+
+.lfe-marked details summary,
+details summary {
+  display: list-item;
+  cursor: pointer !important;
+  list-style: none !important;
+  padding: 16px 20px 16px 42px !important;
+  margin: 0 !important;
+  font-weight: 600 !important;
+  font-size: 1.2em !important;
+  color: #1a3b5e !important;
+  background: rgba(220, 235, 255, 0.6) !important;
+  border-bottom: 2px solid transparent;
+  transition: background 0.15s, border-color 0.15s !important;
+  border-radius: 12px 12px 0 0 !important;
+  letter-spacing: 0.02em;
+  user-select: none;
+  position: relative;
+}
+
+.lfe-marked details summary::-webkit-details-marker,
+details summary::-webkit-details-marker {
+  display: none !important;
+}
+
+.lfe-marked details summary::before,
+details summary::before {
+  content: "▶";
+  position: absolute;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%) rotate(0deg);
+  font-size: 1.2em;
+  color: #4a90e2;
+  transition: transform 0.2s ease;
+  line-height: 1;
+  font-weight: 400;
+}
+
+.lfe-marked details[open] summary::before,
+details[open] summary::before {
+  transform: translateY(-50%) rotate(90deg);
+  color: #7b68ee;
+}
+
+.lfe-marked details[open] summary,
+details[open] summary {
+  border-bottom: 2px solid #4a90e2 !important;
+  background: rgba(200, 225, 255, 0.8) !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.lfe-marked details summary:hover,
+details summary:hover {
+  background: rgba(180, 215, 255, 0.9) !important;
+  color: #0a2a44 !important;
+}
+
+.lfe-marked details > :not(summary),
+details > :not(summary) {
+  padding: 20px 24px !important;
+  margin: 0 !important;
+  background: #ffffff !important;
+  border-radius: 0 0 12px 12px !important;
+  font-size: 16px !important;
+  line-height: 1.8 !important;
+  color: #2c3e50 !important;
+  border-top: 1px solid rgba(74, 144, 226, 0.2) !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif !important;
+  font-weight: 400 !important;
+  letter-spacing: 0.01em !important;
+}
+
+.lfe-marked details > :not(summary) p,
+details > :not(summary) p,
+.lfe-marked details > :not(summary) div,
+details > :not(summary) div,
+.lfe-marked details > :not(summary) span,
+details > :not(summary) span {
+  font-size: 16px !important;
+  line-height: 1.8 !important;
+  color: #2c3e50 !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.lfe-marked details > :not(summary) strong,
+details > :not(summary) strong {
+  color: #4a90e2 !important;
+  font-weight: 600 !important;
+}
+
+.lfe-marked details > :not(summary):first-child,
+details > :not(summary):first-child {
+  margin-top: 0 !important;
+}
+
+.lfe-marked details > :not(summary):last-child,
+details > :not(summary):last-child {
+  margin-bottom: 0 !important;
+}
+
+.lfe-marked details pre,
+details pre {
+  margin: 1em 0 !important;
+  background: #f0f4fa !important;
+  border-left: 4px solid #4a90e2 !important;
+}
+
+.lfe-marked details details,
+details details {
+  margin: 1.2em 0 !important;
+  background: #f3f9ff !important;
+  box-shadow: none !important;
+  border-left: 4px solid #7b68ee !important;
+  border-radius: 8px !important;
+}
+
+.lfe-marked details details summary,
+details details summary {
+  background: #e9f0fa !important;
+  font-size: 1.1em !important;
+  padding: 12px 20px !important;
+}
+
+.lfe-marked details.info,
+.info details,
+details.info {
+  border-left-color: transparent !important;
+  border-left-width: 0 !important;
+}
+
+details[open] > :not(summary) {
+  animation: fadeSlide 0.2s ease-out;
+}
+
+@keyframes fadeSlide {
+  0% { opacity: 0.5; transform: translateY(-6px); }
+  100% { opacity: 1; transform: translateY(0); }
 }

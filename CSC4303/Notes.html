@@ -933,6 +933,102 @@ Step 4 Repeat for remaining flows</p>
 <p><strong>Exactly-Once</strong> retransmission (At-Least-Once) + deduplication (At-Most-Once) + persistence on both sides for crash recovery. Limitation: not possible with external physical actions.</p>
 </li>
 </ul>
+<h4 id="distributed-storage-system"><a class="header" href="#distributed-storage-system">Distributed Storage System</a></h4>
+<ul>
+<li>
+<p><strong>The Google File System (GFS)</strong></p>
+<ul>
+<li>
+<p><strong>Target environment</strong></p>
+<ul>
+<li>Files are huge, but not many.</li>
+<li>Write once, read many.</li>
+<li>I/O bandwidth is more important than latency.</li>
+</ul>
+<p>Typical workloads : Bulk Synchronous Processing (BSP).</p>
+</li>
+<li>
+<p><strong>Design Decisions</strong></p>
+<ul>
+<li>
+<p><strong>Chunk</strong> Use 64MB chunks to amortize seek costs, pushing read throughput close to disk transfer limits for streaming workloads.</p>
+</li>
+<li>
+<p><strong>Replication</strong> Replicate each chunk three times across racks to balance write performance.</p>
+</li>
+<li>
+<p><strong>Single master</strong> Centralize metadata for coordination.</p>
+</li>
+<li>
+<p><strong>Record append</strong> Support concurrent appends.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>General Architecture</strong></p>
+  <img src="pic/10.png" width="60%" height="60%">
+<ul>
+<li>
+<p><strong>Single master</strong></p>
+<p><strong>Shadow masters</strong> provide read-only access with slightly stale metadata by replicating the primary's operation log, ensuring availability during primary failure.</p>
+<p>GFS prevents master <strong>overload</strong> by minimizing its involvement: data never passes through it, large chunks reduce metadata ops, and chunk leases delegate write coordination authority to primary replicas.</p>
+  <table>
+  <thead>
+      <tr>
+      <th width="25%">Category</th>
+      <th width="25%">Responsibility</th>
+      <th>Description</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+      <td rowspan="4" style="vertical-align: top;"><strong>Regular Management</strong></td>
+      <td><strong>Metadata Storage</strong></td>
+      <td>Stores namespaces, file-to-chunk mappings, chunk locations in memory.</td>
+      </tr>
+      <tr>
+      <td><strong>Namespace Locking</strong></td>
+      <td>Locks directory operations to handle concurrent accesses.</td>
+      </tr>
+      <tr>
+      <td><strong>Periodic Communication</strong></td>
+      <td>Heartbeats with chunkservers to monitor health and exchange state.</td>
+      </tr>
+      <tr>
+      <td><strong>Chunk Lifecycle</strong></td>
+      <td>Creates chunks (rack-aware); re-replicates when replicas low; rebalances load/space.</td>
+      </tr>
+      <tr>
+      <td rowspan="2" style="vertical-align: top;"><strong>Background Cleanup</strong></td>
+      <td><strong>Garbage Collection</strong></td>
+      <td>Logs deletion, renames files as hidden, lazily reclaims space.</td>
+      </tr>
+      <tr>
+      <td><strong>Stale Replica Deletion</strong></td>
+      <td>Uses version numbers to detect and remove outdated replicas.</td>
+      </tr>
+  </tbody>
+  </table>
+</li>
+<li>
+<p><strong>Metadata</strong></p>
+<ul>
+<li>file and chunk namespaces</li>
+<li>mappings from files to chunks (unique ID)</li>
+<li>locations of each chunk’s replicas (ask for chunkserver)</li>
+</ul>
+</li>
+<li>
+<p><strong>Chunkserver</strong> Chunkservers store 64MB chunks locally with version numbers and checksums while clients read/write via chunk handle and byte range from master without data caching.</p>
+</li>
+<li>
+<p><strong>Client</strong> GFS client sends control requests to master, caches metadata, but transfers data directly to/from chunkservers without caching file data.</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
 
                     </main>
 
@@ -957,6 +1053,22 @@ Step 4 Repeat for remaining flows</p>
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 

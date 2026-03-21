@@ -429,21 +429,7 @@
 <tr><td><strong>U-type</strong></td><td>Upper Immediate</td><td><code>lui</code>, <code>auipc</code></td></tr>
 <tr><td><strong>UJ-type</strong></td><td>Unconditional Jump</td><td><code>jal</code></td></tr>
 </tbody></table>
-</div><details> <summary><strong>Instruction Encoding List</strong></summary>
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-  <div style="align-self: stretch;">
-    <img src="pic/15.png" style="width: 100%; height: 100%; object-fit: contain;">
-  </div>
-  <div style="display: flex; flex-direction: column; gap: 10px;">
-    <div style="flex: 1; display: flex; align-items: flex-start;">
-      <img src="pic/16.png" style="width: 100%; max-height: 100%; object-fit: contain;">
-    </div>
-    <div style="flex: 1; display: flex; align-items: flex-end;">
-      <img src="pic/17.png" style="width: 100%; max-height: 100%; object-fit: contain;">
-    </div>
-  </div>
 </div>
-</details>
 <ul>
 <li>
 <p>Three operand instruction format.</p>
@@ -462,15 +448,6 @@
 <li><strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">S</span></span></span></span></span> type</strong> The 12‑bit immediate is split into high 7 bits (immediate) and low 5 bits (immed) (maintain regularity). The immediate in the <strong>store</strong> instruction is an offset relative to <code>rs1</code>.</li>
 <li><strong><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">J</span></span></span></span></span> type</strong> 20 bits immediate.</li>
 </ul>
-</li>
-<li>
-<p>LUI loads a 20‑bit immediate into the upper bits of a register; AUIPC adds a 20‑bit immediate to the current PC for position‑independent addressing.</p>
-<details> <summary>How to load a 32b const into a register?</summary>
-<ol>
-<li>Use a LW instruction (cost more)</li>
-<li><code>lui</code> and <code>addi</code> (When the lower 12 bits of a 32‑bit constant are <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">0x800</span></span></span></span></span>, <code>addi</code> sign‑extends them, causing an incorrect result. The assembler automatically adjusts the upper 20 bits when using the <code>li</code> pseudo‑instruction.) (Range: <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">4</span><span class="mord text"><span class="mord">GB</span></span></span></span></span>)</li>
-</ol>
-  </details>
 </li>
 <li>
 <p>Jump</p>
@@ -492,9 +469,36 @@
 </ul>
 </li>
 <li>
-<p>Regularity</p>
+<p>Load and Store</p>
+<p><code>lw rd, offset (rs1)</code> means load data from memory and write into <code>rd</code>.</p>
+<p><code>sw rs2, offset (rs1)</code> means store data from register <code>rs2</code> into memory.</p>
+</li>
+<li>
+<p>LUI loads a 20‑bit immediate into the upper bits of a register; AUIPC adds a 20‑bit immediate to the current PC for position‑independent addressing.</p>
+<details> <summary>How to load a 32b const into a register?</summary>
+<ol>
+<li>Use a LW instruction (cost more)</li>
+<li><code>lui</code> and <code>addi</code> (When the lower 12 bits of a 32‑bit constant are <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7719em;vertical-align:-0.136em;"></span><span class="mrel">≥</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">0x800</span></span></span></span></span>, <code>addi</code> sign‑extends them, causing an incorrect result. The assembler automatically adjusts the upper 20 bits when using the <code>li</code> pseudo‑instruction.) (Range: <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord">4</span><span class="mord text"><span class="mord">GB</span></span></span></span></span>)</li>
+</ol>
+  </details>
 </li>
 </ul>
+<details> <summary><strong>Instruction Encoding List</strong></summary>
+<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+  <div style="align-self: stretch;">
+    <img src="pic/15.png" style="width: 100%; height: 100%; object-fit: contain;">
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px;">
+    <div style="flex: 1; display: flex; align-items: flex-start;">
+      <img src="pic/16.png" style="width: 100%; max-height: 100%; object-fit: contain;">
+    </div>
+    <div style="flex: 1; display: flex; align-items: flex-end;">
+      <img src="pic/17.png" style="width: 100%; max-height: 100%; object-fit: contain;">
+    </div>
+  </div>
+</div>
+</details>
+<details><summary><strong>Regularity</strong></summary>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Field</th><th style="text-align: center">Bit Position</th><th style="text-align: center">Note</th></tr></thead><tbody>
 <tr><td style="text-align: center"><strong>Opcode</strong></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">0</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">6</span><span class="mclose">]</span></span></span></span></td><td style="text-align: center">Always opcode</td></tr>
 <tr><td style="text-align: center"><strong>rd</strong></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">[</span><span class="mord">7</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">11</span><span class="mclose">]</span></span></span></span></td><td style="text-align: center">Destination reg</td></tr>
@@ -503,7 +507,8 @@
 <tr><td style="text-align: center"><strong>Length</strong></td><td style="text-align: center">-</td><td style="text-align: center">Fixed 16/32 bit</td></tr>
 <tr><td style="text-align: center"><strong>Immediate</strong></td><td style="text-align: center">High bits</td><td style="text-align: center">Uses rd field for branch/store</td></tr>
 </tbody></table>
-</div><details><summary><strong>Pseudo Instrcution</strong></summary>
+</div></details>
+<details><summary><strong>Pseudo Instrcution</strong></summary>
 <div class="table-wrapper"><table><thead><tr><th>Pseudoinstruction</th><th>Actual Instruction Sequence</th><th>Operation</th></tr></thead><tbody>
 <tr><td><code>nop</code></td><td><code>addi x0, x0, 0</code></td><td>No operation</td></tr>
 <tr><td><code>li rd, imm</code></td><td><code>lui rd, imm[31:12] + imm[11]</code><br><code>addi rd, rd, imm[11:0]</code></td><td>Load 32-bit immediate</td></tr>
@@ -851,11 +856,22 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 <li>
 <p><strong>Micro-architecture states</strong></p>
 <ul>
-<li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text" style="color:#df0030;"><span class="mord" style="color:#df0030;">Piplined registers</span></span></span></span></span> Pipelined registers hold transient data between stages for a few cycles.</li>
-<li>Branch predictors</li>
-<li>Caches</li>
-<li>Buffers and Quenes</li>
-<li>Counters</li>
+<li>
+<p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text" style="color:#df0030;"><span class="mord" style="color:#df0030;">Piplined registers</span></span></span></span></span> Pipelined registers hold transient data between stages for a few cycles.</p>
+</li>
+<li>
+<p>Branch predictors</p>
+<p>Static prediction: backward taken (like loop, back to the lower address), forward not taken.</p>
+</li>
+<li>
+<p>Caches</p>
+</li>
+<li>
+<p>Buffers and Quenes</p>
+</li>
+<li>
+<p>Counters</p>
+</li>
 </ul>
 </li>
 </ul>
@@ -863,28 +879,44 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 <h3 id="structure-hazards"><a class="header" href="#structure-hazards">Structure Hazards</a></h3>
 <p>A conflict arising due to hardware resourece limitations within the pipeline.</p>
 <ul>
-<li>Pipeline stalls</li>
-<li>Multiple resources</li>
-<li>Instruction Reordering</li>
-<li>ISA design</li>
+<li>
+<p>Pipeline stalls</p>
+</li>
+<li>
+<p>Multiple resources</p>
+</li>
+<li>
+<p>Instruction Reordering</p>
+<p>Static scheduling (by compiler) reorders instructions at compile time to avoid hazards, while dynamic scheduling (by hardware) reorders them at runtime based on actual data and resource availability.</p>
+</li>
+<li>
+<p>ISA design</p>
+</li>
 </ul>
 <h3 id="data-hazards"><a class="header" href="#data-hazards">Data Hazards</a></h3>
 <p>A conflict arising because the current instruction depends on the result of a previous instruction that has not yet been computed or written back.</p>
-<h4 id="register-access-issues"><a class="header" href="#register-access-issues">Register Access Issues</a></h4>
-<p>Register file should write-then-read in the same cycle.</p>
-<h4 id="alu-result-access-issue"><a class="header" href="#alu-result-access-issue">ALU Result Access Issue</a></h4>
-<p>Instruction depends on WB's Regfile write from previous instruction.</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Scenario</th><th style="text-align: center">Data Ready Stage</th><th style="text-align: center">Data Used Stage</th><th style="text-align: center">Example</th></tr></thead><tbody>
+<tr><td style="text-align: center">Register Access Issues</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">EX</span></span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">ID</span></span></span></span></span> <br>It bypasses the ALU, read in ID and held until MEM for memory write.</td><td style="text-align: center"><code>add t0, t1, t2</code><br> <code>sw t0, 4(t3)</code></td></tr>
+<tr><td style="text-align: center">ALU Result Access Issue</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">EX</span></span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">EX</span></span></span></span></span></td><td style="text-align: center"><code>add s0, t0, t1</code> <br> <code>sub t2, s0, t0</code></td></tr>
+<tr><td style="text-align: center">Load Hazard</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">MEM</span></span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6111em;"></span><span class="mord text"><span class="mord texttt">EX</span></span></span></span></span></td><td style="text-align: center"><code>lw s1, 4(s0)</code><br><code>add t0, s1, t1</code></td></tr>
+</tbody></table>
+</div>
+<h4 id="solutions"><a class="header" href="#solutions">Solutions</a></h4>
+<p>Flow dependence (RAW) is a true data dependence, while anti-dependence (WAR) and output dependence (WAW) are name dependences that can be eliminated by register renaming.</p>
 <ul>
 <li>
-<p><strong>Stall pipeline</strong> at ID stage, stalled for two clock cycles.</p>
+<p><strong>Stall pipeline (Interlocking)</strong></p>
 </li>
 <li>
 <p><strong>Data Forwarding (Bypassing)</strong></p>
+<p>Add forwarding control logic to make extra connections in the datapath.</p>
+<p>Hazard detection compares <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord texttt">EX/MEM</span></span></span></span></span> and <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7778em;vertical-align:-0.0833em;"></span><span class="mord text"><span class="mord texttt">MEM/WB</span></span></span></span></span> destination registers with current instruction’s source registers. Forwarding is skipped when <code>RegWr == 0</code> or when the destination register is <code>x0</code>.</p>
 </li>
 <li>
-<p><strong>Compiler Code Transformations</strong></p>
+<p><strong>Compiler Code Transformations</strong> Scheduling (reordering) scope is often limited by branches, indirect branches, and call/ret.</p>
 </li>
 </ul>
+<h3 id="control-hazards"><a class="header" href="#control-hazards">Control Hazards</a></h3>
 
                     </main>
 
@@ -915,22 +947,6 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 
         </div>
 
-        <!-- Livereload script (if served using the cli tool) -->
-        <script>
-            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
-            const socket = new WebSocket(wsAddress);
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
 
 
 

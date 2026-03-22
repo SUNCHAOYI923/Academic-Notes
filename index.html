@@ -155,14 +155,18 @@
                         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.4/dist/katex.min.css">
 <h1 id="catalogue"><a class="header" href="#catalogue">Catalogue</a></h1>
 <h2 id="course-notes"><a class="header" href="#course-notes">Course Notes</a></h2>
-<h3 id="-csc3060"><a class="header" href="#-csc3060">📚 CSC3060</a></h3>
+<h3 id="csc3060"><a class="header" href="#csc3060">CSC3060</a></h3>
 <ul>
 <li><a href="./CSC3060/Notes.html">CSC3060 Notes</a> — Core lecture notes</li>
 <li><a href="./CSC3060/Notes_CSAPP.html">CSC3060 CSAPP Reference</a> — Supplementary notes based on <em>Computer Systems: A Programmer's Perspective</em></li>
 </ul>
-<h3 id="-csc4303"><a class="header" href="#-csc4303">📖 CSC4303</a></h3>
+<h3 id="csc4303"><a class="header" href="#csc4303">CSC4303</a></h3>
 <ul>
 <li><a href="./CSC4303/Notes.html">CSC4303 Notes</a> — Core lecture notes</li>
+</ul>
+<h3 id="dda3020"><a class="header" href="#dda3020">DDA3020</a></h3>
+<ul>
+<li><a href="./DDA3020/Notes.html">DDA3020 Notes</a> — Core lecture notes</li>
 </ul>
 
                     </main>
@@ -188,6 +192,22 @@
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 

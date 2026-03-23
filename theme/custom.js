@@ -56,6 +56,18 @@
         }
     }, true);
 
+    const bqs = document.querySelectorAll('blockquote');
+    bqs.forEach(function(bq) {
+        let html = bq.innerHTML;
+        if (html.includes('$$')) {
+            let parts = html.split('$$');
+            for (let i = 1; i < parts.length; i += 2) {
+                parts[i] = parts[i].replace(/(^|<br\s*\/?>|\n|<p>)\s*(?:&gt;|>)\s?/gi, '$1');
+            }
+            bq.innerHTML = parts.join('$$');
+        }
+    });
+
     const codeBlocks = document.querySelectorAll('pre code');
     codeBlocks.forEach(function(code) {
         const pre = code.parentElement;

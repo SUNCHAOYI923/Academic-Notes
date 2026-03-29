@@ -1,6 +1,33 @@
 (function() {
     if (document.getElementById('my-image-overlay')) return;
 
+    /*
+    function expandAllDetails() {
+        document.querySelectorAll('details:not([open])').forEach(detail => {
+            detail.setAttribute('open', '');
+        });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', expandAllDetails);
+    } else {
+        expandAllDetails();
+    }
+
+    const observer = new MutationObserver(function(mutations) {
+        let shouldExpand = false;
+        for (const mutation of mutations) {
+            if (mutation.addedNodes.length) {
+                shouldExpand = true;
+                break;
+            }
+        }
+        if (shouldExpand) {
+            expandAllDetails();
+        }
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    */
     const overlay = document.createElement('div');
     overlay.id = 'my-image-overlay';
 

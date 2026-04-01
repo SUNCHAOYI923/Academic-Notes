@@ -17,6 +17,7 @@
         <link rel="stylesheet" href="../css/variables.css">
         <link rel="stylesheet" href="../css/general.css">
         <link rel="stylesheet" href="../css/chrome.css">
+        <link rel="stylesheet" href="../css/print.css" media="print">
 
         <!-- Fonts -->
         <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
@@ -126,6 +127,9 @@
                     <h1 class="menu-title">CUHKSZ CSC Notes</h1>
 
                     <div class="right-buttons">
+                        <a href="../print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
 
                     </div>
                 </div>
@@ -658,6 +662,12 @@
 <li><strong>Set cause</strong> Write exception/interrupt reason to <code>mcause</code></li>
 <li><strong>Jump to handler</strong> Jump to exception handler entry point based on <code>mtvec</code> configuration</li>
 </ol>
+<h4 id="frame-pointer-fpstack-pointer-sp"><a class="header" href="#frame-pointer-fpstack-pointer-sp">Frame Pointer (fp)/Stack Pointer (sp)</a></h4>
+<ul>
+<li>sp points to the top of stack.</li>
+<li>fp points to a fixed location within the current stack frame, typically the address where the old fp is stored.</li>
+<li>When the function returns, the saved old fp is restored to the fp register, making fp point back to the caller's stack frame.</li>
+</ul>
 <h4 id="calling-convention"><a class="header" href="#calling-convention">Calling Convention</a></h4>
 <div class="table-wrapper"><table><thead><tr><th>RV Registers</th><th>ABI Name</th><th>Caller/Callee</th><th>Purpose</th></tr></thead><tbody>
 <tr><td>x0</td><td><code>zero</code></td><td>—</td><td>Always zero</td></tr>
@@ -867,7 +877,7 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 </tbody></table>
 </div>
 <ul>
-<li><strong>Latency</strong> The total time required to complete <strong>one single instruction</strong> from start to finish.</li>
+<li><strong>Latency</strong> The total time required to complete <strong>one single instruction</strong> from start to finish. (Single-cycle data path actually has shorter instruction latency because of the setup time and propagation delay in pipeline.)</li>
 <li><strong>Throughput</strong> The total number of instructions completed <strong>per unit</strong> of time.</li>
 <li>For superscalar implementation, CPI <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>.</li>
 <li>Single cycle as lower throughput but shorter instruction latency.</li>
@@ -1055,7 +1065,7 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Level Transfer</th><th style="text-align: center">Staging Unit</th><th style="text-align: center">Typical Size</th><th style="text-align: center">Controlled By</th></tr></thead><tbody>
 <tr><td style="text-align: center">Registers ↔ Memory</td><td style="text-align: center">Instruction Operands</td><td style="text-align: center">Bits / words (e.g., 32/64 bits)</td><td style="text-align: center">Compiler (Programmer)</td></tr>
 <tr><td style="text-align: center">Cache / Local Memory ↔ Memory</td><td style="text-align: center">Blocks / Lines</td><td style="text-align: center">64 B (cache line)</td><td style="text-align: center">Hardware (Cache Controller) / Compiler or Programmer (Local Memory)</td></tr>
-<tr><td style="text-align: center">Memory ↔ Disks</td><td style="text-align: center">Pages</td><td style="text-align: center">4 KB (page)</td><td style="text-align: center">Hardware &amp; OS (Virtual Memory) / Programmer (Files)</td></tr>
+<tr><td style="text-align: center">Memory ↔ Disks</td><td style="text-align: center">Pages</td><td style="text-align: center">4 KB (page)</td><td style="text-align: center">Hardware &amp; OS (<strong>Virtual Memory</strong>) / Programmer (Files)</td></tr>
 <tr><td style="text-align: center">Disks ↔ Tapes</td><td style="text-align: center">Files</td><td style="text-align: center">Variable (e.g., 64 KB–1 MB)</td><td style="text-align: center">Hardware / Operator or Programmer</td></tr>
 </tbody></table>
 </div>

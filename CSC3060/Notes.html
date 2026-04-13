@@ -980,7 +980,7 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 <h4 id="static-branch-prediction-compile-time"><a class="header" href="#static-branch-prediction-compile-time">Static Branch Prediction (Compile Time)</a></h4>
 <ul>
 <li>Predict a backward branch as taken (loop back branches) and predict a forward branch as fall-through (the compiler always puts the then part in the fall-through path).</li>
-<li>Conditional branch's (e.g. <code>blt</code>) behavior is entirely program‑dependent and cannot be accurately predicted using simple static rules. However, static prediction can still be effective for special cases like <code>beq rs1, x0</code> due to common software patterns.</li>
+<li>Conditional branch's (e.g. <code>blt</code>) behavior is entirely program‑dependent and cannot be accurately predicted using simple static rules. <strong>Static branch prediction does not read registers at runtime</strong>. It only considers whether the branch target is forward or backward.</li>
 <li>Unconditional branches (e.g. <code>jal</code>) always jump, static prediction should always predict <strong>taken</strong>.</li>
 <li>The ISA may reserve a bit in branch instructions as a prediction bit.</li>
 <li>When branch prediction is wrong, <strong>pipeline flushing</strong> is performed.</li>
@@ -1072,7 +1072,7 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 <p>This gives you Large, Cheap memory, but Fast access.</p>
 <p>Caches provide automatic (transparent) data movement, while local memory requires explicit programmer-controlled data management.</p>
 <h2 id="cache"><a class="header" href="#cache">Cache</a></h2>
-<h3 id="direct-mapped"><a class="header" href="#direct-mapped">Direct Mapped</a></h3>
+<h3 id="direct-mapped-caches"><a class="header" href="#direct-mapped-caches">Direct Mapped Caches</a></h3>
 <img src="pic/22.png" width="50%" height="50%">
 <ul>
 <li>
@@ -1096,7 +1096,91 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 <details><summary>Why is the set index typically taken from the middle bits of the address rather than the high bits?</summary>
 <p>Using high bits as the set index causes consecutive memory blocks to map to the same set, leading to more conflict misses, whereas middle bits distribute blocks across sets to better exploit spatial locality.</p>
 </details>
-<h3 id="fully-associative"><a class="header" href="#fully-associative">Fully Associative</a></h3>
+<h3 id="set-associative-caches"><a class="header" href="#set-associative-caches">Set Associative Caches</a></h3>
+<p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span>-way set-associative has <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span> lines per set while direct-mapped is one way and fully associative is one set.</p>
+<p>Given a cache with total size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span> measured in kilobytes, associativity <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span>, and block size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span> measured in bytes. The number of sets <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span> is calculated as <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2173em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05764em;">BE</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1024</span><span class="mord mathnormal mtight" style="margin-right:0.07153em;">C</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>.</p>
+<p>For a 64 bit address:</p>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Parameter / Change</th><th style="text-align: center">Block Offset Bits</th><th style="text-align: center">Set Index Bits</th><th style="text-align: center">Tag Bits</th></tr></thead><tbody>
+<tr><td style="text-align: left">Formula (64‑bit address)</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">64</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span></td></tr>
+<tr><td style="text-align: left">Increase block size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↑</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↓</span></span></span></span></td><td style="text-align: center">—</td></tr>
+<tr><td style="text-align: left">Increase cache size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span></td><td style="text-align: center">—</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↑</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↓</span></span></span></span></td></tr>
+<tr><td style="text-align: left">Increase associativity <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span></td><td style="text-align: center">—</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↓</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↑</span></span></span></span></td></tr>
+</tbody></table>
+</div>
+<ul>
+<li>When the block size is too small, the cache cannot fetch enough contiguous data in a single miss (lower spatial locality -- most accesses to nearby addresses still result in cache misses).</li>
+<li>When the block size is too large, the fixed-size cache holds fewer blocks, leading to more conflicts, frequent replacements and higher miss penalty (lower temporal locality -- the recently used data is quickly evicted before it can be reused).</li>
+</ul>
+<h3 id="cache-hit-and-miss"><a class="header" href="#cache-hit-and-miss">Cache Hit and Miss</a></h3>
+<ul>
+<li>
+<p><strong>Cache Read</strong></p>
+<ul>
+<li><strong>Read Hit</strong></li>
+<li><strong>Read Miss</strong> When a read miss occurs, the CPU stalls the pipeline, fetches the missing block from the next memory level, and then resumes execution.</li>
+</ul>
+</li>
+<li>
+<p><strong>Cache Write</strong></p>
+<ul>
+<li>
+<p><strong>Write Hit</strong></p>
+<ul>
+<li>
+<p><strong>Write Through</strong></p>
+<p>It simultaneously updated to cache and memory. It ensures data isn't lost if the cache is disrupted, but increases memory traffic and write latency.</p>
+<p>Solution:  <strong>write buffer</strong>. A write buffer hides write latency, but if store frequency exceeds the DRAM write cycle, the buffer saturates and stalls the CPU (Write buffer allows write-coalescing/combining to reduce traffic to memory.).</p>
+</li>
+<li>
+<p><strong>Write Back</strong></p>
+<p>The CPU writes data only to the cache initially, and main memory is not updated until the cache line is eventually replaced (need Dirty Bit). This reduces memory traffic and write latency, but creates cache-memory inconsistency, requiring cache coherence protocols (e.g., MESI) in multi-core systems. Data loss risk on cache failure is mitigated by Error Correcting Code (ECC) protection.</p>
+</li>
+</ul>
+</li>
+<li>
+<p><strong>Write Miss</strong></p>
+<ul>
+<li><strong>Write Allocate</strong> First read the data from main memory and loaded into the cache, and then the write operation is performed on the cached copy.</li>
+<li><strong>No Write Allocate</strong> It writes the data directly to main memory without loading the missing block into the cache.</li>
+</ul>
+</li>
+</ul>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Aspect</th><th style="text-align: center">Write Through + No Write Allocate</th><th style="text-align: center">Write Back + Write Allocate</th></tr></thead><tbody>
+<tr><td style="text-align: center"><strong>Write Miss Behavior</strong></td><td style="text-align: center">Bypass cache, write directly to main memory (optionally via write buffer + write-combining)</td><td style="text-align: center">Load missing block from main memory into cache first, then write to cache</td></tr>
+<tr><td style="text-align: center"><strong>Typical Partner</strong></td><td style="text-align: center">Write Through Cache</td><td style="text-align: center">Copy Back (Write Back) Cache</td></tr>
+<tr><td style="text-align: center"><strong>Initial Cost</strong></td><td style="text-align: center">Low (no main memory read)</td><td style="text-align: center">High (one read miss)</td></tr>
+<tr><td style="text-align: center"><strong>Reuse Cost</strong></td><td style="text-align: center">High (data not in cache, still miss on reuse)</td><td style="text-align: center">Low (subsequent reads/writes hit in cache, only set dirty bit)</td></tr>
+<tr><td style="text-align: center"><strong>Best For</strong></td><td style="text-align: center">Write once, never reused data (e.g., writing logs)</td><td style="text-align: center">Repeated reads/writes to same data (temporal locality)</td></tr>
+</tbody></table>
+</div></li>
+<li>
+<p><strong>Instruction Cache Miss Handling</strong></p>
+<p>On an instruction cache miss, the CPU sends the PC to memory, waits for the read to complete, writes the fetched data into cache with its tag and valid bit set, then restarts the instruction fetch. (Instruction cache prefetching is a commonly used hardware optimization to reduce instruction cache misses.)</p>
+  <details><summary> Can you prefetch for instruction cache in software? </summary>
+<p>Software cannot directly prefetch instructions (the fetch stage is PC-driven), unlike data prefetching. It can only indirectly affect I-cache hit rate via code layout or execution order.</p>
+  </details>
+  <details><summary> If we prefetch on every miss, why not just use a larger cache line size? </summary>
+<ul>
+<li><strong>Branch-sensitive</strong> Prefetching follows the predicted path, fetching only useful instructions. Large lines load all adjacent instructions regardless of branches, wasting bandwidth and cache space on dead code.</li>
+<li><strong>False sharing</strong> Large lines reduce effective cache capacity, more likely to cause conflict.</li>
+<li><strong>Bandwidth-aware</strong> Large line increases the cost of every miss. Prefetch is more flexible.</li>
+</ul>
+  </details>
+  <details><summary> Why does the GPU prefetch for the next 10-12 lines, but the CPU only prefetches for 1-2 lines?  </summary>
+<p>GPU prefetches 10–12 lines because it is throughput‑oriented with highly linear instruction flow, making deep prefetch safe, while CPU, being latency‑sensitive with frequent branches, only prefetches 1–2 lines to avoid polluting the cache and wasting bandwidth on wrong paths.</p>
+  </details>
+</li>
+</ul>
+<h3 id="non-blocking-cache-and-blocking-cache"><a class="header" href="#non-blocking-cache-and-blocking-cache">Non-Blocking Cache and Blocking Cache</a></h3>
+<ul>
+<li><strong>Blocking Cache</strong> A cache miss stalls the CPU pipeline immediately (stall on miss).</li>
+<li><strong>Non-Blocking Cache (Lockup-Free Cache)</strong> The CPU continues executing other instructions on a miss and stalls only when the data is needed, using Miss Status Holding Register (MSHRs) to track outstanding misses (stall on use). Non-blocking caches support MLP (Memory Level Parallelism).
+<ul>
+<li><strong>Hit under Miss</strong> During one miss, the cache can still handle subsequent hits.</li>
+<li><strong>Miss under Miss (better)</strong> During one miss, the cache can also handle another miss, allowing multiple outstanding misses.</li>
+</ul>
+</li>
+</ul>
 
                     </main>
 

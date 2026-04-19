@@ -687,6 +687,7 @@
 <ul>
 <li><strong>Caller-Saved</strong> Caller decides whether to save based on whether the value will be used after the call.</li>
 <li><strong>Callee-Saved</strong> Callee must always save these registers before using them and restore them before returning (<strong>absolutely safe</strong>).</li>
+<li>Array variables are typically allocated in memory (stack or static data section), not in registers.</li>
 </ul>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Aspect</th><th style="text-align: center">Caller-Saved</th><th style="text-align: center">Callee-Saved</th></tr></thead><tbody>
 <tr><td style="text-align: center"><strong>Decision maker</strong></td><td style="text-align: center">Caller</td><td style="text-align: center">Callee</td></tr>
@@ -695,13 +696,13 @@
 <tr><td style="text-align: center"><strong>Restore timing</strong></td><td style="text-align: center">After subroutine returns</td><td style="text-align: center">Before function returns</td></tr>
 </tbody></table>
 </div><details> <summary>Why <strong>caller</strong> registers are allocated to temporaries?</summary>
-Temporaries are short-lived and do not need to survive across function calls.  Placing them in caller‑save registers avoids unnecessary save/restore code.
+<p>Temporaries are short-lived and do not need to survive across function calls.  Placing them in caller‑save registers avoids unnecessary save/restore code.</p>
 </details>
 <details> <summary>Why <strong>callee</strong> registers are allocated to local variables?</summary>
-Local variables live across function calls. Using callee registers ensures they are preserved automatically by the callee, avoiding repeated saves at each call site.
+<p>Local variables live across function calls. Using callee registers ensures they are preserved automatically by the callee, avoiding repeated saves at each call site.</p>
 </details>
 <details> <summary>Why <strong>callee</strong> registers are allocated to CSEs (Common Sub-Expressions)?</summary>
-Local variables and CSEs are tend to live longer (may be as long as the procedure invocation).
+<p>Local variables and CSEs are tend to live longer (may be as long as the procedure invocation).</p>
 </details>
 <h3 id="cisc-optimized-for-compact-code-size"><a class="header" href="#cisc-optimized-for-compact-code-size">CISC [optimized for compact code size]</a></h3>
 <h1 id="chapter-4-processor-architecture--logic-design"><a class="header" href="#chapter-4-processor-architecture--logic-design">Chapter 4 Processor Architecture &amp; Logic Design</a></h1>
@@ -1062,6 +1063,7 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 </li>
 </ul>
 <h2 id="memory-hierarchy-1"><a class="header" href="#memory-hierarchy-1">Memory Hierarchy</a></h2>
+<img src="pic/24.png" width="60%" height="60%">
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Level Transfer</th><th style="text-align: center">Staging Unit</th><th style="text-align: center">Typical Size</th><th style="text-align: center">Controlled By</th></tr></thead><tbody>
 <tr><td style="text-align: center">Registers ↔ Memory</td><td style="text-align: center">Instruction Operands</td><td style="text-align: center">Bits / words (e.g., 32/64 bits)</td><td style="text-align: center">Compiler (Programmer)</td></tr>
 <tr><td style="text-align: center">Cache / Local Memory ↔ Memory</td><td style="text-align: center">Blocks / Lines</td><td style="text-align: center">64 B (cache line)</td><td style="text-align: center">Hardware (Cache Controller) / Compiler or Programmer (Local Memory)</td></tr>
@@ -1110,18 +1112,19 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 <ul>
 <li>When the block size is too small, the cache cannot fetch enough contiguous data in a single miss (lower spatial locality -- most accesses to nearby addresses still result in cache misses).</li>
 <li>When the block size is too large, the fixed-size cache holds fewer blocks, leading to more conflicts, frequent replacements and higher miss penalty (lower temporal locality -- the recently used data is quickly evicted before it can be reused).</li>
+<li>Number of cache lines is determined by the cache size and the line size.</li>
 </ul>
 <h3 id="cache-hit-and-miss"><a class="header" href="#cache-hit-and-miss">Cache Hit and Miss</a></h3>
+<h4 id="cache-read"><a class="header" href="#cache-read">Cache Read</a></h4>
 <ul>
 <li>
-<p><strong>Cache Read</strong></p>
-<ul>
-<li><strong>Read Hit</strong></li>
-<li><strong>Read Miss</strong> When a read miss occurs, the CPU stalls the pipeline, fetches the missing block from the next memory level, and then resumes execution.</li>
-</ul>
+<p><strong>Read Hit</strong></p>
 </li>
 <li>
-<p><strong>Cache Write</strong></p>
+<p><strong>Read Miss</strong> When a read miss occurs, the CPU stalls the pipeline, fetches the missing block from the next memory level, and then resumes execution.</p>
+</li>
+</ul>
+<h4 id="cache-write"><a class="header" href="#cache-write">Cache Write</a></h4>
 <ul>
 <li>
 <p><strong>Write Hit</strong></p>
@@ -1152,35 +1155,103 @@ Local variables and CSEs are tend to live longer (may be as long as the procedur
 <tr><td style="text-align: center"><strong>Reuse Cost</strong></td><td style="text-align: center">High (data not in cache, still miss on reuse)</td><td style="text-align: center">Low (subsequent reads/writes hit in cache, only set dirty bit)</td></tr>
 <tr><td style="text-align: center"><strong>Best For</strong></td><td style="text-align: center">Write once, never reused data (e.g., writing logs)</td><td style="text-align: center">Repeated reads/writes to same data (temporal locality)</td></tr>
 </tbody></table>
-</div></li>
-<li>
-<p><strong>Instruction Cache Miss Handling</strong></p>
+</div>
+<h4 id="instruction-cache-miss-handling"><a class="header" href="#instruction-cache-miss-handling">Instruction Cache Miss Handling</a></h4>
 <p>On an instruction cache miss, the CPU sends the PC to memory, waits for the read to complete, writes the fetched data into cache with its tag and valid bit set, then restarts the instruction fetch. (Instruction cache prefetching is a commonly used hardware optimization to reduce instruction cache misses.)</p>
-  <details><summary> Can you prefetch for instruction cache in software? </summary>
+<details><summary> Can you prefetch for instruction cache in software? </summary>
 <p>Software cannot directly prefetch instructions (the fetch stage is PC-driven), unlike data prefetching. It can only indirectly affect I-cache hit rate via code layout or execution order.</p>
-  </details>
-  <details><summary> If we prefetch on every miss, why not just use a larger cache line size? </summary>
+</details>
+<details><summary> If we prefetch on every miss, why not just use a larger cache line size? </summary>
 <ul>
 <li><strong>Branch-sensitive</strong> Prefetching follows the predicted path, fetching only useful instructions. Large lines load all adjacent instructions regardless of branches, wasting bandwidth and cache space on dead code.</li>
 <li><strong>False sharing</strong> Large lines reduce effective cache capacity, more likely to cause conflict.</li>
 <li><strong>Bandwidth-aware</strong> Large line increases the cost of every miss. Prefetch is more flexible.</li>
 </ul>
-  </details>
-  <details><summary> Why does the GPU prefetch for the next 10-12 lines, but the CPU only prefetches for 1-2 lines?  </summary>
+</details>
+<details><summary> Why does the GPU prefetch for the next 10-12 lines, but the CPU only prefetches for 1-2 lines?  </summary>
 <p>GPU prefetches 10–12 lines because it is throughput‑oriented with highly linear instruction flow, making deep prefetch safe, while CPU, being latency‑sensitive with frequent branches, only prefetches 1–2 lines to avoid polluting the cache and wasting bandwidth on wrong paths.</p>
-  </details>
-</li>
-</ul>
-<h3 id="non-blocking-cache-and-blocking-cache"><a class="header" href="#non-blocking-cache-and-blocking-cache">Non-Blocking Cache and Blocking Cache</a></h3>
+</details>
+<h4 id="types-of-cache-misses"><a class="header" href="#types-of-cache-misses">Types of Cache Misses</a></h4>
 <ul>
-<li><strong>Blocking Cache</strong> A cache miss stalls the CPU pipeline immediately (stall on miss).</li>
-<li><strong>Non-Blocking Cache (Lockup-Free Cache)</strong> The CPU continues executing other instructions on a miss and stalls only when the data is needed, using Miss Status Holding Register (MSHRs) to track outstanding misses (stall on use). Non-blocking caches support MLP (Memory Level Parallelism).
+<li><strong>Compulsory (or Cold) Miss</strong> The first access to a block that has never been loaded into the cache before.</li>
+<li><strong>Conflict Miss</strong> Multiple references are mapping to the same set, and the set is not large enough to hold them.</li>
+<li><strong>Capacity Miss</strong> Cache is not large enough to hold needed blocks.</li>
+<li><strong>Coherence Miss</strong> Caused by invalidation from other processors in a multiprocessor system to maintain cache coherence.</li>
+</ul>
+<h4 id="ways-to-reduce-cache-miss-penalty"><a class="header" href="#ways-to-reduce-cache-miss-penalty">Ways to Reduce Cache Miss Penalty</a></h4>
+<div class="table-wrapper"><table><thead><tr><th>Technique</th><th>Core Idea</th><th>How It Hides Penalty</th></tr></thead><tbody>
+<tr><td>Critical Word First and Early Restart</td><td>Fetch requested word first; resume execution immediately</td><td>Reduces wait time; overlaps load with execution</td></tr>
+<tr><td>Non-Blocking Cache</td><td>Continue on miss; track multiple misses with MSHRs</td><td>Overlaps multiple misses</td></tr>
+<tr><td>Cache Prefetching</td><td>Fetch data before it is needed</td><td>Avoids miss entirely</td></tr>
+<tr><td>Write Buffer</td><td>Hold dirty blocks temporarily; write back later</td><td>CPU doesn't wait for write</td></tr>
+<tr><td>Cache-Aware Code Scheduling</td><td>Compiler reorders instructions</td><td>Overlaps miss with computation</td></tr>
+</tbody></table>
+</div>
+<h3 id="non-blocking-cache-and-blocking-cache"><a class="header" href="#non-blocking-cache-and-blocking-cache">Non-Blocking Cache and Blocking Cache</a></h3>
+<h4 id="blocking-cache"><a class="header" href="#blocking-cache">Blocking Cache</a></h4>
+<p>A cache miss stalls the CPU pipeline immediately (stall on miss).</p>
+<h4 id="non-blocking-cache-lockup-free-cache"><a class="header" href="#non-blocking-cache-lockup-free-cache">Non-Blocking Cache (Lockup-Free Cache)</a></h4>
+<p>The CPU continues executing other instructions on a miss and stalls only when the data is needed, using Miss Status Holding Register (MSHRs) to track outstanding misses (stall on use). Non-blocking caches support MLP (Memory Level Parallelism).</p>
 <ul>
 <li><strong>Hit under Miss</strong> During one miss, the cache can still handle subsequent hits.</li>
 <li><strong>Miss under Miss (better)</strong> During one miss, the cache can also handle another miss, allowing multiple outstanding misses.</li>
 </ul>
+<h3 id="cache-block-replacement"><a class="header" href="#cache-block-replacement">Cache Block Replacement</a></h3>
+<h4 id="direct-mapped"><a class="header" href="#direct-mapped">Direct Mapped</a></h4>
+<p>Each set has only one line, so the new block always replaces the existing block in that set.</p>
+<h4 id="set-ssociative-or-fully-associative"><a class="header" href="#set-ssociative-or-fully-associative">Set ssociative or Fully Associative</a></h4>
+<ul>
+<li>
+<p><strong>Random</strong></p>
+</li>
+<li>
+<p><strong>Least Recently Used (LRU)</strong></p>
+<p>Hardware keeps track of the access history and replaces the block that has not been used for the longest time.</p>
+<p>Each block has a counter. On a hit, reset its counter to 0 and increment all other counters in the set. On a miss, replace the block with the highest counter value.</p>
+</li>
+<li>
+<p><strong>First In First Out (FIFO)</strong> The block that has been in the cache the longest is replaced, regardless of access history.</p>
+</li>
+<li>
+<p><strong>Belady’s Algorithm</strong> Replace the block that will not be used for the longest time in the future. It is optimal but requires perfect knowledge of future accesses, making it impractical for real hardware.</p>
 </li>
 </ul>
+<h3 id="victim-cache"><a class="header" href="#victim-cache">Victim Cache</a></h3>
+<p>A small fully associative cache placed between the main cache and memory to hold recently evicted blocks, reducing conflict misses by providing a second chance for recently replaced data. Since such conflicts occur in only a few sets, just 4–8 entries suffice for fast access, combining the speed of direct-mapped L1 with the benefit of full associativity.</p>
+<img src="pic/23.png" width="50%" height="50%">
+<h3 id="average-memory-access-time-amat"><a class="header" href="#average-memory-access-time-amat">Average Memory Access Time (AMAT)</a></h3>
+<p>Usually, <code>%instr</code> is higher than <code>%data</code>, but I-cache hits better because instruction accesses are highly sequential with strong spatial locality, have no write misses (read-only), and exhibit simpler access patterns than data references, which often involve random pointers or strided array accesses.</p>
+<p>AMAT was accurate for blocking caches and in-order CPUs, but lost relevance as out-of-order execution, non-blocking caches, prefetching hid miss latency and spliting I/D caches.</p>
+<h4 id="low-hit-latency"><a class="header" href="#low-hit-latency">Low Hit Latency</a></h4>
+<ul>
+<li><strong>Small and Simple</strong></li>
+<li><strong>Direct-map or low associativity</strong> Number of comparators needed equals total cache entries for fully associative, but only <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span> for <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">n</span></span></span></span>-way set associative.</li>
+<li><strong>Prediction</strong> Predict which way to compare first.</li>
+<li><strong>Virtual address cache or virtual index and physical tagged cache</strong> Avoid or overlap with address translation delay.</li>
+<li><strong>Cache layout closer to CPU to minimize signal delay</strong></li>
+</ul>
+<h3 id="multilevel-cache"><a class="header" href="#multilevel-cache">Multilevel Cache</a></h3>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Feature</th><th style="text-align: center">L1 Cache</th><th style="text-align: center">L2 Cache</th></tr></thead><tbody>
+<tr><td style="text-align: center">Primary goal</td><td style="text-align: center">Minimize hit time</td><td style="text-align: center">Minimize miss rate</td></tr>
+<tr><td style="text-align: center">Locality preference</td><td style="text-align: center">Spatial locality</td><td style="text-align: center">Temporal locality</td></tr>
+<tr><td style="text-align: center">Typical write policy</td><td style="text-align: center">Write-through</td><td style="text-align: center">Write-back</td></tr>
+<tr><td style="text-align: center">Reason</td><td style="text-align: center">L1 hit directly affects pipeline</td><td style="text-align: center">L2 miss leads to high memory penalty</td></tr>
+<tr><td style="text-align: center">Associativity</td><td style="text-align: center">Low</td><td style="text-align: center">High</td></tr>
+<tr><td style="text-align: center">Size</td><td style="text-align: center">Small</td><td style="text-align: center">Large</td></tr>
+</tbody></table>
+</div>
+<h3 id="snoopy-cache-coherence-schemes"><a class="header" href="#snoopy-cache-coherence-schemes">Snoopy Cache Coherence Schemes</a></h3>
+<p>All coherence operations are broadcast over a global bus, and every cache controller snoops the bus and reacts according to its own cache contents.</p>
+<p>Each cache controller is a bidirectional state machine that takes CPU requests and bus snoop events, updates state and acts per a transition diagram. Multiple controllers form a distributed algorithm, and coherence operates at cache block granularity.</p>
+<p>MESI protocol uses four states (Modified, Exclusive, Shared, Invalid) to track each cache block, enabling multi-core coherence while minimizing bus communication and memory accesses.</p>
+<h3 id="exclusiveinclusive-caches"><a class="header" href="#exclusiveinclusive-caches">Exclusive/Inclusive Caches</a></h3>
+<p>Inclusive L2 caches simplify coherence invalidation in multiprocessor systems by checking at the L2 level, despite wasting capacity, which modern processors tolerate for easier consistency management, making inclusive more common than exclusive today.</p>
+<h4 id="inclusive-caches"><a class="header" href="#inclusive-caches">Inclusive caches</a></h4>
+<p>Every line in L1 must be presented in L2 (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8193em;vertical-align:-0.136em;"></span><span class="mord text"><span class="mord">L1</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊆</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">L2</span></span></span></span></span>). When L2 evicts a line, it must invalidate the corresponding line in L1, and L2 can have a larger line size than L1.</p>
+<h4 id="exclusive-caches"><a class="header" href="#exclusive-caches">Exclusive caches</a></h4>
+<p>If a line, A, is in L1, it must NOT be presented in L2. AMD had adopted this for L2/L3. When L1 evicts a line, it moves to L2. On an L1 miss that hits in L2, the line migrates from L2 to L1. And L1 and L2 must have the same line size.</p>
+<h4 id="nine-non-inclusive-and-non-exclusive"><a class="header" href="#nine-non-inclusive-and-non-exclusive">NINE (Non-Inclusive and Non-Exclusive)</a></h4>
+<p>More suitable for L2/L3.</p>
 
                     </main>
 

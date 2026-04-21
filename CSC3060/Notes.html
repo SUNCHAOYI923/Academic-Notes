@@ -1011,7 +1011,7 @@
 </div></li>
 </ul>
 <h1 id="chapter-6-the-memory-hierarchy"><a class="header" href="#chapter-6-the-memory-hierarchy">Chapter 6 The Memory Hierarchy</a></h1>
-<h2 id="random-access-memory-ram"><a class="header" href="#random-access-memory-ram">Random Access Memory (RAM)</a></h2>
+<h2 id="storage-technologies"><a class="header" href="#storage-technologies">Storage Technologies</a></h2>
 <p>Access time is the same for all locations.</p>
 <p>All unconventional DRAM chips offer much higher bandwidth, but the latency remains the same (The first data still takes the same time to arrive).</p>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Feature</th><th style="text-align: center">SRAM</th><th style="text-align: center">DRAM</th></tr></thead><tbody>
@@ -1026,44 +1026,37 @@
 <h3 id="static-random-access-memory-sram"><a class="header" href="#static-random-access-memory-sram">Static Random Access Memory (SRAM)</a></h3>
 <h3 id="dynamic-random-access-memory-dram"><a class="header" href="#dynamic-random-access-memory-dram">Dynamic Random Access Memory (DRAM)</a></h3>
 <ul>
-<li>
-<p><strong>Reading DRAM Supercell</strong> Select row <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> via RAS, load into buffer. Select column <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span></span></span></span> via CAS, output data, then rewrite row to refresh.</p>
-</li>
-<li>
-<p><strong>Memory Modules</strong> A 64-bit word is stored across eight <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span> DRAM chips in parallel, with each chip providing one byte (8 bits) at the same row and column address.</p>
-</li>
-<li>
-<p><strong>Memory Wall</strong> The gap between the speed of processors and the main memory. The bottleneck has shifted from how fast memory can respond (latency) to how much data it can deliver per second (bandwidth).</p>
-<ul>
-<li><strong>Latency</strong>
+<li><strong>Reading DRAM Supercell</strong> Select row <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6595em;"></span><span class="mord mathnormal">i</span></span></span></span> via RAS, load into buffer. Select column <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.854em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.05724em;">j</span></span></span></span> via CAS, output data, then rewrite row to refresh.</li>
+<li><strong>Memory Modules</strong> A 64-bit word is stored across eight <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7667em;vertical-align:-0.0833em;"></span><span class="mord">8</span><span class="mord mathnormal" style="margin-right:0.10903em;">M</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">×</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">8</span></span></span></span> DRAM chips in parallel, with each chip providing one byte (8 bits) at the same row and column address.</li>
+</ul>
+<h3 id="memory-wall"><a class="header" href="#memory-wall">Memory Wall</a></h3>
+<p>The gap between the speed of processors and the main memory. The bottleneck has shifted from how fast memory can respond (latency) to how much data it can deliver per second (bandwidth).</p>
+<h4 id="latency"><a class="header" href="#latency">Latency</a></h4>
 <ul>
 <li><strong>Reduction</strong> local memory, NUMA, PIM (Reduce the waiting time for each visit.)</li>
 <li><strong>Hiding</strong> multi-threading/Hyper-threading, WARP interleaving, chip-multithreading (Keep computation units busy.)</li>
 </ul>
-</li>
-<li><strong>Bandwidth</strong>
+<h4 id="bandwidth"><a class="header" href="#bandwidth">Bandwidth</a></h4>
 <ul>
 <li><strong>Memory bandwidth</strong> multi-banks and interleaved memory, SDRAM, HBM</li>
 <li><strong>Communication bandwith</strong> wider bus, interconnection network</li>
 </ul>
-</li>
-</ul>
-</li>
-</ul>
 <h2 id="locality"><a class="header" href="#locality">Locality</a></h2>
-<ul>
-<li>
-<p><strong>Principle</strong> Many Programs tend to use data and instructions with addresses near or equal to those they have used recently.</p>
-</li>
-<li>
-<p><strong>Temporal locality</strong> Recently referenced items are likely to be referenced again in the near future.</p>
-</li>
-<li>
-<p><strong>Spatial locality</strong> Items with nearby addresses tend to be referenced close together in time.</p>
-</li>
-</ul>
+<h3 id="principle"><a class="header" href="#principle">Principle</a></h3>
+<p>Many Programs tend to use data and instructions with addresses near or equal to those they have used recently.</p>
+<h3 id="emporal-locality"><a class="header" href="#emporal-locality">emporal locality</a></h3>
+<p>Recently referenced items are likely to be referenced again in the near future.</p>
+<h3 id="spatial-locality"><a class="header" href="#spatial-locality">Spatial locality</a></h3>
+<p>Items with nearby addresses tend to be referenced close together in time.</p>
+<details><summary> What locality is exhibited by the following C loop? </summary>
+<pre><code class="language-c">while (A != NULL) A = A-&gt;next;
+</code></pre>
+<p>A. Data temporal locality   B. Data spatial locality   C. Structural locality   D. Instruction temporal locality   E. Instruction spatial locality</p>
+<p><strong>Answer</strong></p>
+<p>D and E. The loop repeatedly executes the same small set of contiguous instructions (instruction spatial locality) and reuses those instruction addresses across iterations (instruction temporal locality); data locality is absent because each list node is accessed only once and nodes may not be contiguous in memory.</p>
+</details>
 <h2 id="memory-hierarchy-1"><a class="header" href="#memory-hierarchy-1">Memory Hierarchy</a></h2>
-<img src="pic/24.png" width="60%" height="60%">
+<img src="pic/26.png" width="60%" height="60%">
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Level Transfer</th><th style="text-align: center">Staging Unit</th><th style="text-align: center">Typical Size</th><th style="text-align: center">Controlled By</th></tr></thead><tbody>
 <tr><td style="text-align: center">Registers ↔ Memory</td><td style="text-align: center">Instruction Operands</td><td style="text-align: center">Bits / words (e.g., 32/64 bits)</td><td style="text-align: center">Compiler (Programmer)</td></tr>
 <tr><td style="text-align: center">Cache / Local Memory ↔ Memory</td><td style="text-align: center">Blocks / Lines</td><td style="text-align: center">64 B (cache line)</td><td style="text-align: center">Hardware (Cache Controller) / Compiler or Programmer (Local Memory)</td></tr>
@@ -1073,9 +1066,11 @@
 </div>
 <p>This gives you Large, Cheap memory, but Fast access.</p>
 <p>Caches provide automatic (transparent) data movement, while local memory requires explicit programmer-controlled data management.</p>
-<h2 id="cache"><a class="header" href="#cache">Cache</a></h2>
-<h3 id="direct-mapped-caches"><a class="header" href="#direct-mapped-caches">Direct Mapped Caches</a></h3>
+<img src="pic/24.png" width="60%" height="60%">
+<h2 id="cache-management"><a class="header" href="#cache-management">Cache Management</a></h2>
+<h3 id="general-cache-memory-organization"><a class="header" href="#general-cache-memory-organization">General Cache Memory Organization</a></h3>
 <img src="pic/22.png" width="50%" height="50%">
+<h3 id="direct-mapped-caches"><a class="header" href="#direct-mapped-caches">Direct Mapped Caches</a></h3>
 <ul>
 <li>
 <p><strong>Valid Bit</strong></p>
@@ -1101,12 +1096,15 @@
 <h3 id="set-associative-caches"><a class="header" href="#set-associative-caches">Set Associative Caches</a></h3>
 <p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span>-way set-associative has <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span> lines per set while direct-mapped is one way and fully associative is one set.</p>
 <p>Given a cache with total size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span> measured in kilobytes, associativity <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span>, and block size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span> measured in bytes. The number of sets <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span> is calculated as <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2173em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05764em;">BE</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1024</span><span class="mord mathnormal mtight" style="margin-right:0.07153em;">C</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>.</p>
-<p>For a 64 bit address:</p>
-<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Parameter / Change</th><th style="text-align: center">Block Offset Bits</th><th style="text-align: center">Set Index Bits</th><th style="text-align: center">Tag Bits</th></tr></thead><tbody>
-<tr><td style="text-align: left">Formula (64‑bit address)</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">64</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span></td></tr>
-<tr><td style="text-align: left">Increase block size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↑</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↓</span></span></span></span></td><td style="text-align: center">—</td></tr>
-<tr><td style="text-align: left">Increase cache size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span></td><td style="text-align: center">—</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↑</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↓</span></span></span></span></td></tr>
-<tr><td style="text-align: left">Increase associativity <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span></td><td style="text-align: center">—</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↓</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↑</span></span></span></span></td></tr>
+<h3 id="performance-impact-of-cache-parameters"><a class="header" href="#performance-impact-of-cache-parameters">Performance Impact of Cache Parameters</a></h3>
+<img src="pic/25.png" width="60%" height="60%">
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Feature</th><th style="text-align: center">L1 Cache</th><th style="text-align: center">L2 Cache</th></tr></thead><tbody>
+<tr><td style="text-align: center">Primary goal</td><td style="text-align: center">Minimize hit time</td><td style="text-align: center">Minimize miss rate</td></tr>
+<tr><td style="text-align: center">Locality preference</td><td style="text-align: center">Spatial locality</td><td style="text-align: center">Temporal locality</td></tr>
+<tr><td style="text-align: center">Typical write policy</td><td style="text-align: center">Write-through</td><td style="text-align: center">Write-back</td></tr>
+<tr><td style="text-align: center">Reason</td><td style="text-align: center">L1 hit directly affects pipeline</td><td style="text-align: center">L2 miss leads to high memory penalty</td></tr>
+<tr><td style="text-align: center">Associativity</td><td style="text-align: center">Low</td><td style="text-align: center">High</td></tr>
+<tr><td style="text-align: center">Size</td><td style="text-align: center">Small</td><td style="text-align: center">Large</td></tr>
 </tbody></table>
 </div>
 <ul>
@@ -1114,6 +1112,13 @@
 <li>When the block size is too large, the fixed-size cache holds fewer blocks, leading to more conflicts, frequent replacements and higher miss penalty (lower temporal locality -- the recently used data is quickly evicted before it can be reused).</li>
 <li>Number of cache lines is determined by the cache size and the line size.</li>
 </ul>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Parameter / Change</th><th style="text-align: center">Block Offset Bits</th><th style="text-align: center">Set Index Bits</th><th style="text-align: center">Tag Bits</th></tr></thead><tbody>
+<tr><td style="text-align: left">Formula (64‑bit address)</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.7278em;vertical-align:-0.0833em;"></span><span class="mord">64</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span><span class="mspace" style="margin-right:0.2222em;"></span><span class="mbin">−</span><span class="mspace" style="margin-right:0.2222em;"></span></span><span class="base"><span class="strut" style="height:0.9386em;vertical-align:-0.2441em;"></span><span class="mop"><span class="mop">lo<span style="margin-right:0.01389em;">g</span></span><span class="msupsub"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.207em;"><span style="top:-2.4559em;margin-right:0.05em;"><span class="pstrut" style="height:2.7em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight">2</span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.2441em;"><span></span></span></span></span></span></span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span></td></tr>
+<tr><td style="text-align: left">Increase block size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↑</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↓</span></span></span></span></td><td style="text-align: center">—</td></tr>
+<tr><td style="text-align: left">Increase cache size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span></td><td style="text-align: center">—</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↑</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↓</span></span></span></span></td></tr>
+<tr><td style="text-align: left">Increase associativity <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span></td><td style="text-align: center">—</td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↓</span></span></span></span></td><td style="text-align: center"><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mrel">↑</span></span></span></span></td></tr>
+</tbody></table>
+</div>
 <h3 id="cache-hit-and-miss"><a class="header" href="#cache-hit-and-miss">Cache Hit and Miss</a></h3>
 <h4 id="cache-read"><a class="header" href="#cache-read">Cache Read</a></h4>
 <ul>
@@ -1144,7 +1149,7 @@
 <p><strong>Write Miss</strong></p>
 <ul>
 <li><strong>Write Allocate</strong> First read the data from main memory and loaded into the cache, and then the write operation is performed on the cached copy.</li>
-<li><strong>No Write Allocate</strong> It writes the data directly to main memory without loading the missing block into the cache.</li>
+<li><strong>No Write Allocate</strong> It writes the data directly to main memory without loading the missing block into the cache (Better for streaming writes, e.g. writing database logs).</li>
 </ul>
 </li>
 </ul>
@@ -1173,8 +1178,8 @@
 </details>
 <h4 id="types-of-cache-misses"><a class="header" href="#types-of-cache-misses">Types of Cache Misses</a></h4>
 <ul>
-<li><strong>Compulsory (or Cold) Miss</strong> The first access to a block that has never been loaded into the cache before.</li>
-<li><strong>Conflict Miss</strong> Multiple references are mapping to the same set, and the set is not large enough to hold them.</li>
+<li><strong>Compulsory (or Cold) Miss</strong> The first access to a block that has never been loaded into the cache before. (Hardware prefetching &amp; larger cache <strong>line</strong> size to reduce compulsory misses.)</li>
+<li><strong>Conflict (or Collision) Miss</strong> Multiple references are mapping to the same set, and the set is not large enough to hold them.</li>
 <li><strong>Capacity Miss</strong> Cache is not large enough to hold needed blocks.</li>
 <li><strong>Coherence Miss</strong> Caused by invalidation from other processors in a multiprocessor system to maintain cache coherence.</li>
 </ul>
@@ -1191,7 +1196,7 @@
 <h4 id="blocking-cache"><a class="header" href="#blocking-cache">Blocking Cache</a></h4>
 <p>A cache miss stalls the CPU pipeline immediately (stall on miss).</p>
 <h4 id="non-blocking-cache-lockup-free-cache"><a class="header" href="#non-blocking-cache-lockup-free-cache">Non-Blocking Cache (Lockup-Free Cache)</a></h4>
-<p>The CPU continues executing other instructions on a miss and stalls only when the data is needed, using Miss Status Holding Register (MSHRs) to track outstanding misses (stall on use). Non-blocking caches support MLP (Memory Level Parallelism).</p>
+<p>The CPU continues executing other instructions on a miss and stalls only when the data is needed, using <strong>Miss Status Holding Register</strong> (MSHRs) to track outstanding misses (stall on use). Non-blocking caches support MLP (Memory Level Parallelism).</p>
 <ul>
 <li><strong>Hit under Miss</strong> During one miss, the cache can still handle subsequent hits.</li>
 <li><strong>Miss under Miss (better)</strong> During one miss, the cache can also handle another miss, allowing multiple outstanding misses.</li>
@@ -1205,7 +1210,7 @@
 <p><strong>Random</strong></p>
 </li>
 <li>
-<p><strong>Least Recently Used (LRU)</strong></p>
+<p><strong>Least Recently Used (LRU)</strong> [stack algorithm]</p>
 <p>Hardware keeps track of the access history and replaces the block that has not been used for the longest time.</p>
 <p>Each block has a counter. On a hit, reset its counter to 0 and increment all other counters in the set. On a miss, replace the block with the highest counter value.</p>
 </li>
@@ -1213,12 +1218,24 @@
 <p><strong>First In First Out (FIFO)</strong> The block that has been in the cache the longest is replaced, regardless of access history.</p>
 </li>
 <li>
-<p><strong>Belady’s Algorithm</strong> Replace the block that will not be used for the longest time in the future. It is optimal but requires perfect knowledge of future accesses, making it impractical for real hardware.</p>
+<p><strong>Belady’s Algorithm</strong> [upper bound]</p>
+<p>Replace the block that will not be used for the longest time in the future. It is optimal but requires perfect knowledge of future accesses, making it impractical for real hardware.</p>
 </li>
 </ul>
 <h3 id="victim-cache"><a class="header" href="#victim-cache">Victim Cache</a></h3>
 <p>A small fully associative cache placed between the main cache and memory to hold recently evicted blocks, reducing conflict misses by providing a second chance for recently replaced data. Since such conflicts occur in only a few sets, just 4–8 entries suffice for fast access, combining the speed of direct-mapped L1 with the benefit of full associativity.</p>
 <img src="pic/23.png" width="50%" height="50%">
+<h3 id="snoopy-cache-coherence-schemes"><a class="header" href="#snoopy-cache-coherence-schemes">Snoopy Cache Coherence Schemes</a></h3>
+<p>Snoopy cache maintains coherence in bus-connected multi-processors by broadcasting all coherence operations over a shared bus. Every cache controller snoops the bus and reacts based on its local cache state. Each controller is a bidirectional state machine that processes CPU requests and bus snoop events, updating states according to a transition diagram.</p>
+<p>Multiple controllers form a distributed algorithm operating at cache block granularity. The MESI protocol, with its four states (Modified, Exclusive, Shared, Invalid), tracks each block to enable coherence while minimizing bus traffic and memory accesses.</p>
+<h3 id="exclusiveinclusive-caches"><a class="header" href="#exclusiveinclusive-caches">Exclusive/Inclusive Caches</a></h3>
+<p>Inclusive L2 caches simplify coherence invalidation in multiprocessor systems by checking at the L2 level, despite wasting capacity, which modern processors tolerate for easier consistency management, making inclusive more common than exclusive today.</p>
+<h4 id="inclusive-caches"><a class="header" href="#inclusive-caches">Inclusive caches</a></h4>
+<p>Every line in L1 must be presented in L2 (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8193em;vertical-align:-0.136em;"></span><span class="mord text"><span class="mord">L1</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊆</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">L2</span></span></span></span></span>). When L2 evicts a line, it must invalidate the corresponding line in L1, and L2 can have a larger line size than L1.</p>
+<h4 id="exclusive-caches"><a class="header" href="#exclusive-caches">Exclusive caches</a></h4>
+<p>If a line, A, is in L1, it must NOT be presented in L2. AMD had adopted this for L2/L3. When L1 evicts a line, it moves to L2. On an L1 miss that hits in L2, the line migrates from L2 to L1. And L1 and L2 must have the same line size.</p>
+<h4 id="nine-non-inclusive-and-non-exclusive"><a class="header" href="#nine-non-inclusive-and-non-exclusive">NINE (Non-Inclusive and Non-Exclusive)</a></h4>
+<p>More suitable for L2/L3.</p>
 <h3 id="average-memory-access-time-amat"><a class="header" href="#average-memory-access-time-amat">Average Memory Access Time (AMAT)</a></h3>
 <p>Usually, <code>%instr</code> is higher than <code>%data</code>, but I-cache hits better because instruction accesses are highly sequential with strong spatial locality, have no write misses (read-only), and exhibit simpler access patterns than data references, which often involve random pointers or strided array accesses.</p>
 <p>AMAT was accurate for blocking caches and in-order CPUs, but lost relevance as out-of-order execution, non-blocking caches, prefetching hid miss latency and spliting I/D caches.</p>
@@ -1230,28 +1247,6 @@
 <li><strong>Virtual address cache or virtual index and physical tagged cache</strong> Avoid or overlap with address translation delay.</li>
 <li><strong>Cache layout closer to CPU to minimize signal delay</strong></li>
 </ul>
-<h3 id="multilevel-cache"><a class="header" href="#multilevel-cache">Multilevel Cache</a></h3>
-<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Feature</th><th style="text-align: center">L1 Cache</th><th style="text-align: center">L2 Cache</th></tr></thead><tbody>
-<tr><td style="text-align: center">Primary goal</td><td style="text-align: center">Minimize hit time</td><td style="text-align: center">Minimize miss rate</td></tr>
-<tr><td style="text-align: center">Locality preference</td><td style="text-align: center">Spatial locality</td><td style="text-align: center">Temporal locality</td></tr>
-<tr><td style="text-align: center">Typical write policy</td><td style="text-align: center">Write-through</td><td style="text-align: center">Write-back</td></tr>
-<tr><td style="text-align: center">Reason</td><td style="text-align: center">L1 hit directly affects pipeline</td><td style="text-align: center">L2 miss leads to high memory penalty</td></tr>
-<tr><td style="text-align: center">Associativity</td><td style="text-align: center">Low</td><td style="text-align: center">High</td></tr>
-<tr><td style="text-align: center">Size</td><td style="text-align: center">Small</td><td style="text-align: center">Large</td></tr>
-</tbody></table>
-</div>
-<h3 id="snoopy-cache-coherence-schemes"><a class="header" href="#snoopy-cache-coherence-schemes">Snoopy Cache Coherence Schemes</a></h3>
-<p>All coherence operations are broadcast over a global bus, and every cache controller snoops the bus and reacts according to its own cache contents.</p>
-<p>Each cache controller is a bidirectional state machine that takes CPU requests and bus snoop events, updates state and acts per a transition diagram. Multiple controllers form a distributed algorithm, and coherence operates at cache block granularity.</p>
-<p>MESI protocol uses four states (Modified, Exclusive, Shared, Invalid) to track each cache block, enabling multi-core coherence while minimizing bus communication and memory accesses.</p>
-<h3 id="exclusiveinclusive-caches"><a class="header" href="#exclusiveinclusive-caches">Exclusive/Inclusive Caches</a></h3>
-<p>Inclusive L2 caches simplify coherence invalidation in multiprocessor systems by checking at the L2 level, despite wasting capacity, which modern processors tolerate for easier consistency management, making inclusive more common than exclusive today.</p>
-<h4 id="inclusive-caches"><a class="header" href="#inclusive-caches">Inclusive caches</a></h4>
-<p>Every line in L1 must be presented in L2 (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8193em;vertical-align:-0.136em;"></span><span class="mord text"><span class="mord">L1</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊆</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">L2</span></span></span></span></span>). When L2 evicts a line, it must invalidate the corresponding line in L1, and L2 can have a larger line size than L1.</p>
-<h4 id="exclusive-caches"><a class="header" href="#exclusive-caches">Exclusive caches</a></h4>
-<p>If a line, A, is in L1, it must NOT be presented in L2. AMD had adopted this for L2/L3. When L1 evicts a line, it moves to L2. On an L1 miss that hits in L2, the line migrates from L2 to L1. And L1 and L2 must have the same line size.</p>
-<h4 id="nine-non-inclusive-and-non-exclusive"><a class="header" href="#nine-non-inclusive-and-non-exclusive">NINE (Non-Inclusive and Non-Exclusive)</a></h4>
-<p>More suitable for L2/L3.</p>
 
                     </main>
 
@@ -1282,6 +1277,22 @@
 
         </div>
 
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
 
 
 

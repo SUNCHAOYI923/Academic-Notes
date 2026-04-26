@@ -160,7 +160,7 @@
 <h1 id="csc4303-network-programming"><a class="header" href="#csc4303-network-programming">CSC4303 Network Programming</a></h1>
 <h2 id="reference"><a class="header" href="#reference">Reference</a></h2>
 <ul>
-<li>https://book.systemsapproach.org/foundation.html</li>
+<li><a href="https://book.systemsapproach.org/foundation.html">Reference</a></li>
 </ul>
 <h2 id="network-model"><a class="header" href="#network-model">Network Model</a></h2>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Layer</th><th style="text-align: center">Description</th><th style="text-align: center">Example</th></tr></thead><tbody>
@@ -172,7 +172,7 @@
 </tbody></table>
 </div>
 <h3 id="transport-layer"><a class="header" href="#transport-layer">Transport Layer</a></h3>
-<h4 id="udp"><a class="header" href="#udp">UDP</a></h4>
+<h4 id="user-datagram-protocol-udp"><a class="header" href="#user-datagram-protocol-udp">User Datagram Protocol (UDP)</a></h4>
 <ul>
 <li>
 <p><strong>Connectionless</strong></p>
@@ -220,7 +220,7 @@
 </code></pre>
 </li>
 </ul>
-<h4 id="tcp"><a class="header" href="#tcp">TCP</a></h4>
+<h4 id="transmission-control-protocol-tcp"><a class="header" href="#transmission-control-protocol-tcp">Transmission Control Protocol (TCP)</a></h4>
 <ul>
 <li>
 <p><strong>Header</strong></p>
@@ -317,7 +317,7 @@
 </ul>
 </li>
 <li>
-<p><strong>Flow Control</strong></p>
+<p><strong>Flow Control</strong> (Receiver processing limitation)</p>
 <ul>
 <li>
 <p><strong>Automatic Repeat Query</strong></p>
@@ -374,7 +374,7 @@
 </ul>
 </li>
 <li>
-<p><strong>Congestion Control</strong>
+<p><strong>Congestion Control</strong> (Network capacity limitation)
 TCP congestion control uses a sliding window (cwnd), interprets packet loss as a congestion signal, and adjusts the window via AIMD to achieve an efficient and roughly fair bandwidth allocation.</p>
 <ul>
 <li>
@@ -420,7 +420,8 @@ Step 4 Repeat for remaining flows</p>
 </ul>
 </li>
 <li>
-<p><strong>TCP Tahoe</strong></p>
+<p><strong>TCP Tahoe/Reno</strong></p>
+  <img src="pic/16.png" width="60%" height="60%">
 <ul>
 <li>
 <p><strong>Slow Start</strong></p>
@@ -456,6 +457,7 @@ Step 4 Repeat for remaining flows</p>
 <tr><td style="text-align: center">Data Size</td><td style="text-align: center">Unlimited</td><td style="text-align: center">Limited</td></tr>
 <tr><td style="text-align: center">Flow Control</td><td style="text-align: center">Flow control matches sender to receiver</td><td style="text-align: center">Send regardless of receiver state</td></tr>
 <tr><td style="text-align: center">Congestion Control</td><td style="text-align: center">Congestion control matches sender to network</td><td style="text-align: center">Send regardless of network state</td></tr>
+<tr><td style="text-align: center">Example</td><td style="text-align: center">Files, Web pages</td><td style="text-align: center">Voice, video, DNS</td></tr>
 </tbody></table>
 </div>
 <h4 id="socket"><a class="header" href="#socket">Socket</a></h4>
@@ -624,11 +626,12 @@ Step 4 Repeat for remaining flows</p>
 </div></li>
 </ul>
 <h4 id="dynamic-host-configuration-protocol-dhcp-application-layer"><a class="header" href="#dynamic-host-configuration-protocol-dhcp-application-layer">Dynamic Host Configuration Protocol (DHCP) [Application Layer]</a></h4>
+<p>Uses UDP ports 67 (server) and 68 (client).</p>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Step</th><th style="text-align: left">Message</th><th style="text-align: left">IP Header (Src → Dst)</th><th style="text-align: left">Ethernet (Src → Dst)</th><th style="text-align: left">Purpose</th></tr></thead><tbody>
 <tr><td style="text-align: center">1</td><td style="text-align: left"><strong>DISCOVER</strong></td><td style="text-align: left"><code>0.0.0.0</code> → <code>255.255.255.255</code></td><td style="text-align: left"><code>Client MAC</code> → <code>FF:FF:FF:FF:FF:FF</code></td><td style="text-align: left">Client broadcasts to find DHCP servers</td></tr>
-<tr><td style="text-align: center">2</td><td style="text-align: left"><strong>OFFER</strong></td><td style="text-align: left"><code>Server's IP</code> → <code>255.255.255.255</code></td><td style="text-align: left"><code>Server MAC</code> → <code>FF:FF:FF:FF:FF:FF</code></td><td style="text-align: left">Server proposes IP configuration</td></tr>
+<tr><td style="text-align: center">2</td><td style="text-align: left"><strong>OFFER</strong></td><td style="text-align: left"><code>Server's IP</code> → <code>255.255.255.255</code></td><td style="text-align: left"><code>Server MAC</code> → <code>Client MAC</code></td><td style="text-align: left">Server proposes IP configuration</td></tr>
 <tr><td style="text-align: center">3</td><td style="text-align: left"><strong>REQUEST</strong></td><td style="text-align: left"><code>0.0.0.0</code> → <code>255.255.255.255</code></td><td style="text-align: left"><code>Client MAC</code> → <code>FF:FF:FF:FF:FF:FF</code></td><td style="text-align: left">Client accepts the offer</td></tr>
-<tr><td style="text-align: center">4</td><td style="text-align: left"><strong>ACK</strong></td><td style="text-align: left"><code>Server's IP</code> → <code>255.255.255.255</code></td><td style="text-align: left"><code>Server MAC</code> → <code>FF:FF:FF:FF:FF:FF</code></td><td style="text-align: left">Server confirms and finalizes lease</td></tr>
+<tr><td style="text-align: center">4</td><td style="text-align: left"><strong>ACK</strong></td><td style="text-align: left"><code>Server's IP</code> → <code>255.255.255.255</code></td><td style="text-align: left"><code>Server MAC</code> → <code> Client MAC</code></td><td style="text-align: left">Server confirms and finalizes lease</td></tr>
 </tbody></table>
 </div>
 <h4 id="address-resolution-protocol-arp"><a class="header" href="#address-resolution-protocol-arp">Address Resolution Protocol (ARP)</a></h4>
@@ -691,7 +694,7 @@ Step 4 Repeat for remaining flows</p>
 </ul>
 </li>
 <li>
-<p><strong>IP Prefix Aggregation and Subnets</strong></p>
+<p><strong>IP Prefix Aggregation and Subnets</strong> (Longest prefix matching)</p>
 <p>Routers can change prefix lengths without affecting hosts.</p>
 <ul>
 <li><strong>Subnetting</strong> Split large prefix into smaller ones internally.</li>
@@ -1149,22 +1152,6 @@ Step 4 Repeat for remaining flows</p>
 
         </div>
 
-        <!-- Livereload script (if served using the cli tool) -->
-        <script>
-            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
-            const socket = new WebSocket(wsAddress);
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
 
 
 

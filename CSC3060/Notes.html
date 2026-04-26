@@ -1010,6 +1010,74 @@
 </tbody></table>
 </div></li>
 </ul>
+<h1 id="chapter-5-optimizing-program-performance"><a class="header" href="#chapter-5-optimizing-program-performance">Chapter 5 Optimizing Program Performance</a></h1>
+<h2 id="compiler-optimization"><a class="header" href="#compiler-optimization">Compiler Optimization</a></h2>
+<h3 id="compiler-optimization-levels"><a class="header" href="#compiler-optimization-levels">Compiler Optimization Levels</a></h3>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Level</th><th style="text-align: center">Description</th></tr></thead><tbody>
+<tr><td style="text-align: center"><code>-O0</code></td><td style="text-align: center">No optimizations, fast compile, for debugging.</td></tr>
+<tr><td style="text-align: center"><code>-O1</code></td><td style="text-align: center">Basic optimizations.</td></tr>
+<tr><td style="text-align: center"><code>-O2</code></td><td style="text-align: center">Recommended default: safe, stable, efficient.</td></tr>
+<tr><td style="text-align: center"><code>-O3</code></td><td style="text-align: center">Aggressive (loop unroll, SIMD). May increase code size, compile time, and even hurt performance.</td></tr>
+<tr><td style="text-align: center"><code>-O4</code></td><td style="text-align: center"><code>-O3</code> + Link-Time Optimization (LTO).</td></tr>
+</tbody></table>
+</div>
+<h3 id="general-goals"><a class="header" href="#general-goals">General Goals</a></h3>
+<h4 id="minimize-the-number-of-instructions"><a class="header" href="#minimize-the-number-of-instructions">Minimize the Number of Instructions</a></h4>
+<ul>
+<li><strong>Common Subexpression Elimination (CSE)</strong> Calculate the same expression once and reuse the result.</li>
+<li><strong>Dead Code Elimination (DCE)</strong> Don't calculate values that are never used.</li>
+<li><strong>Strength Reduction (SR)</strong> Avoid slow instructions (multiplication/division).</li>
+</ul>
+<h4 id="minimize-the-execution-cycles"><a class="header" href="#minimize-the-execution-cycles">Minimize the Execution Cycles</a></h4>
+<ul>
+<li><strong>Register Allocation (RA)</strong> Keep frequently used variables in registers.</li>
+<li><strong>Code Scheduling</strong> Reorder instructions to avoid stalls.</li>
+<li><strong>Locality Improvement</strong></li>
+<li><strong>Preload &amp; Redundant Load Elimination</strong> Load a value once and reuse it, instead of reloading from memory.</li>
+</ul>
+<h4 id="avoid-branching"><a class="header" href="#avoid-branching">Avoid Branching</a></h4>
+<ul>
+<li><strong>Avoid Branching</strong> Conditional move in x86 (<code>cmov</code>, e.g. <code>a = (b &gt; c) ? b : c</code>), conditional execution in ARM (e.g. <code>addgt r0, r1, r2</code>).</li>
+<li><strong>Loop Unrolling</strong> Reduce the number of branch instructions. Loop unrolling improves performance by reducing the number of branch evaluations and branch mispredictions, also creates opportunities for CSE, code motion, and scheduling.</li>
+<li><strong>Procedure Inlining</strong> Reduce the overhead of the call. However, inlining can cause register or I‑cache spilling when code grows too large. For recursive functions, inlining may lead to infinite expansion unless the compiler enforces a depth limit.</li>
+<li><strong>Unswitching</strong> Move a condition outside the loop to avoid branching inside the loop. (e.g. <code>if (cond) { for (...) { ... } } else { for (...) { ... } }</code>)</li>
+</ul>
+<h3 id="limitations"><a class="header" href="#limitations">Limitations</a></h3>
+<ol>
+<li>
+<p>Compilers cannot change the algorithm.</p>
+</li>
+<li>
+<p>Compilers must obey the rules and semantics of the programming language.</p>
+<ul>
+<li><strong>Memory Aliasing</strong> Two pointers may point to the same memory location. Use a local variable for the intermediate value to avoid redundant loads or use the <code>restrict</code> qualifier to promise no aliasing.</li>
+<li><strong>FP Associativity</strong> Floating-point addition is not associative.</li>
+<li><strong>Function Side Effects</strong> A function may modify global state or have observable effects beyond its return value.</li>
+<li><strong>Volatile Variables</strong> A variable declared as <code>volatile</code> can be changed by external factors.</li>
+<li><strong>Memory Consistency</strong> In multi-threaded programs, compilers must respect memory ordering constraints.</li>
+</ul>
+</li>
+<li>
+<p>Lack of runtime and domain knowledge.</p>
+</li>
+<li>
+<p>Many specific optimization problems are NP-hard.</p>
+</li>
+<li>
+<p>Boundary crossing issues (separate compilation).</p>
+</li>
+</ol>
+<h3 id="several-optimization-options"><a class="header" href="#several-optimization-options">Several Optimization Options</a></h3>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Flag</th><th style="text-align: center">Description</th></tr></thead><tbody>
+<tr><td style="text-align: center"><code>-O3 -flto</code></td><td style="text-align: center">Link-Time Optimization: enables whole-program optimization.</td></tr>
+<tr><td style="text-align: center"><code>-march=native</code></td><td style="text-align: center">Generate code optimized for the current CPU architecture (enables all supported instruction sets).</td></tr>
+<tr><td style="text-align: center"><code>-mtune=native</code></td><td style="text-align: center">Optimize instruction scheduling for the current CPU without breaking compatibility with older CPUs.</td></tr>
+<tr><td style="text-align: center"><code>-fprofile-generate</code></td><td style="text-align: center">Compile instrumented code to generate runtime profiles.</td></tr>
+<tr><td style="text-align: center"><code>-fprofile-use</code></td><td style="text-align: center">Use profile data to guide optimizations.</td></tr>
+<tr><td style="text-align: center"><code>-Ofast</code></td><td style="text-align: center">Alias for <code>-O3 -ffast-math</code>; allows aggressive FP reordering (may break IEEE compliance).</td></tr>
+<tr><td style="text-align: center"><code>-fopt-info-missed</code></td><td style="text-align: center">Report which optimizations were missed and why.</td></tr>
+</tbody></table>
+</div>
 <h1 id="chapter-6-the-memory-hierarchy"><a class="header" href="#chapter-6-the-memory-hierarchy">Chapter 6 The Memory Hierarchy</a></h1>
 <h2 id="storage-technologies"><a class="header" href="#storage-technologies">Storage Technologies</a></h2>
 <p>Access time is the same for all locations.</p>
@@ -1277,22 +1345,6 @@
 
         </div>
 
-        <!-- Livereload script (if served using the cli tool) -->
-        <script>
-            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
-            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
-            const socket = new WebSocket(wsAddress);
-            socket.onmessage = function (event) {
-                if (event.data === "reload") {
-                    socket.close();
-                    location.reload();
-                }
-            };
-
-            window.onbeforeunload = function() {
-                socket.close();
-            }
-        </script>
 
 
 

@@ -1,0 +1,340 @@
+<style>
+  .pca-container {
+    background: #ffffff;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.08);
+    border-radius: 16px;
+    padding: 30px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    color: #1e293b;
+  }
+  .pca-charts {
+    display: flex;
+    gap: 40px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  .chart-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .canvas-container {
+    position: relative;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.02);
+  }
+  canvas {
+    background: #ffffff;
+    border-radius: 8px;
+    border: 1px solid #f1f5f9;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    cursor: pointer;
+  }
+  .axis-label {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #64748b;
+    letter-spacing: 0.5px;
+  }
+  .controls {
+    margin-top: 30px;
+    width: 100%;
+    max-width: 600px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+  }
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    background: transparent;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    height: 20px;
+    width: 20px;
+    border-radius: 50%;
+    background: #3b82f6;
+    cursor: pointer;
+    margin-top: -8px;
+    box-shadow: 0 2px 6px rgba(59, 130, 246, 0.4);
+    transition: transform 0.1s;
+  }
+  input[type=range]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 4px;
+    cursor: pointer;
+    background: #cbd5e1;
+    border-radius: 2px;
+  }
+  .info-panel {
+    display: flex;
+    gap: 20px;
+    background: #f1f5f9;
+    padding: 10px 20px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .info-item span {
+    color: #3b82f6;
+    font-weight: 700;
+    min-width: 40px;
+    display: inline-block;
+  }
+  .hint {
+    font-size: 11px;
+    color: #94a3b8;
+    margin-top: -5px;
+  }
+</style>
+
+<div class="pca-container">
+  <div class="pca-charts">
+    <div class="chart-wrapper">
+      <div class="canvas-container">
+        <canvas id="scatterCanvas" width="400" height="400"></canvas>
+      </div>
+      <div class="axis-label">
+        <span>X Axis &rarr;</span>
+        <span>&uarr; Y Axis</span>
+      </div>
+    </div>
+    
+    <div class="chart-wrapper">
+      <div class="canvas-container">
+        <canvas id="varianceCanvas" width="400" height="400"></canvas>
+      </div>
+      <div class="axis-label">
+        <span>0&deg;</span>
+        <span>Projection Angle (&theta;)</span>
+        <span>180&deg;</span>
+      </div>
+    </div>
+  </div>
+  
+  <div class="controls">
+    <input type="range" id="angleSlider" min="0" max="180" step="1" value="0">
+    <div class="info-panel">
+      <div class="info-item">Angle: <span id="angleValue">0&deg;</span></div>
+      <div class="info-item">Variance: <span id="varValue">0.000</span></div>
+    </div>
+    <div class="hint">Double-click the scatter plot to generate new data points</div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const sc = document.getElementById('scatterCanvas').getContext('2d');
+  const vc = document.getElementById('varianceCanvas').getContext('2d');
+  const slider = document.getElementById('angleSlider');
+  const angleSpan = document.getElementById('angleValue');
+  const varSpan = document.getElementById('varValue');
+
+  let points = [];
+  let varFunc = [];
+
+  function randomPoints() {
+    let pts = [];
+    let rotAngle = Math.random() * Math.PI; 
+    let cosR = Math.cos(rotAngle);
+    let sinR = Math.sin(rotAngle);
+
+    for (let i = 0; i < 80; i++) {
+      let u1 = Math.random();
+      let u2 = Math.random();
+      if (u1 === 0) u1 = 0.0001; 
+      
+      let z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+      let z1 = Math.sqrt(-2.0 * Math.log(u1)) * Math.sin(2.0 * Math.PI * u2);
+
+      let x = z0 * 1.8;
+      let y = z1 * 0.4;
+      
+      pts.push({
+        x: x * cosR - y * sinR,
+        y: x * sinR + y * cosR
+      });
+    }
+
+    let mx = pts.reduce((s, p) => s + p.x, 0) / pts.length;
+    let my = pts.reduce((s, p) => s + p.y, 0) / pts.length;
+    
+    let maxDist = Math.max(...pts.map(p => Math.sqrt((p.x - mx)**2 + (p.y - my)**2)));
+    let scale = 1 / (maxDist > 0 ? maxDist : 1);
+
+    return pts.map(p => ({
+      x: (p.x - mx) * scale * 0.9, 
+      y: (p.y - my) * scale * 0.9
+    }));
+  }
+
+  function variance(angle) {
+    let rad = angle * Math.PI / 180;
+    let dx = Math.cos(rad);
+    let dy = Math.sin(rad);
+    let proj = points.map(p => p.x * dx + p.y * dy);
+    let mean = proj.reduce((a, b) => a + b, 0) / proj.length;
+    return proj.reduce((s, v) => s + (v - mean) ** 2, 0) / proj.length;
+  }
+
+  function computeVarFunc() {
+    let arr = [];
+    for (let a = 0; a <= 180; a++) arr.push(variance(a));
+    return arr;
+  }
+
+  function drawScatter(angle) {
+    sc.clearRect(0, 0, 400, 400);
+    
+    sc.beginPath();
+    sc.moveTo(200, 0); sc.lineTo(200, 400);
+    sc.moveTo(0, 200); sc.lineTo(400, 200);
+    sc.strokeStyle = '#f1f5f9';
+    sc.lineWidth = 2;
+    sc.stroke();
+    
+    let cx = 200, cy = 200;
+    let rad = angle * Math.PI / 180;
+    let ddx = Math.cos(rad), ddy = Math.sin(rad);
+
+    sc.beginPath();
+    points.forEach(p => {
+      let px = p.x * 200;
+      let py = p.y * 200;
+      let projDist = px * ddx + py * ddy;
+      
+      let startX = cx + px;
+      let startY = cy + py;
+      let endX = cx + projDist * ddx;
+      let endY = cy + projDist * ddy;
+
+      sc.moveTo(startX, startY);
+      sc.lineTo(endX, endY);
+    });
+    sc.strokeStyle = 'rgba(148, 163, 184, 0.3)';
+    sc.lineWidth = 1;
+    sc.stroke();
+
+    points.forEach(p => {
+      let x = cx + p.x * 200;
+      let y = cy + p.y * 200;
+      sc.beginPath();
+      sc.arc(x, y, 4, 0, 2 * Math.PI);
+      sc.fillStyle = 'rgba(59, 130, 246, 0.8)';
+      sc.fill();
+      sc.strokeStyle = 'rgba(37, 99, 235, 1)';
+      sc.lineWidth = 1;
+      sc.stroke();
+    });
+    
+    sc.beginPath();
+    sc.moveTo(cx - ddx * 180, cy - ddy * 180);
+    sc.lineTo(cx + ddx * 180, cy + ddy * 180);
+    sc.strokeStyle = '#ef4444';
+    sc.lineWidth = 2;
+    sc.stroke();
+    
+    sc.beginPath();
+    let radPerp = (angle + 90) * Math.PI / 180;
+    let pdx = Math.cos(radPerp), pdy = Math.sin(radPerp);
+    sc.moveTo(cx - pdx * 180, cy - pdy * 180);
+    sc.lineTo(cx + pdx * 180, cy + pdy * 180);
+    sc.strokeStyle = '#cbd5e1';
+    sc.setLineDash([5, 5]);
+    sc.lineWidth = 1.5;
+    sc.stroke();
+    sc.setLineDash([]);
+  }
+
+  function drawVariance(angle) {
+    vc.clearRect(0, 0, 400, 400);
+    
+    let maxV = Math.max(...varFunc);
+    let minV = Math.min(...varFunc);
+    if (maxV === minV) maxV = minV + 1;
+    let rangeV = maxV - minV;
+    
+    vc.beginPath();
+    vc.moveTo(40, 20); vc.lineTo(40, 360);
+    vc.moveTo(40, 360); vc.lineTo(380, 360);
+    vc.strokeStyle = '#e2e8f0';
+    vc.lineWidth = 2;
+    vc.stroke();
+
+    vc.fillStyle = '#94a3b8';
+    vc.font = '10px sans-serif';
+    vc.textAlign = 'right';
+    vc.fillText('Max', 32, 25);
+    vc.fillText('Min', 32, 360);
+    
+    vc.beginPath();
+    for (let a = 0; a <= 180; a++) {
+      let x = 40 + (a / 180) * 340;
+      let y = 360 - ((varFunc[a] - minV) / rangeV) * 330;
+      if (a === 0) vc.moveTo(x, y);
+      else vc.lineTo(x, y);
+    }
+    vc.strokeStyle = '#3b82f6';
+    vc.lineWidth = 3;
+    vc.lineJoin = 'round';
+    vc.stroke();
+    
+    let curX = 40 + (angle / 180) * 340;
+    let curY = 360 - ((varFunc[angle] - minV) / rangeV) * 330;
+    
+    vc.beginPath();
+    vc.moveTo(40, curY);
+    vc.lineTo(curX, curY);
+    vc.moveTo(curX, 360);
+    vc.lineTo(curX, curY);
+    vc.strokeStyle = 'rgba(239, 68, 68, 0.4)';
+    vc.setLineDash([4, 4]);
+    vc.lineWidth = 1.5;
+    vc.stroke();
+    vc.setLineDash([]);
+    
+    vc.beginPath();
+    vc.arc(curX, curY, 6, 0, 2 * Math.PI);
+    vc.fillStyle = '#ef4444';
+    vc.fill();
+    vc.strokeStyle = '#ffffff';
+    vc.lineWidth = 2;
+    vc.stroke();
+    
+    varSpan.innerText = varFunc[angle].toFixed(4);
+  }
+
+  function update() {
+    let a = parseInt(slider.value);
+    angleSpan.innerHTML = a + '&deg;';
+    drawScatter(a);
+    drawVariance(a);
+  }
+
+  function regenerate() {
+    points = randomPoints();
+    varFunc = computeVarFunc();
+    slider.value = 0;
+    update();
+  }
+
+  regenerate();
+  slider.addEventListener('input', update);
+  document.getElementById('scatterCanvas').addEventListener('dblclick', regenerate);
+})();
+</script>

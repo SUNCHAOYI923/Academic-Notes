@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Weather Decision Tree - Optimized</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: #eef2fa;
+            margin: 0;
+            padding: 20px 16px;
+            color: #1a2c3e;
+        }
+        .dashboard-wrapper {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.08);
+            padding: 18px 20px 22px 20px;
+        }
+        .main-title {
+            text-align: center;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #e0edf2;
+            padding-bottom: 10px;
+        }
+        .main-title h1 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin: 0;
+            color: #1f5e6e;
+        }
+        .action-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 16px;
+        }
+        .btn-generate {
+            background: #2c7a6e;
+            border: none;
+            color: white;
+            padding: 6px 22px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-generate:hover {
+            background: #1f5f53;
+        }
+        .two-columns {
+            display: block;
+            margin-bottom: 20px;
+        }
+        .table-area {
+            width: 100%;
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e0ecef;
+            overflow: hidden;
+            margin-bottom: 24px;
+        }
+        .table-header {
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 10px 16px 6px 16px;
+            border-bottom: 1px solid #e0edf2;
+            color: #1f5e6e;
+        }
+        .table-wrapper {
+            overflow-x: auto;
+            padding: 0 12px 12px 12px;
+        }
+        .weather-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+            font-family: 'SF Mono', 'Courier New', monospace;
+        }
+        .weather-table th {
+            background: #f2f8fc;
+            padding: 8px 6px;
+            text-align: center;
+            font-weight: 700;
+            border-bottom: 1px solid #dce5ec;
+            color: #1a4b5c;
+            font-size: 0.75rem;
+        }
+        .weather-table td {
+            padding: 6px 6px;
+            text-align: center;
+            border-bottom: 1px solid #e9f0f5;
+            font-size: 0.75rem;
+        }
+        .weather-table tr:hover td {
+            background-color: #f5fbfe;
+        }
+        .badge-yes, .badge-no {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 30px;
+            font-weight: 700;
+            font-size: 0.7rem;
+        }
+        .badge-yes {
+            background: #2c9c8c20;
+            color: #1e6b5e;
+        }
+        .badge-no {
+            background: #e06c5e20;
+            color: #b13e2e;
+        }
+        .tree-area {
+            width: 100%;
+            background: #ffffff;
+            border-radius: 20px;
+            border: 1px solid #e0ecef;
+            padding: 12px 8px 12px 8px;
+        }
+        .tree-header {
+            font-weight: 700;
+            font-size: 1rem;
+            padding: 0 6px 8px 10px;
+            border-bottom: 1px solid #e0edf2;
+            color: #1f5e6e;
+        }
+        .tree-canvas-container {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: auto;
+            background: #ffffff;
+            border-radius: 16px;
+            min-height: 420px;
+            max-height: 55vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            border: 1px solid #eef2f7;
+            margin-top: 10px;
+        }
+        svg {
+            display: block;
+            background: #ffffff;
+            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            width: 100%;
+            height: auto;
+            min-width: 700px;
+        }
+        .tree-node circle {
+            stroke: #2c7a6e;
+            stroke-width: 1.5px;
+            fill: #f0faf8;
+            r: 14px;          /* 从20减小到14 */
+        }
+        .tree-node text {
+            font-size: 5px !important;
+            font-weight: 600;
+            fill: #1e3a4d;
+            dominant-baseline: middle;
+            text-anchor: middle;
+        }
+        .leaf-node circle {
+            fill: #e0f0ec;
+            stroke: #1f8a74;
+            stroke-width: 1.5px;
+            r: 14px;
+        }
+        .leaf-node text {
+            font-weight: 800;
+            fill: #0b4f43;
+            font-size: 5px !important;
+        }
+        .link {
+            fill: none;
+            stroke: #8aaec2;
+            stroke-width: 1.8px;
+        }
+        .edge-label {
+            font-size: 8px;
+            fill: #1f6577;
+            font-weight: 700;
+        }
+        .info-panel {
+            margin-top: 16px;
+            background: #fafcfd;
+            border-radius: 18px;
+            border: 1px solid #e0ecef;
+            padding: 10px 16px;
+        }
+        .info-title {
+            font-weight: 600;
+            font-size: 0.8rem;
+            color: #5f7f9a;
+            margin-bottom: 6px;
+        }
+        .math-block {
+            overflow-x: auto;
+            font-size: 0.75rem;
+            line-height: 1.4;
+        }
+        .latex-render {
+            font-size: 0.75rem;
+        }
+        @media (max-width: 700px) {
+            body {
+                padding: 12px;
+            }
+            .dashboard-wrapper {
+                padding: 12px;
+            }
+            .tree-canvas-container {
+                min-height: 350px;
+            }
+        }
+    </style>
+</head>
+<body>
+<div class="dashboard-wrapper">
+    <div class="main-title">
+        <h1>Weather Decision Tree</h1>
+    </div>
+    <div class="action-row">
+        <button class="btn-generate" id="randomizeBtn">Generate New Data</button>
+    </div>
+    <div class="two-columns">
+        <div class="table-area">
+            <div class="table-header">Weather Samples</div>
+            <div class="table-wrapper">
+                <table class="weather-table" id="weatherDataTable">
+                    <thead>
+                        <tr><th>#</th><th>Outlook</th><th>Temperature</th><th>Humidity</th><th>Windy</th><th>Play</th></tr>
+                    </thead>
+                    <tbody id="tableDynamicBody"></tbody>
+                </table>
+            </div>
+        </div>
+        <div class="tree-area">
+            <div class="tree-header">Decision Tree</div>
+            <div id="treeVisualization" class="tree-canvas-container">
+                <svg width="100%" height="100%"></svg>
+            </div>
+        </div>
+    </div>
+    <div class="info-panel">
+        <div class="info-title">Information Gain</div>
+        <div id="latexExplanation" class="math-block">
+            <span>Click "Generate New Data" to see best split.</span>
+        </div>
+    </div>
+</div>
+
+<script>
+    (function() {
+        const OUTLOOK_VALS = ['Sunny', 'Overcast', 'Rain'];
+        const TEMP_VALS = ['Hot', 'Mild', 'Cold'];
+        const HUMIDITY_VALS = ['High', 'Normal'];
+        const WINDY_VALS = [true, false];
+        
+        function computePlay(outlook, humidity, windy) {
+            if (outlook === 'Overcast') return 'Yes';
+            if (outlook === 'Sunny') return humidity === 'Normal' ? 'Yes' : 'No';
+            if (outlook === 'Rain') return windy === false ? 'Yes' : 'No';
+            return 'No';
+        }
+        
+        function randomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+        
+        function generateRandomSample(idx) {
+            const outlook = OUTLOOK_VALS[Math.floor(Math.random() * OUTLOOK_VALS.length)];
+            const temperature = TEMP_VALS[Math.floor(Math.random() * TEMP_VALS.length)];
+            const humidity = HUMIDITY_VALS[Math.floor(Math.random() * HUMIDITY_VALS.length)];
+            const windy = WINDY_VALS[Math.floor(Math.random() * WINDY_VALS.length)];
+            const play = computePlay(outlook, humidity, windy);
+            return { id: idx, features: { Outlook: outlook, Temperature: temperature, Humidity: humidity, Windy: windy }, label: play };
+        }
+        
+        function generateDataset() {
+            const num = randomInt(8, 10);
+            const data = [];
+            for (let i = 0; i < num; i++) data.push(generateRandomSample(i+1));
+            return data;
+        }
+        
+        function entropyFromCounts(yes, no) {
+            const total = yes + no;
+            if (total === 0) return 0;
+            if (yes === 0 || no === 0) return 0;
+            const p_yes = yes / total;
+            const p_no = no / total;
+            return -p_yes * Math.log2(p_yes) - p_no * Math.log2(p_no);
+        }
+        
+        function entropy(labels) {
+            const yes = labels.filter(l => l === 'Yes').length;
+            const no = labels.length - yes;
+            return entropyFromCounts(yes, no);
+        }
+        
+        function majorityLabel(examples) {
+            const counts = {};
+            for (let ex of examples) counts[ex.label] = (counts[ex.label] || 0) + 1;
+            let best = null, bestCnt = -1;
+            for (let lbl in counts) if (counts[lbl] > bestCnt) { bestCnt = counts[lbl]; best = lbl; }
+            return best;
+        }
+        
+        function infoGain(examples, feature, featureValues, allLabels) {
+            const totalEnt = entropy(allLabels);
+            const total = examples.length;
+            let remainder = 0;
+            for (let val of featureValues) {
+                const subset = examples.filter(ex => ex.features[feature] === val);
+                if (subset.length === 0) continue;
+                const w = subset.length / total;
+                remainder += w * entropy(subset.map(ex => ex.label));
+            }
+            return totalEnt - remainder;
+        }
+        
+        function buildID3Tree(examples, featuresList, defaultLabel) {
+            if (examples.length === 0) return { type: 'leaf', label: defaultLabel };
+            const allSame = examples.every(ex => ex.label === examples[0].label);
+            if (allSame) return { type: 'leaf', label: examples[0].label };
+            if (featuresList.length === 0) return { type: 'leaf', label: majorityLabel(examples) };
+            
+            const labelsAll = examples.map(ex => ex.label);
+            let bestFeature = null, bestGain = -1;
+            for (let feat of featuresList) {
+                let domain = [];
+                if (feat === 'Outlook') domain = [...OUTLOOK_VALS];
+                else if (feat === 'Temperature') domain = [...TEMP_VALS];
+                else if (feat === 'Humidity') domain = [...HUMIDITY_VALS];
+                else if (feat === 'Windy') domain = [true, false];
+                const gain = infoGain(examples, feat, domain, labelsAll);
+                if (gain > bestGain) { bestGain = gain; bestFeature = feat; }
+            }
+            if (!bestFeature) return { type: 'leaf', label: majorityLabel(examples) };
+            
+            let featDomain = [];
+            if (bestFeature === 'Outlook') featDomain = [...OUTLOOK_VALS];
+            else if (bestFeature === 'Temperature') featDomain = [...TEMP_VALS];
+            else if (bestFeature === 'Humidity') featDomain = [...HUMIDITY_VALS];
+            else if (bestFeature === 'Windy') featDomain = [true, false];
+            
+            const newNode = { type: 'internal', feature: bestFeature, gain: bestGain, children: {}, default: majorityLabel(examples) };
+            const remainingFeatures = featuresList.filter(f => f !== bestFeature);
+            for (let val of featDomain) {
+                const subset = examples.filter(ex => ex.features[bestFeature] === val);
+                newNode.children[val] = buildID3Tree(subset, remainingFeatures, majorityLabel(examples));
+            }
+            return newNode;
+        }
+        
+        function computeGainLatex(dataset) {
+            const examples = dataset.map(s => ({ features: s.features, label: s.label }));
+            const total = examples.length;
+            const labelsAll = examples.map(ex => ex.label);
+            const yesTotal = labelsAll.filter(l => l === 'Yes').length;
+            const noTotal = total - yesTotal;
+            const totalEnt = entropy(labelsAll);
+            
+            const domains = {
+                Outlook: OUTLOOK_VALS,
+                Temperature: TEMP_VALS,
+                Humidity: HUMIDITY_VALS,
+                Windy: [true, false]
+            };
+            
+            const lines = [];
+            lines.push(`\\text{Dataset: } ${total} \\text{ samples, } ${yesTotal} \\text{ Yes, } ${noTotal} \\text{ No.}`);
+            lines.push(`H(S) = H\\left(\\frac{${yesTotal}}{${total}}, \\frac{${noTotal}}{${total}}\\right) = ${totalEnt.toFixed(4)}`);
+            lines.push(``);
+            
+            const gains = {};
+            
+            for (const feat of ['Outlook', 'Temperature', 'Humidity', 'Windy']) {
+                const values = domains[feat];
+                let remainder = 0;
+                const termStrings = [];
+                
+                for (const val of values) {
+                    const subset = examples.filter(ex => ex.features[feat] === val);
+                    if (subset.length === 0) continue;
+                    const subLabels = subset.map(ex => ex.label);
+                    const subYes = subLabels.filter(l => l === 'Yes').length;
+                    const subNo = subset.length - subYes;
+                    const subEnt = entropy(subLabels);
+                    const weight = subset.length / total;
+                    remainder += weight * subEnt;
+                    
+                    let entFormula = '';
+                    if (subYes === 0 && subNo === 0) {
+                        entFormula = '0';
+                    } else if (subYes === 0) {
+                        entFormula = 'H(0, 1)';
+                    } else if (subNo === 0) {
+                        entFormula = 'H(1, 0)';
+                    } else {
+                        entFormula = `H\\left(\\frac{${subYes}}{${subset.length}}, \\frac{${subNo}}{${subset.length}}\\right)`;
+                    }
+                    termStrings.push(`\\frac{${subset.length}}{${total}} \\cdot ${entFormula}`);
+                }
+                
+                const infoGiven = remainder.toFixed(4);
+                const gain = totalEnt - remainder;
+                gains[feat] = gain;
+                
+                let infoExpr = termStrings.join(' + ');
+                if (infoExpr === '') infoExpr = '0';
+                
+                lines.push(`\\text{Info}(S \\mid \\text{${feat}}) = ${infoExpr} = ${infoGiven}`);
+                lines.push(`\\text{Gain}(\\text{${feat}}) = H(S) - \\text{Info}(S \\mid \\text{${feat}}) = ${totalEnt.toFixed(4)} - ${infoGiven} = ${gain.toFixed(4)}`);
+                lines.push(``);
+            }
+            
+            let bestFeat = 'Outlook';
+            let bestGainVal = -1;
+            for (const [feat, gain] of Object.entries(gains)) {
+                if (gain > bestGainVal) {
+                    bestGainVal = gain;
+                    bestFeat = feat;
+                }
+            }
+            
+            lines.push(`\\boxed{\\text{Best attribute: } \\mathbf{${bestFeat}} \\text{ (Gain = ${bestGainVal.toFixed(4)})}}`);
+            
+            const latex = `\\begin{align*}\n` + lines.map(l => `& ${l}`).join(`\\\\\n`) + `\n\\end{align*}`;
+            return { latex, bestFeature: bestFeat };
+        }
+        
+        function buildD3Hierarchy(node, edgeValue = null) {
+            if (node.type === 'leaf') {
+                return { name: `Play: ${node.label}`, isLeaf: true, edgeLabel: edgeValue, labelShort: node.label === 'Yes' ? 'Yes' : 'No' };
+            }
+            const childrenList = [];
+            for (const [val, childNode] of Object.entries(node.children)) {
+                childrenList.push(buildD3Hierarchy(childNode, val));
+            }
+            let displayFeature = node.feature;
+            if (displayFeature === 'Temperature') displayFeature = 'Temp';
+            return { name: displayFeature, isLeaf: false, edgeLabel: edgeValue, children: childrenList, gain: node.gain };
+        }
+        
+        let currentSvg = null;
+        function renderVerticalTree(treeRoot, containerId) {
+            const container = document.getElementById(containerId);
+            if (!container) return;
+            let svgElement = container.querySelector("svg");
+            if (!svgElement) {
+                const newSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+                newSvg.setAttribute("width", "100%");
+                newSvg.setAttribute("height", "100%");
+                container.innerHTML = "";
+                container.appendChild(newSvg);
+                currentSvg = d3.select(newSvg);
+            } else {
+                currentSvg = d3.select(svgElement);
+                currentSvg.selectAll("*").remove();
+            }
+            const svg = currentSvg;
+            
+            if (!treeRoot || (!treeRoot.children && treeRoot.isLeaf === undefined)) {
+                svg.append("text").attr("x", 100).attr("y", 100).text("Press 'Generate New Data' to build tree");
+                return;
+            }
+            
+            const root = d3.hierarchy(treeRoot, d => d.children ? d.children : null);
+            // 优化间距：垂直60，水平110，边长度适中
+            const treeLayout = d3.tree().nodeSize([60, 110]);
+            const treeData = treeLayout(root);
+            
+            // 动态计算 viewBox，留出足够边距
+            const allNodes = treeData.descendants();
+            const minX = d3.min(allNodes, d => d.x);
+            const maxX = d3.max(allNodes, d => d.x);
+            const minY = d3.min(allNodes, d => d.y);
+            const maxY = d3.max(allNodes, d => d.y);
+            const padding = 50;
+            svg.attr("viewBox", `${minY - padding} ${minX - padding} ${maxY - minY + 2 * padding} ${maxX - minX + 2 * padding}`);
+            
+            // 连线样式优化：实线，更柔和
+            svg.selectAll(".link").data(treeData.links()).enter().append("path")
+                .attr("class", "link")
+                .attr("d", d3.linkVertical().x(d => d.y).y(d => d.x))
+                .attr("fill", "none")
+                .attr("stroke", "#92b0c0")
+                .attr("stroke-width", 1.8);
+            
+            // 边上的文字（分裂条件）
+            const edgeGroup = svg.append("g").attr("class", "edge-labels");
+            treeData.links().forEach(link => {
+                let edgeVal = link.target.data.edgeLabel;
+                if (edgeVal === undefined) edgeVal = "";
+                if (typeof edgeVal === "boolean") edgeVal = edgeVal ? "True" : "False";
+                const midX = (link.source.y + link.target.y) / 2;
+                const midY = (link.source.x + link.target.x) / 2 - 5;
+                edgeGroup.append("text")
+                    .attr("x", midX)
+                    .attr("y", midY)
+                    .attr("text-anchor", "middle")
+                    .style("font-size", "8px")
+                    .style("fill", "#1f6577")
+                    .style("font-weight", "700")
+                    .text(edgeVal);
+            });
+            
+            // 画节点
+            const nodesGroup = svg.append("g").attr("class", "nodes");
+            const nodeGroups = nodesGroup.selectAll(".tree-node").data(treeData.descendants()).enter()
+                .append("g")
+                .attr("class", d => d.data.isLeaf ? "tree-node leaf-node" : "tree-node")
+                .attr("transform", d => `translate(${d.y}, ${d.x})`);
+            
+            nodeGroups.append("circle")
+                .attr("r", 14)   // 节点半径14px
+                .attr("stroke", d => d.data.isLeaf ? "#1f8a74" : "#2c7a6e")
+                .attr("fill", d => d.data.isLeaf ? "#e0f0ec" : "#f0faf8")
+                .attr("stroke-width", 1.5);
+            
+            nodeGroups.append("text")
+                .attr("dy", "3")
+                .attr("text-anchor", "middle")
+                .style("font-size", "9px")
+                .style("font-weight", "700")
+                .style("fill", "#1d4a5c")
+                .style("font-size", "6px")
+                .text(d => d.data.isLeaf ? d.data.labelShort : d.data.name);
+            
+            nodeGroups.append("title")
+                .text(d => !d.data.isLeaf && d.data.gain !== undefined ? `Gain: ${d.data.gain.toFixed(4)}` : d.data.name);
+        }
+        
+        let currentDataset = [];
+        
+        function updateTableUI(dataset) {
+            const tbody = document.getElementById("tableDynamicBody");
+            if (!tbody) return;
+            tbody.innerHTML = "";
+            dataset.forEach(sample => {
+                const row = tbody.insertRow();
+                row.insertCell(0).innerText = sample.id;
+                row.insertCell(1).innerText = sample.features.Outlook;
+                row.insertCell(2).innerText = sample.features.Temperature;
+                row.insertCell(3).innerText = sample.features.Humidity;
+                row.insertCell(4).innerText = sample.features.Windy ? "True" : "False";
+                const playCell = row.insertCell(5);
+                const isYes = sample.label === "Yes";
+                playCell.innerHTML = `<span class="${isYes ? 'badge-yes' : 'badge-no'}">${sample.label}</span>`;
+            });
+        }
+        
+        function refreshAll() {
+            currentDataset = generateDataset();
+            updateTableUI(currentDataset);
+            
+            const examples = currentDataset.map(s => ({ features: s.features, label: s.label }));
+            const treeModel = buildID3Tree(examples, ['Outlook', 'Temperature', 'Humidity', 'Windy'], majorityLabel(examples));
+            const d3Compatible = buildD3Hierarchy(treeModel);
+            renderVerticalTree(d3Compatible, "treeVisualization");
+            
+            const gainAnalysis = computeGainLatex(currentDataset);
+            const latexDiv = document.getElementById("latexExplanation");
+            if (latexDiv) {
+                latexDiv.innerHTML = `<div class="latex-render">\\[ ${gainAnalysis.latex} \\]</div>`;
+                if (window.MathJax) {
+                    MathJax.typesetPromise([latexDiv]).catch(console.log);
+                }
+            }
+        }
+        
+        document.getElementById("randomizeBtn")?.addEventListener("click", () => refreshAll());
+        refreshAll();
+    })();
+</script>
+</body>
+</html>

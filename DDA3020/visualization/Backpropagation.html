@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        MathJax = {
+            tex: { inlineMath: [['$', '$']], displayMath: [['$$', '$$']] },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 24px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: #f8fafc;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            border: 1px solid #e8eef5;
+        }
+        h1 {
+            margin: 0 0 24px 0;
+            font-size: 20px;
+            color: #1a202c;
+            text-align: center;
+        }
+        .main-layout {
+            display: grid;
+            grid-template-columns: 140px 1fr 200px;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+        .image-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+        .image-label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #718096;
+            text-transform: uppercase;
+        }
+        #digitImage {
+            width: 100%;
+            border: 2px solid #667eea;
+            border-radius: 8px;
+            background: white;
+        }
+        .controls-section {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            justify-content: center;
+        }
+        button {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        button:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        button.secondary {
+            background: #e2e8f0;
+            color: #2d3748;
+        }
+        button.secondary:hover:not(:disabled) {
+            background: #cbd5e0;
+        }
+        .status-info {
+            text-align: center;
+            font-size: 12px;
+            color: #718096;
+            min-height: 60px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .iteration-num {
+            font-size: 18px;
+            font-weight: 600;
+            color: #667eea;
+        }
+        .output-section {
+            border: 1px solid #e8eef5;
+            border-radius: 8px;
+            padding: 12px;
+            background: #f7fafc;
+        }
+        .output-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #667eea;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+        }
+        .output-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .output-bar {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+        }
+        .output-digit {
+            width: 16px;
+            text-align: center;
+            font-weight: 600;
+            color: #718096;
+        }
+        .output-value {
+            flex: 1;
+            height: 16px;
+            background: #e2e8f0;
+            border-radius: 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        .output-bar.selected .output-value {
+            background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+        }
+        .output-percent {
+            font-size: 10px;
+            color: #718096;
+            width: 28px;
+            text-align: right;
+        }
+        .network-section {
+            grid-column: 1 / -1;
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+            display: block;
+            border: 1px solid #e8eef5;
+            border-radius: 8px;
+            background: white;
+            margin-bottom: 12px;
+        }
+        .params-section {
+            background: #f7fafc;
+            border: 1px solid #e8eef5;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            color: #1a202c;
+            overflow-x: auto;
+        }
+        .params-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            font-size: 12px;
+        }
+        .params-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: 'Monaco', monospace;
+            font-size: 12px;
+        }
+        .params-table th {
+            background: #e8eef5;
+            color: #2d3748;
+            padding: 8px 12px;
+            text-align: left;
+            font-weight: 600;
+            border: 1px solid #cbd5e0;
+        }
+        .params-table td {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e0;
+            text-align: right;
+        }
+        .params-table tr:nth-child(even) {
+            background: #ffffff;
+        }
+        .params-table tr:nth-child(odd) {
+            background: #f7fafc;
+        }
+        .param-label {
+            text-align: left;
+            color: #667eea;
+            font-weight: 600;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .stat-box {
+            background: #f7fafc;
+            border: 1px solid #e8eef5;
+            border-radius: 6px;
+            padding: 12px;
+            text-align: center;
+        }
+        .stat-label {
+            font-size: 10px;
+            font-weight: 600;
+            color: #667eea;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+        .stat-value {
+            font-size: 16px;
+            font-family: 'Monaco', monospace;
+            font-weight: 600;
+            color: #1a202c;
+        }
+        @media (max-width: 1024px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Digit Recognition - Backpropagation Process</h1>
+        
+        <div class="main-layout">
+            <div class="image-section">
+                <div class="image-label">Input</div>
+                <canvas id="digitImage" width="140" height="140"></canvas>
+            </div>
+
+            <div style="display: flex; flex-direction: column; justify-content: center;">
+                <div class="controls-section">
+                    <button id="trainBtn" onclick="startTraining()">▶ Start</button>
+                    <button class="secondary" onclick="newDigit()">↻ New</button>
+                </div>
+                <div class="status-info">
+                    <div class="iteration-num" id="iterNum">-</div>
+                    <div id="statusText" style="font-size: 11px; margin-top: 4px; color: #718096;">Ready</div>
+                    <div id="lossDisplay" style="font-size: 12px; margin-top: 6px; color: #667eea; font-weight: 600;">-</div>
+                </div>
+            </div>
+
+            <div class="output-section">
+                <div class="output-label">Output Prediction</div>
+                <div class="output-bars" id="outputBars"></div>
+            </div>
+        </div>
+
+        <div class="network-section">
+            <canvas id="graphCanvas" width="1000" height="420"></canvas>
+        </div>
+
+        <div class="params-section">
+            <div class="params-title">Parameters Update</div>
+            <table class="params-table">
+                <thead>
+                    <tr>
+                        <th class="param-label">Layer</th>
+                        <th>$\mathbf{w}$ (Weight)</th>
+                        <th>$\mathbf{b}$ (Bias)</th>
+                        <th>$C$ (Loss)</th>
+                    </tr>
+                </thead>
+                <tbody id="paramsTableBody">
+                    <tr><td class="param-label">L1</td><td id="w1">-</td><td id="b1">-</td><td id="c1">-</td></tr>
+                    <tr><td class="param-label">L2</td><td id="w2">-</td><td id="b2">-</td><td id="c2">-</td></tr>
+                    <tr><td class="param-label">L3</td><td id="w3">-</td><td id="b3">-</td><td id="c3">-</td></tr>
+                    <tr><td class="param-label">Output</td><td id="w4">-</td><td id="b4">-</td><td id="c4">-</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-box">
+                <div class="stat-label">Loss $C_i^{(n+1)}$</div>
+                <div class="stat-value" id="loss">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Avg Activation</div>
+                <div class="stat-value" id="avgActivation">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Avg Gradient $\overline{v}_i$</div>
+                <div class="stat-value" id="avgGradient">-</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Prediction</div>
+                <div class="stat-value" id="prediction">-</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const graphCanvas = document.getElementById('graphCanvas');
+        const graphCtx = graphCanvas.getContext('2d');
+        const imgCanvas = document.getElementById('digitImage');
+        const imgCtx = imgCanvas.getContext('2d');
+
+        let network = null;
+        let trainingState = {
+            isTraining: false,
+            currentIteration: 0,
+            maxIterations: 10,
+            targetDigit: 3,
+            phase: 'idle',
+            currentLayer: 0,
+            lossHistory: [],
+            shouldStop: false
+        };
+
+        function drawDigitImage(digit) {
+            imgCtx.fillStyle = '#ffffff';
+            imgCtx.fillRect(0, 0, 140, 140);
+            
+            imgCtx.fillStyle = '#000000';
+            const digitPatterns = {
+                0: [[2,3],[2,4],[2,5],[2,6],[3,2],[3,7],[4,2],[4,7],[5,2],[5,7],[6,2],[6,7],[7,3],[7,4],[7,5],[7,6]],
+                1: [[3,3],[3,4],[4,4],[5,4],[6,3],[6,4],[6,5]],
+                2: [[2,3],[2,4],[3,2],[3,5],[4,5],[5,4],[6,3],[6,4],[7,2],[7,3]],
+                3: [[2,3],[2,4],[3,2],[3,5],[4,4],[5,2],[5,5],[6,2],[6,5],[7,3],[7,4]],
+                4: [[2,6],[3,5],[3,6],[4,4],[4,5],[4,6],[5,3],[5,6],[6,2],[6,6],[7,2],[7,3]],
+                5: [[2,2],[2,3],[2,4],[3,2],[4,3],[4,4],[5,5],[6,2],[6,5],[7,3],[7,4]],
+                6: [[3,4],[4,3],[5,2],[5,5],[6,2],[6,6],[7,3],[7,5],[7,4]],
+                7: [[2,2],[2,3],[2,4],[2,5],[3,5],[4,5],[5,4],[6,4],[7,3]],
+                8: [[2,3],[2,4],[3,2],[3,5],[4,3],[4,4],[5,2],[5,5],[6,2],[6,5],[7,3],[7,4]],
+                9: [[2,3],[2,4],[3,2],[3,5],[4,2],[4,6],[5,3],[5,6],[6,4],[7,3]]
+            };
+
+            const pattern = digitPatterns[digit] || [];
+            const cellSize = 140 / 8;
+
+            pattern.forEach(([row, col]) => {
+                imgCtx.fillRect(col * cellSize + 2, row * cellSize + 2, cellSize - 4, cellSize - 4);
+            });
+        }
+
+        class DigitNetwork {
+            constructor(targetDigit) {
+                this.targetDigit = targetDigit;
+                this.layers = [
+                    { size: 1, nodes: [] },
+                    { size: 3, nodes: [] },
+                    { size: 4, nodes: [] },
+                    { size: 3, nodes: [] },
+                    { size: 10, nodes: [] }
+                ];
+
+                for (let l = 0; l < this.layers.length; l++) {
+                    for (let i = 0; i < this.layers[l].size; i++) {
+                        this.layers[l].nodes.push({ value: 0.3, gradient: 0 });
+                    }
+                }
+
+                this.weights = [];
+                this.biases = [];
+                for (let l = 0; l < this.layers.length - 1; l++) {
+                    this.weights[l] = [];
+                    this.biases[l] = [];
+                    for (let i = 0; i < this.layers[l + 1].size; i++) {
+                        this.weights[l][i] = [];
+                        for (let j = 0; j < this.layers[l].size; j++) {
+                            this.weights[l][i][j] = (Math.random() - 0.5) * 0.6;
+                        }
+                        this.biases[l][i] = (Math.random() - 0.5) * 0.2;
+                    }
+                }
+
+                this.loss = 0;
+                this.learningRate = 0.3;
+                this.currentInput = 0;
+            }
+
+            forward() {
+                this.currentInput = (this.targetDigit - 4.5) / 5;
+                this.layers[0].nodes[0].value = this.currentInput;
+
+                for (let l = 1; l < this.layers.length; l++) {
+                    for (let i = 0; i < this.layers[l].size; i++) {
+                        let sum = this.biases[l - 1][i];
+                        for (let j = 0; j < this.layers[l - 1].size; j++) {
+                            sum += this.weights[l - 1][i][j] * this.layers[l - 1].nodes[j].value;
+                        }
+                        
+                        if (l === this.layers.length - 1) {
+                            this.layers[l].nodes[i].value = 1 / (1 + Math.exp(-sum));
+                        } else {
+                            this.layers[l].nodes[i].value = Math.max(0.05, Math.max(0, sum));
+                        }
+                    }
+                }
+
+                let outputSum = 0;
+                for (let i = 0; i < 10; i++) {
+                    const target = i === this.targetDigit ? 1 : 0;
+                    outputSum += Math.pow(this.layers[4].nodes[i].value - target, 2);
+                }
+                this.loss = 0.5 * outputSum;
+            }
+
+            backward() {
+                for (let l = 0; l < this.layers.length; l++) {
+                    for (let i = 0; i < this.layers[l].size; i++) {
+                        this.layers[l].nodes[i].gradient = 0;
+                    }
+                }
+
+                const outputLayer = this.layers.length - 1;
+                for (let i = 0; i < 10; i++) {
+                    const target = i === this.targetDigit ? 1 : 0;
+                    this.layers[outputLayer].nodes[i].gradient = 
+                        this.layers[outputLayer].nodes[i].value - target;
+                }
+
+                for (let l = this.layers.length - 2; l >= 0; l--) {
+                    for (let j = 0; j < this.layers[l].size; j++) {
+                        let grad = 0;
+                        for (let i = 0; i < this.layers[l + 1].size; i++) {
+                            grad += this.weights[l][i][j] * this.layers[l + 1].nodes[i].gradient;
+                        }
+                        grad *= this.layers[l].nodes[j].value > 0.04 ? 1 : 0;
+                        this.layers[l].nodes[j].gradient = grad;
+                    }
+                }
+
+                for (let l = 0; l < this.layers.length - 1; l++) {
+                    for (let i = 0; i < this.layers[l + 1].size; i++) {
+                        for (let j = 0; j < this.layers[l].size; j++) {
+                            this.weights[l][i][j] -= this.learningRate * 
+                                this.layers[l + 1].nodes[i].gradient * 
+                                this.layers[l].nodes[j].value;
+                        }
+                        this.biases[l][i] -= this.learningRate * this.layers[l + 1].nodes[i].gradient;
+                    }
+                }
+            }
+
+            getPrediction() {
+                let maxIdx = 0;
+                let maxVal = this.layers[4].nodes[0].value;
+                for (let i = 1; i < 10; i++) {
+                    if (this.layers[4].nodes[i].value > maxVal) {
+                        maxVal = this.layers[4].nodes[i].value;
+                        maxIdx = i;
+                    }
+                }
+                return { digit: maxIdx, confidence: maxVal };
+            }
+
+            getAverageActivation() {
+                let sum = 0, count = 0;
+                for (let l = 1; l < this.layers.length; l++) {
+                    for (let i = 0; i < this.layers[l].size; i++) {
+                        sum += Math.abs(this.layers[l].nodes[i].value);
+                        count++;
+                    }
+                }
+                return count > 0 ? sum / count : 0;
+            }
+
+            getAverageGradient() {
+                let sum = 0, count = 0;
+                for (let l = 0; l < this.layers.length; l++) {
+                    for (let i = 0; i < this.layers[l].size; i++) {
+                        sum += Math.abs(this.layers[l].nodes[i].gradient);
+                        count++;
+                    }
+                }
+                return count > 0 ? sum / count : 0;
+            }
+        }
+
+        function drawNetwork() {
+            graphCtx.clearRect(0, 0, graphCanvas.width, graphCanvas.height);
+            graphCtx.fillStyle = '#ffffff';
+            graphCtx.fillRect(0, 0, graphCanvas.width, graphCanvas.height);
+
+            const padding = 50;
+            const graphWidth = graphCanvas.width - 2 * padding;
+            const graphHeight = graphCanvas.height - 2 * padding;
+            const layerSpacing = graphWidth / (network.layers.length - 1);
+
+            for (let l = 0; l < network.layers.length - 1; l++) {
+                const x1 = padding + l * layerSpacing;
+                const x2 = padding + (l + 1) * layerSpacing;
+
+                for (let i = 0; i < network.layers[l].size; i++) {
+                    const y1 = padding + (graphHeight / (network.layers[l].size + 1)) * (i + 1);
+                    for (let j = 0; j < network.layers[l + 1].size; j++) {
+                        const y2 = padding + (graphHeight / (network.layers[l + 1].size + 1)) * (j + 1);
+
+                        const isActive = trainingState.phase !== 'idle' && l === trainingState.currentLayer;
+
+                        if (isActive) {
+                            graphCtx.strokeStyle = trainingState.phase === 'forward' ? '#667eea' : '#ff6b6b';
+                            graphCtx.lineWidth = 2.5;
+                        } else {
+                            graphCtx.strokeStyle = '#cbd5e0';
+                            graphCtx.lineWidth = 1.5;
+                        }
+
+                        graphCtx.beginPath();
+                        graphCtx.moveTo(x1, y1);
+                        graphCtx.lineTo(x2, y2);
+                        graphCtx.stroke();
+                    }
+                }
+            }
+
+            for (let l = 0; l < network.layers.length; l++) {
+                const x = padding + l * layerSpacing;
+
+                for (let i = 0; i < network.layers[l].size; i++) {
+                    const y = padding + (graphHeight / (network.layers[l].size + 1)) * (i + 1);
+                    const nodeRadius = 16;
+
+                    let color = '#667eea';
+                    if (trainingState.phase !== 'idle' && l === trainingState.currentLayer) {
+                        color = trainingState.phase === 'forward' ? '#4c63d2' : '#ff6b6b';
+                    }
+
+                    graphCtx.fillStyle = color;
+                    graphCtx.beginPath();
+                    graphCtx.arc(x, y, nodeRadius, 0, 2 * Math.PI);
+                    graphCtx.fill();
+
+                    graphCtx.fillStyle = '#fff';
+                    graphCtx.font = 'bold 12px monospace';
+                    graphCtx.textAlign = 'center';
+                    graphCtx.textBaseline = 'middle';
+                    const val = network.layers[l].nodes[i].value.toFixed(2);
+                    graphCtx.fillText(val, x, y);
+                }
+            }
+
+            const labels = ['In', 'L1', 'L2', 'L3', 'Out'];
+            graphCtx.fillStyle = '#718096';
+            graphCtx.font = '11px sans-serif';
+            graphCtx.textAlign = 'center';
+            for (let l = 0; l < network.layers.length; l++) {
+                const x = padding + l * layerSpacing;
+                graphCtx.fillText(labels[l], x, graphCanvas.height - 15);
+            }
+        }
+
+        function updateOutputBars() {
+            const container = document.getElementById('outputBars');
+            container.innerHTML = '';
+
+            const pred = network.getPrediction();
+
+            for (let i = 0; i < 10; i++) {
+                const val = network.layers[4].nodes[i].value;
+                const pct = Math.max(0, Math.min(1, val)) * 100;
+                
+                const bar = document.createElement('div');
+                bar.className = 'output-bar' + (i === pred.digit ? ' selected' : '');
+                bar.innerHTML = `
+                    <div class="output-digit">${i}</div>
+                    <div class="output-value" style="width: ${pct}%;"></div>
+                    <div class="output-percent">${pct.toFixed(0)}%</div>
+                `;
+                container.appendChild(bar);
+            }
+        }
+
+        function updateInfo() {
+            document.getElementById('loss').textContent = network.loss.toFixed(4);
+            document.getElementById('lossDisplay').textContent = `Loss: ${network.loss.toFixed(4)}`;
+            document.getElementById('avgActivation').textContent = network.getAverageActivation().toFixed(3);
+            document.getElementById('avgGradient').textContent = network.getAverageGradient().toFixed(3);
+            
+            const pred = network.getPrediction();
+            document.getElementById('prediction').textContent = pred.digit;
+
+            // Update parameters table
+            for (let l = 0; l < network.weights.length; l++) {
+                let wSum = 0, bSum = 0, wCount = 0, bCount = 0;
+                
+                for (let i = 0; i < network.weights[l].length; i++) {
+                    for (let j = 0; j < network.weights[l][i].length; j++) {
+                        wSum += Math.abs(network.weights[l][i][j]);
+                        wCount++;
+                    }
+                    bSum += Math.abs(network.biases[l][i]);
+                    bCount++;
+                }
+                
+                const wAvg = wCount > 0 ? wSum / wCount : 0;
+                const bAvg = bCount > 0 ? bSum / bCount : 0;
+                const loss = network.loss;
+                
+                const layerIdx = l + 1;
+                document.getElementById(`w${layerIdx}`).textContent = wAvg.toFixed(3);
+                document.getElementById(`b${layerIdx}`).textContent = bAvg.toFixed(3);
+                document.getElementById(`c${layerIdx}`).textContent = loss.toFixed(4);
+            }
+
+            updateOutputBars();
+            
+            // Re-render MathJax for table headers
+            if (window.MathJax && window.MathJax.typesetPromise) {
+                MathJax.typesetPromise([document.querySelector('.params-table')]).catch(err => console.log(err));
+            }
+        }
+
+        async function startTraining() {
+            if (trainingState.isTraining) return;
+            
+            trainingState.isTraining = true;
+            trainingState.shouldStop = false;
+            document.getElementById('trainBtn').disabled = true;
+            
+            // Re-initialize network for fresh training
+            network = new DigitNetwork(trainingState.targetDigit);
+            
+            trainingState.currentIteration = 0;
+            trainingState.lossHistory = [];
+
+            for (let iter = 0; iter < trainingState.maxIterations; iter++) {
+                if (trainingState.shouldStop) break;
+                
+                trainingState.currentIteration = iter + 1;
+                document.getElementById('iterNum').textContent = `${iter + 1}/${trainingState.maxIterations}`;
+                document.getElementById('statusText').textContent = 'Forward...';
+
+                trainingState.phase = 'forward';
+                for (let l = 0; l < network.layers.length - 1; l++) {
+                    if (trainingState.shouldStop) break;
+                    trainingState.currentLayer = l;
+                    drawNetwork();
+                    updateInfo();
+                    await new Promise(r => setTimeout(r, 150));
+                }
+
+                if (trainingState.shouldStop) break;
+                network.forward();
+                updateInfo();
+                await new Promise(r => setTimeout(r, 300));
+
+                if (trainingState.shouldStop) break;
+                document.getElementById('statusText').textContent = 'Backward...';
+                trainingState.phase = 'backward';
+                for (let l = network.layers.length - 2; l >= 0; l--) {
+                    if (trainingState.shouldStop) break;
+                    trainingState.currentLayer = l;
+                    drawNetwork();
+                    await new Promise(r => setTimeout(r, 150));
+                }
+
+                if (trainingState.shouldStop) break;
+                network.backward();
+                trainingState.lossHistory.push(network.loss);
+
+                updateInfo();
+                await new Promise(r => setTimeout(r, 300));
+            }
+
+            trainingState.phase = 'idle';
+            trainingState.isTraining = false;
+            document.getElementById('trainBtn').disabled = false;
+            if (!trainingState.shouldStop) {
+                document.getElementById('statusText').textContent = 'Done! ✓';
+            }
+            drawNetwork();
+            updateInfo();
+        }
+
+        function newDigit() {
+            trainingState.shouldStop = true;
+            trainingState.targetDigit = Math.floor(Math.random() * 10);
+            trainingState.currentIteration = 0;
+            trainingState.phase = 'idle';
+            trainingState.isTraining = false;
+            trainingState.lossHistory = [];
+            document.getElementById('trainBtn').disabled = false;
+            document.getElementById('iterNum').textContent = '-';
+            document.getElementById('statusText').textContent = 'Ready';
+            document.getElementById('lossDisplay').textContent = '-';
+            
+            // Reset all display values to '-'
+            for (let i = 1; i <= 4; i++) {
+                document.getElementById(`w${i}`).textContent = '-';
+                document.getElementById(`b${i}`).textContent = '-';
+                document.getElementById(`c${i}`).textContent = '-';
+            }
+            document.getElementById('loss').textContent = '-';
+            document.getElementById('avgActivation').textContent = '-';
+            document.getElementById('avgGradient').textContent = '-';
+            document.getElementById('prediction').textContent = '-';
+            
+            network = new DigitNetwork(trainingState.targetDigit);
+            drawDigitImage(trainingState.targetDigit);
+            drawNetwork();
+            updateOutputBars();
+        }
+
+        network = new DigitNetwork(trainingState.targetDigit);
+        drawDigitImage(trainingState.targetDigit);
+        drawNetwork();
+        
+        // Reset parameters table on initial load
+        for (let i = 1; i <= 4; i++) {
+            document.getElementById(`w${i}`).textContent = '-';
+            document.getElementById(`b${i}`).textContent = '-';
+            document.getElementById(`c${i}`).textContent = '-';
+        }
+        
+        document.getElementById('loss').textContent = '-';
+        document.getElementById('lossDisplay').textContent = '-';
+        document.getElementById('avgActivation').textContent = '-';
+        document.getElementById('avgGradient').textContent = '-';
+        document.getElementById('prediction').textContent = '-';
+    </script>
+</body>
+</html>

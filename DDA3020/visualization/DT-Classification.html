@@ -11,69 +11,77 @@
             box-sizing: border-box;
         }
         body {
-            font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
-            background: #eef2fa;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             margin: 0;
-            padding: 20px 16px;
-            color: #1a2c3e;
+            padding: 24px 16px;
+            color: #2c3e50;
         }
         .dashboard-wrapper {
             max-width: 1300px;
             margin: 0 auto;
             background: white;
-            border-radius: 24px;
-            box-shadow: 0 10px 20px -8px rgba(0, 0, 0, 0.08);
-            padding: 18px 20px 22px 20px;
+            border-radius: 16px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.04);
+            padding: 24px;
         }
         .main-title {
             text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 1px solid #e0edf2;
-            padding-bottom: 10px;
+            margin-bottom: 24px;
+            border-bottom: 2px solid #e8eef5;
+            padding-bottom: 12px;
         }
         .main-title h1 {
-            font-size: 1.6rem;
-            font-weight: 700;
+            font-size: 1.8rem;
+            font-weight: 600;
             margin: 0;
-            color: #1f5e6e;
+            color: #1a5f7a;
+            letter-spacing: -0.5px;
         }
         .action-row {
             display: flex;
             justify-content: flex-end;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
         .btn-generate {
-            background: #2c7a6e;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             border: none;
             color: white;
-            padding: 6px 22px;
-            font-size: 0.85rem;
+            padding: 8px 28px;
+            font-size: 0.9rem;
             font-weight: 600;
-            border-radius: 40px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: 0.2s;
+            transition: 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
         }
         .btn-generate:hover {
-            background: #1f5f53;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
         }
         .two-columns {
             display: block;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
         }
         .table-area {
             width: 100%;
             background: #ffffff;
-            border-radius: 20px;
-            border: 1px solid #e0ecef;
+            border-radius: 12px;
+            border: 1px solid #e8eef5;
             overflow: hidden;
             margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+        .table-area:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
         .table-header {
-            font-weight: 700;
+            font-weight: 600;
             font-size: 1rem;
-            padding: 10px 16px 6px 16px;
-            border-bottom: 1px solid #e0edf2;
-            color: #1f5e6e;
+            padding: 14px 18px 10px 18px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+            border-bottom: 1px solid #e8eef5;
+            color: #1a5f7a;
         }
         .table-wrapper {
             overflow-x: auto;
@@ -82,142 +90,162 @@
         .weather-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.8rem;
-            font-family: 'SF Mono', 'Courier New', monospace;
+            font-size: 0.85rem;
         }
         .weather-table th {
-            background: #f2f8fc;
-            padding: 8px 6px;
+            background: transparent;
+            padding: 10px 8px;
             text-align: center;
-            font-weight: 700;
-            border-bottom: 1px solid #dce5ec;
-            color: #1a4b5c;
-            font-size: 0.75rem;
+            font-weight: 600;
+            border-bottom: 2px solid #e8eef5;
+            color: #2c5aa0;
+            font-size: 0.9rem;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         }
         .weather-table td {
-            padding: 6px 6px;
+            padding: 10px 8px;
             text-align: center;
-            border-bottom: 1px solid #e9f0f5;
-            font-size: 0.75rem;
+            border-bottom: 1px solid #f0f4f8;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #2c3e50;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         }
-        .weather-table tr:hover td {
-            background-color: #f5fbfe;
+        .weather-table tbody tr:hover td {
+            background-color: #f8fafc;
         }
         .badge-yes, .badge-no {
             display: inline-block;
-            padding: 2px 10px;
-            border-radius: 30px;
-            font-weight: 700;
-            font-size: 0.7rem;
+            padding: 3px 12px;
+            border-radius: 16px;
+            font-weight: 600;
+            font-size: 0.75rem;
+            letter-spacing: 0.3px;
         }
         .badge-yes {
-            background: #2c9c8c20;
-            color: #1e6b5e;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
         }
         .badge-no {
-            background: #e06c5e20;
-            color: #b13e2e;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
         }
         .tree-area {
             width: 100%;
             background: #ffffff;
-            border-radius: 20px;
-            border: 1px solid #e0ecef;
-            padding: 12px 8px 12px 8px;
+            border-radius: 12px;
+            border: 1px solid #e8eef5;
+            padding: 14px;
+            transition: all 0.3s ease;
+        }
+        .tree-area:hover {
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
         }
         .tree-header {
-            font-weight: 700;
+            font-weight: 600;
             font-size: 1rem;
-            padding: 0 6px 8px 10px;
-            border-bottom: 1px solid #e0edf2;
-            color: #1f5e6e;
+            padding: 0 4px 12px 4px;
+            border-bottom: 1px solid #e8eef5;
+            color: #1a5f7a;
         }
         .tree-canvas-container {
             width: 100%;
             overflow-x: auto;
             overflow-y: auto;
-            background: #ffffff;
-            border-radius: 16px;
-            min-height: 420px;
-            max-height: 55vh;
+            background: linear-gradient(135deg, #fafbfc 0%, #f0f4f8 100%);
+            border-radius: 10px;
+            min-height: 480px;
+            max-height: 60vh;
             display: flex;
             justify-content: center;
             align-items: flex-start;
-            border: 1px solid #eef2f7;
-            margin-top: 10px;
+            border: 1px solid #e8eef5;
+            margin-top: 12px;
         }
         svg {
             display: block;
-            background: #ffffff;
-            font-family: 'Segoe UI', 'Roboto', sans-serif;
+            background: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             width: 100%;
             height: auto;
             min-width: 700px;
         }
         .tree-node circle {
-            stroke: #2c7a6e;
-            stroke-width: 1.5px;
-            fill: #f0faf8;
-            r: 14px;          /* 从20减小到14 */
+            stroke: #667eea !important;
+            stroke-width: 1.5px !important;
+            fill: #e8f1ff !important;
+            r: 12px !important;
+            transition: all 0.2s ease;
+        }
+        .tree-node:hover circle {
+            fill: #d0e0ff !important;
+            stroke-width: 2px !important;
         }
         .tree-node text {
             font-size: 5px !important;
-            font-weight: 600;
-            fill: #1e3a4d;
+            font-weight: 700 !important;
+            fill: #1a3a52 !important;
             dominant-baseline: middle;
             text-anchor: middle;
         }
         .leaf-node circle {
-            fill: #e0f0ec;
-            stroke: #1f8a74;
-            stroke-width: 1.5px;
-            r: 14px;
+            fill: #d0f5f7 !important;
+            stroke: #06c !important;
+            stroke-width: 1.5px !important;
+            r: 12px !important;
+        }
+        .leaf-node:hover circle {
+            fill: #b0ebef !important;
+            stroke-width: 2px !important;
         }
         .leaf-node text {
-            font-weight: 800;
-            fill: #0b4f43;
+            font-weight: 800 !important;
+            fill: #003366 !important;
             font-size: 5px !important;
         }
         .link {
             fill: none;
-            stroke: #8aaec2;
-            stroke-width: 1.8px;
+            stroke: #cbd5e0;
+            stroke-width: 2px;
+            opacity: 0.8;
         }
         .edge-label {
             font-size: 8px;
-            fill: #1f6577;
+            fill: #667eea;
             font-weight: 700;
+            background: white;
         }
         .info-panel {
             margin-top: 16px;
-            background: #fafcfd;
-            border-radius: 18px;
-            border: 1px solid #e0ecef;
-            padding: 10px 16px;
+            background: linear-gradient(135deg, #f8fafc 0%, #f0f4f8 100%);
+            border-radius: 12px;
+            border: 1px solid #e8eef5;
+            padding: 12px 16px;
         }
         .info-title {
             font-weight: 600;
-            font-size: 0.8rem;
-            color: #5f7f9a;
+            font-size: 0.85rem;
+            color: #1a5f7a;
             margin-bottom: 6px;
         }
         .math-block {
             overflow-x: auto;
-            font-size: 0.75rem;
-            line-height: 1.4;
+            font-size: 0.8rem;
+            line-height: 1.5;
         }
         .latex-render {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
         }
         @media (max-width: 700px) {
             body {
-                padding: 12px;
+                padding: 16px;
             }
             .dashboard-wrapper {
-                padding: 12px;
+                padding: 16px;
             }
             .tree-canvas-container {
                 min-height: 350px;
+                max-height: 50vh;
             }
         }
     </style>
@@ -475,8 +503,7 @@
             }
             
             const root = d3.hierarchy(treeRoot, d => d.children ? d.children : null);
-            // 优化间距：垂直60，水平110，边长度适中
-            const treeLayout = d3.tree().nodeSize([60, 110]);
+            const treeLayout = d3.tree().nodeSize([45, 80]);
             const treeData = treeLayout(root);
             
             // 动态计算 viewBox，留出足够边距
@@ -508,9 +535,9 @@
                     .attr("x", midX)
                     .attr("y", midY)
                     .attr("text-anchor", "middle")
-                    .style("font-size", "8px")
-                    .style("fill", "#1f6577")
-                    .style("font-weight", "700")
+                    .attr("font-size", "5px")
+                    .attr("fill", "#667eea")
+                    .attr("font-weight", "700")
                     .text(edgeVal);
             });
             
@@ -522,18 +549,17 @@
                 .attr("transform", d => `translate(${d.y}, ${d.x})`);
             
             nodeGroups.append("circle")
-                .attr("r", 14)   // 节点半径14px
-                .attr("stroke", d => d.data.isLeaf ? "#1f8a74" : "#2c7a6e")
-                .attr("fill", d => d.data.isLeaf ? "#e0f0ec" : "#f0faf8")
+                .attr("r", 12)
+                .attr("stroke", d => d.data.isLeaf ? "#06c" : "#667eea")
+                .attr("fill", d => d.data.isLeaf ? "#d0f5f7" : "#e8f1ff")
                 .attr("stroke-width", 1.5);
             
             nodeGroups.append("text")
-                .attr("dy", "3")
+                .attr("dy", "2")
                 .attr("text-anchor", "middle")
-                .style("font-size", "9px")
-                .style("font-weight", "700")
-                .style("fill", "#1d4a5c")
-                .style("font-size", "6px")
+                .attr("font-size", "4.5px")
+                .attr("font-weight", "700")
+                .attr("fill", d => d.data.isLeaf ? "#003366" : "#1a3a52")
                 .text(d => d.data.isLeaf ? d.data.labelShort : d.data.name);
             
             nodeGroups.append("title")

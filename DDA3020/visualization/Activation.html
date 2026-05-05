@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 24px;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
+            background: #f8fafc;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06), 0 0 1px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+            border: 1px solid #e8eef5;
+        }
+        .card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+        canvas {
+            width: 100% !important;
+            height: auto !important;
+            max-height: 280px;
+            display: block;
+        }
+        .formula {
+            text-align: center;
+            margin-top: 12px;
+            font-size: 14px;
+            color: #2c3e50;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+<div class="grid">
+    <div class="card"><canvas id="linear"></canvas><div class="formula">\(y = z\)</div></div>
+    <div class="card"><canvas id="relu"></canvas><div class="formula">\(y = \max(0, z)\)</div></div>
+    <div class="card"><canvas id="softplus"></canvas><div class="formula">\(y = \log(1 + \exp(z))\)</div></div>
+    <div class="card"><canvas id="threshold"></canvas><div class="formula">\(y = \begin{cases}1 & z > 0 \\ 0 & z \le 0\end{cases}\)</div></div>
+    <div class="card"><canvas id="sigmoid"></canvas><div class="formula">\(y = \dfrac{1}{1 + \exp(-z)}\)</div></div>
+    <div class="card"><canvas id="tanh"></canvas><div class="formula">\(y = \dfrac{\exp(z) - \exp(-z)}{\exp(z) + \exp(-z)}\)</div></div>
+</div>
+<script>
+    const N = 200;
+    const xMin = -10, xMax = 10;
+    const xVals = Array.from({length: N}, (_, i) => xMin + i * (xMax - xMin) / (N - 1));
+
+    const linear = xVals.map(v => v);
+    const relu = xVals.map(v => Math.max(0, v));
+    const softplus = xVals.map(v => Math.log(1 + Math.exp(Math.min(v, 50))));
+    const threshold = xVals.map(v => v > 0 ? 1 : 0);
+    const sigmoid = xVals.map(v => 1 / (1 + Math.exp(-v)));
+    const tanh = xVals.map(v => Math.tanh(v));
+
+    const dataMap = {
+        linear: xVals.map((x, i) => ({x, y: linear[i]})),
+        relu: xVals.map((x, i) => ({x, y: relu[i]})),
+        softplus: xVals.map((x, i) => ({x, y: softplus[i]})),
+        threshold: xVals.map((x, i) => ({x, y: threshold[i]})),
+        sigmoid: xVals.map((x, i) => ({x, y: sigmoid[i]})),
+        tanh: xVals.map((x, i) => ({x, y: tanh[i]}))
+    };
+
+    const colors = {
+        linear: '#1f77b4',
+        relu: '#2ca02c',
+        softplus: '#d62728',
+        threshold: '#ff7f0e',
+        sigmoid: '#9467bd',
+        tanh: '#8c564b'
+    };
+
+    // 插件：在绘制数据集之前绘制轴线，这样曲线会覆盖轴线，曲线颜色在上方
+    const axisLinePlugin = {
+        beforeDatasetsDraw(chart) {
+            const ctx = chart.ctx;
+            const yAxis = chart.scales.y;
+            const xAxis = chart.scales.x;
+            if (!yAxis || !xAxis) return;
+            ctx.save();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = '#000000';
+            ctx.setLineDash([]);
+            // y=0 线
+            if (0 >= yAxis.min && 0 <= yAxis.max) {
+                const yPixel = yAxis.getPixelForValue(0);
+                ctx.beginPath();
+                ctx.moveTo(xAxis.left, yPixel);
+                ctx.lineTo(xAxis.right, yPixel);
+                ctx.stroke();
+            }
+            // x=0 线
+            if (0 >= xAxis.min && 0 <= xAxis.max) {
+                const xPixel = xAxis.getPixelForValue(0);
+                ctx.beginPath();
+                ctx.moveTo(xPixel, yAxis.top);
+                ctx.lineTo(xPixel, yAxis.bottom);
+                ctx.stroke();
+            }
+            // 原点标记
+            if (0 >= xAxis.min && 0 <= xAxis.max && 0 >= yAxis.min && 0 <= yAxis.max) {
+                const xPixel = xAxis.getPixelForValue(0);
+                const yPixel = yAxis.getPixelForValue(0);
+                ctx.fillStyle = '#000000';
+                ctx.beginPath();
+                ctx.arc(xPixel, yPixel, 3, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+    };
+
+    const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: {
+            legend: { display: true, position: 'top' },
+            tooltip: { enabled: false }
+        },
+        scales: {
+            x: {
+                type: 'linear',
+                title: { display: false },
+                min: xMin, max: xMax,
+                ticks: {
+                    stepSize: 1,
+                    callback: function(val) {
+                        return Number.isInteger(val) ? val : null;
+                    },
+                    font: { size: 11 }
+                },
+                grid: { color: '#cccccc', lineWidth: 0.5 }
+            },
+            y: {
+                type: 'linear',
+                title: { display: false },
+                min: -5, max: 5,
+                ticks: {
+                    stepSize: 1,
+                    callback: function(val) {
+                        return Number.isInteger(val) ? val : null;
+                    },
+                    font: { size: 11 }
+                },
+                grid: { color: '#cccccc', lineWidth: 0.5 }
+            }
+        }
+    };
+
+    const ids = ['linear', 'relu', 'softplus', 'threshold', 'sigmoid', 'tanh'];
+    const names = {
+        linear: 'Linear',
+        relu: 'ReLU',
+        softplus: 'Softplus',
+        threshold: 'Threshold',
+        sigmoid: 'Sigmoid',
+        tanh: 'Tanh'
+    };
+    
+    const xRanges = {
+        linear: { min: -5, max: 5 },
+        relu: { min: -5, max: 5 },
+        softplus: { min: -5, max: 10 },
+        threshold: { min: -5, max: 5 },
+        sigmoid: { min: -10, max: 10 },
+        tanh: { min: -10, max: 10 }
+    };
+    
+    const yRanges = {
+        linear: { min: -5, max: 5 },
+        relu: { min: -2, max: 6 },
+        softplus: { min: -1, max: 8 },
+        threshold: { min: -1, max: 2 },
+        sigmoid: { min: -1, max: 2 },
+        tanh: { min: -2, max: 2 }
+    };
+    
+    ids.forEach(id => {
+        const ctx = document.getElementById(id).getContext('2d');
+        
+        const options = JSON.parse(JSON.stringify(commonOptions));
+        options.scales.x.min = xRanges[id].min;
+        options.scales.x.max = xRanges[id].max;
+        options.scales.y.min = yRanges[id].min;
+        options.scales.y.max = yRanges[id].max;
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                datasets: [{
+                    label: names[id],
+                    data: dataMap[id],
+                    borderColor: colors[id],
+                    borderWidth: 2.2,
+                    fill: false,
+                    pointRadius: 0,
+                    tension: 0.1,
+                    showLine: true
+                }]
+            },
+            options: options,
+            plugins: [axisLinePlugin]
+        });
+    });
+</script>
+</body>
+</html>

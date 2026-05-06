@@ -1315,7 +1315,120 @@
 <li><strong>Virtual address cache or virtual index and physical tagged cache</strong> Avoid or overlap with address translation delay.</li>
 <li><strong>Cache layout closer to CPU to minimize signal delay</strong></li>
 </ul>
-
+<h1 id="chapter-7-linking"><a class="header" href="#chapter-7-linking">Chapter 7 Linking</a></h1>
+<h2 id="why-linking-matters"><a class="header" href="#why-linking-matters">Why Linking Matters</a></h2>
+<h3 id="modularity"><a class="header" href="#modularity">Modularity</a></h3>
+<p>Separate compilation allows developers to work on different modules independently, improving productivity and enabling code reuse.</p>
+<h3 id="efficiency"><a class="header" href="#efficiency">Efficiency</a></h3>
+<ul>
+<li><strong>Time</strong> Separate compilation &amp; Parallel compilation.</li>
+<li><strong>Space</strong> Static linking (Executable files and running memory images contain only the library code they actually use.) &amp; Dynamic linking (Executable files contain no library code. During execution, a single copy of the library code is shared among all executing processes.)</li>
+</ul>
+<h2 id="static-linking"><a class="header" href="#static-linking">Static Linking</a></h2>
+<h3 id="symbol-resolution"><a class="header" href="#symbol-resolution">Symbol Resolution</a></h3>
+<p>Symbol tables in object files record symbol definitions (name, size, location), and the linker matches each symbol reference to exactly one definition during symbol resolution.</p>
+<h4 id="link-symbols"><a class="header" href="#link-symbols">Link Symbols</a></h4>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Type</th><th style="text-align: center">Description</th><th style="text-align: center">Example</th></tr></thead><tbody>
+<tr><td style="text-align: center"><strong>Global symbols</strong></td><td style="text-align: center">Defined by module m, can be referenced by other modules.</td><td style="text-align: center"><code>int global_var = 10;</code><br><code>void func() { }</code></td></tr>
+<tr><td style="text-align: center"><strong>External symbols</strong></td><td style="text-align: center">Referenced by module m but defined by some other module.</td><td style="text-align: center"><code>extern int global_var;</code><br><code>extern void func();</code></td></tr>
+<tr><td style="text-align: center"><strong>Local symbols</strong></td><td style="text-align: center">Defined and referenced exclusively by module m.</td><td style="text-align: center"><code>static int local_var = 10;</code><br><code>static void helper() { }</code></td></tr>
+</tbody></table>
+</div>
+<p>Strong symbols are procedures and initialized globals, while weak symbols are uninitialized globals. Linker's Symbol Rules: Multiple strong symbols are forbidden; one strong wins over weak; multiple weak are arbitrary, unless <code>-fno-common</code> forces an error.</p>
+<details><summary> Example </summary>
+<ul>
+<li>
+<p><code>file1.c</code></p>
+<pre><code class="language-c">int x = 10; // strong symbol   
+int y = 5;  // strong symbol
+void p1() {printf("x = %d, y = %d\n", x, y);}
+</code></pre>
+</li>
+<li>
+<p><code>file2.c</code></p>
+<pre><code class="language-c">double x; // weak symbol
+void p2() {printf("x = %f\n", x);}
+</code></pre>
+</li>
+</ul>
+<p>Writes to <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.4306em;"></span><span class="mord mathnormal">x</span></span></span></span> in <code>p2</code> might overwrite <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.625em;vertical-align:-0.1944em;"></span><span class="mord mathnormal" style="margin-right:0.03588em;">y</span></span></span></span>.</p>
+</details>
+<p>Avoid <strong>global symbols</strong> if possible, otherwise use <code>static</code> to limit scope, initialize globals to make them strong, and reference external globals with <code>extern</code> to avoid linker errors.</p>
+<h4 id="static-libraries"><a class="header" href="#static-libraries">Static Libraries</a></h4>
+<p>Concatenate related relocatable object files into a single file with an index (called an archive). For example, <code>ar rs libfoo.a a.o b.o c.o</code> creates a static library <code>libfoo.a</code> containing <code>a.o</code>, <code>b.o</code>, and <code>c.o</code>.</p>
+<p>Linkers scan files left to right, maintain an unresolved reference list, and only extract archive members that resolve current entries, so libraries must come at the end of the command line.</p>
+<p>The solution to deal with the order sensitivity and duplicate symbol definitions is to introduce Shared libraries are object files whose code and data are loaded and linked into an application dynamically, either at load time or at run time.</p>
+<h3 id="relocation"><a class="header" href="#relocation">Relocation</a></h3>
+<p>It first merges all separate code and data sections into single sections. Then, it relocates symbols from their relative offsets in <code>.o</code> files to final absolute addresses in the executable. Finally, it updates every reference to these symbols to reflect their new positions.</p>
+<h2 id="object-files"><a class="header" href="#object-files">Object Files</a></h2>
+<h3 id="classification"><a class="header" href="#classification">Classification</a></h3>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Type</th><th style="text-align: center">Extension (Linux/Unix)</th><th style="text-align: center">Description</th></tr></thead><tbody>
+<tr><td style="text-align: center"><strong>Relocatable Object File</strong></td><td style="text-align: center"><code>.o</code></td><td style="text-align: center">Contains code and data in a form that can be combined with other relocatable object files to form an executable object file. Each <code>.o</code> file is produced from exactly one source (<code>.c</code>) file.</td></tr>
+<tr><td style="text-align: center"><strong>Executable Object File</strong></td><td style="text-align: center"><code>a.out</code></td><td style="text-align: center">Contains code and data in a form that can be copied directly into memory and then executed.</td></tr>
+<tr><td style="text-align: center"><strong>Shared Object File</strong></td><td style="text-align: center"><code>.so</code></td><td style="text-align: center">Special type of relocatable object file that can be loaded into memory and linked dynamically, at either load time or run-time. It also called Dynamic Link Libraries (DLLs) by Windows.</td></tr>
+</tbody></table>
+</div>
+<h3 id="elf-object-file-format"><a class="header" href="#elf-object-file-format">ELF Object File Format</a></h3>
+<div style="display: flex; align-items: center; gap: 20px;">
+  <div style="flex: 1;">
+<div class="table-wrapper"><table><thead><tr><th>Component</th><th>Description</th></tr></thead><tbody>
+<tr><td><strong>ELF Header</strong></td><td>Word size, byte ordering, file type (<code>.o</code> / executable / <code>.so</code>), machine type, etc.</td></tr>
+<tr><td><strong>Segment Header Table</strong> (for OS)</td><td>Page size, virtual address memory segments (sections), segment sizes.</td></tr>
+<tr><td><strong>.text</strong></td><td>Code</td></tr>
+<tr><td><strong>.rodata</strong></td><td>Read-only data: jump tables, string constants, etc.</td></tr>
+<tr><td><strong>.data</strong></td><td>Initialized <strong>global variables</strong> and <strong>initialized local static variables</strong>.</td></tr>
+<tr><td><strong>.bss</strong></td><td>Uninitialized <strong>global variables</strong> and <strong>uninitialized local static variables</strong>. <br> Has section header but occupies no space.</td></tr>
+<tr><td><strong>.symtab</strong></td><td>Symbol table: <strong>procedure names</strong>, <strong>global variable names</strong>, <strong>static variable names</strong>, <strong>external symbols</strong>, section names, and their locations.</td></tr>
+<tr><td><strong>.rel.text</strong></td><td>Relocation info for <code>.text</code> section: addresses of <strong>instructions</strong> that will need to be modified in the executable, plus instructions for modifying.</td></tr>
+<tr><td><strong>.rel.data</strong></td><td>Relocation info for <code>.data</code> section: addresses of <strong>pointer</strong> data that will need to be modified in the merged executable.</td></tr>
+<tr><td><strong>.debug</strong></td><td>Info for symbolic debugging (generated with <code>gcc -g</code>).</td></tr>
+<tr><td><strong>Section Header Table</strong> (for execution and debugging)</td><td>Offsets and sizes of each section.</td></tr>
+</tbody></table>
+</div>  </div>
+  <div style="flex: 1; display: flex; justify-content: center;">
+    <img src="pic/27.png" alt="ELF Structure Diagram" style="width: 100%; max-width: 500px;">
+  </div>
+</div>
+<ul>
+<li>
+<p>Using the command <code>readelf -s &lt;file&gt;</code> to view the symbol table of an
+<strong>Executable and Linkable Format</strong> (ELF) file.</p>
+</li>
+<li>
+<p>Note that Local non-static variables are stored on the stack.</p>
+</li>
+<li>
+<p>It will create local symbols in the symbol table with unique names.</p>
+</li>
+</ul>
+<h2 id="executable-object-files"><a class="header" href="#executable-object-files">Executable Object Files</a></h2>
+<img src="pic/28.png" width="50%" height="50%">
+<h2 id="load-executable-object-files"><a class="header" href="#load-executable-object-files">Load Executable Object Files</a></h2>
+<img src="pic/29.png" width="50%" height="50%">
+<h2 id="dynamic-linking-with-shared-libraries"><a class="header" href="#dynamic-linking-with-shared-libraries">Dynamic Linking with Shared Libraries</a></h2>
+<h3 id="load-time-linking"><a class="header" href="#load-time-linking">Load-Time Linking</a></h3>
+<p>It occurs when the executable is first loaded and run. The standard C library (<code>libc.so</code>) is typically dynamically linked this way.</p>
+<img src="pic/30.png" width="50%" height="50%">
+<p><code>LD_PRELOAD</code> forces the dynamic linker to load a user-specified shared library first, allowing interception of standard functions, but cannot intercept statically linked <code>_start</code>.</p>
+<h3 id="run-time-linking"><a class="header" href="#run-time-linking">Run-Time Linking</a></h3>
+<p>It occurs after the program has begun, using calls to the <code>dlopen()</code> interface on Linux.</p>
+<img src="pic/31.png" width="50%" height="50%">
+<h2 id="position-independent-code-pic"><a class="header" href="#position-independent-code-pic">Position-Independent Code (PIC)</a></h2>
+<p>To exploit the fact that the distance between any instruction in the code segment and any variable in the data segment is a runtime constant, the compiler creates a table called the Global Offset Table (GOT) that holds the absolute addresses of global variables.</p>
+<h3 id="global-offset-table-got"><a class="header" href="#global-offset-table-got">Global Offset Table (GOT)</a></h3>
+<p>Resides in the data segment and stores the actual absolute addresses of external functions and global variables. These addresses are filled in by the dynamic linker at load time or on the first call.</p>
+<h3 id="procedure-linkage-table-plt"><a class="header" href="#procedure-linkage-table-plt">Procedure Linkage Table (PLT)</a></h3>
+<p>A memory section containing small executable stubs for each external function the program calls. It lives in a read-only code section (<code>.text</code> or <code>.plt</code>), providing a trampoline that jumps through the GOT to the actual function.</p>
+<p><code>.got</code> stores addresses of global variables for direct access, while <code>.got.plt</code> stores addresses of external functions specifically for PLT stubs</p>
+<h3 id="whole-process"><a class="header" href="#whole-process">Whole Process</a></h3>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Step</th><th style="text-align: center">Stage</th><th style="text-align: center">Action</th></tr></thead><tbody>
+<tr><td style="text-align: center">1</td><td style="text-align: center">Compile (static time)</td><td style="text-align: center">Compiler generates pseudo instruction: call printf</td></tr>
+<tr><td style="text-align: center">2</td><td style="text-align: center">Compile (static time)</td><td style="text-align: center">Assembler expands to <code>auipc+jalr</code>, adds reloc entries</td></tr>
+<tr><td style="text-align: center">3</td><td style="text-align: center">Link (walk time)</td><td style="text-align: center">Linker creates .plt stub (<code>auipc+ld+jalr</code>)</td></tr>
+<tr><td style="text-align: center">4</td><td style="text-align: center">Link (walk time)</td><td style="text-align: center">Linker allocates GOT entry (44B for 32b, 8B for 64b)</td></tr>
+<tr><td style="text-align: center">5</td><td style="text-align: center">Dynamic Linking (run time)</td><td style="text-align: center">Dynamic linker fills GOT with real printf address</td></tr>
+</tbody></table>
+</div>
                     </main>
 
                     <nav class="nav-wrapper" aria-label="Page navigation">

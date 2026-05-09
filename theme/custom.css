@@ -390,3 +390,179 @@ details[open] > :not(summary) {
   0% { opacity: 0.5; transform: translateY(-6px); }
   100% { opacity: 1; transform: translateY(0); }
 }
+
+#my-floating-export {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 99999;
+    background: linear-gradient(135deg, #4A90E2, #7B68EE);
+    color: white;
+    border: none;
+    border-radius: 50px;
+    padding: 12px 24px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0 8px 20px rgba(74, 144, 226, 0.4);
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+#my-floating-export:hover {
+    transform: scale(1.05);
+    box-shadow: 0 12px 25px rgba(123, 104, 238, 0.5);
+}
+
+#my-export-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.export-modal-content {
+    background: #ffffff;
+    padding: 30px;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+    width: 380px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    color: #2c3e50;
+    font-family: inherit;
+    animation: fadeSlide 0.2s ease-out;
+}
+
+.export-modal-content label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.export-modal-content input[type="number"] {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid #c0d0f0;
+    font-family: inherit;
+    outline: none;
+    color: #2c3e50;
+    font-size: 15px;
+}
+
+.export-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.export-actions button {
+    padding: 10px 20px;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    transition: transform 0.2s;
+}
+
+.export-actions button:hover {
+    transform: translateY(-2px);
+}
+
+#export-btn-cancel {
+    background: #e8f0fe;
+    color: #4A90E2;
+}
+
+#export-btn-confirm {
+    background: linear-gradient(135deg, #4A90E2, #7B68EE);
+    color: white;
+}
+
+#my-select-toolbar {
+    position: fixed;
+    top: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ffffff;
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+    z-index: 1000001;
+    display: none;
+    align-items: center;
+    gap: 15px;
+    border: 2px solid #4A90E2;
+    font-family: inherit;
+    color: #2c3e50;
+    animation: fadeSlide 0.2s ease-out;
+}
+
+#my-select-toolbar button {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+
+#my-select-confirm {
+    background: linear-gradient(135deg, #4A90E2, #7B68EE);
+    color: white;
+}
+
+#my-select-cancel {
+    background: #e8f0fe;
+    color: #4A90E2;
+}
+
+@media print {
+    #my-floating-export, 
+    #my-export-modal, 
+    #my-select-toolbar,
+    #my-progress-bar, 
+    #my-image-overlay {
+        display: none !important;
+    }
+
+    html, body { 
+        background-color: #ffffff !important; 
+        background-image: none !important;
+    }
+
+    .page-wrapper, .main, .content, main, #my-print-container {
+        background-color: #ffffff !important;
+        box-shadow: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        max-width: none !important;
+        width: 100% !important;
+        border-radius: 0 !important;
+    }
+
+    * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+    }
+
+    details, pre, blockquote, img, tr, td { 
+        page-break-inside: avoid; 
+    }
+    
+    h1, h2, h3 { 
+        page-break-after: avoid; 
+    }
+}

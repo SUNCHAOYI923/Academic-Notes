@@ -17,7 +17,6 @@
         <link rel="stylesheet" href="../css/variables.css">
         <link rel="stylesheet" href="../css/general.css">
         <link rel="stylesheet" href="../css/chrome.css">
-        <link rel="stylesheet" href="../css/print.css" media="print">
 
         <!-- Fonts -->
         <link rel="stylesheet" href="../FontAwesome/css/font-awesome.css">
@@ -127,9 +126,6 @@
                     <h1 class="menu-title">CUHKSZ Academic Notes</h1>
 
                     <div class="right-buttons">
-                        <a href="../print.html" title="Print this book" aria-label="Print this book">
-                            <i id="print-button" class="fa fa-print"></i>
-                        </a>
 
                     </div>
                 </div>
@@ -167,6 +163,7 @@
 </li>
 </ul>
 <h1 id="chapter-1-a-tour-of-computer-system"><a class="header" href="#chapter-1-a-tour-of-computer-system">Chapter 1 A Tour of Computer System</a></h1>
+<p>Computer system is a combination of hardware components and systems software that work together to run application programs.</p>
 <h3 id="compilation-system"><a class="header" href="#compilation-system">Compilation System</a></h3>
 <p>Take C language as an example <code>linux &gt; gcc hello.c -o hello</code>.</p>
 <ul>
@@ -199,6 +196,7 @@
 </li>
 <li>
 <p><strong>Virtual Memory</strong></p>
+<p>Virtual memory is an abstraction that gives each program its own private, continuous address space, while the OS and hardware (MMU/TLB) map those virtual addresses to physical memory (or disk via paging) to provide isolation, security, and the illusion of more memory than physically available.</p>
 <p>Program Code &amp; Data, Shared Libraries, Heap, Stack, Kernel Virtual Memory from bottom to top.</p>
 <ul>
 <li>
@@ -242,7 +240,7 @@
 </li>
 </ul>
 <h3 id="computer-architecture"><a class="header" href="#computer-architecture">Computer Architecture</a></h3>
-<p>Computer Architecture (e.g. Intel x86, IBM 360, ARM, RISC-V) is the interface between hardware and software, it includes ISA and Microarchitectures (e.g. Different implementations of the same ISA: Single cycle, Multi-cycle, Pipelined, Superscalar, Out-Of-Order, Speculative Execution, Cache Hierarchies, and Various Predictions).</p>
+<p>Computer Architecture (e.g. Intel x86, IBM 360, ARM, RISC-V) is <strong>the interface between hardware and software</strong>, it includes ISA and Microarchitectures (parallel processing techniques (e.g. Pipelining, Multi-threading, Multi-Processing, Superscalar) and Memory hierarchy (e.g. Local memory and caches / Registers, vector registers, SIMD registers)).</p>
 <h1 id="chapter-2-representing-and-manipulating-information"><a class="header" href="#chapter-2-representing-and-manipulating-information">Chapter 2 Representing and Manipulating Information</a></h1>
 <h2 id="information-storage"><a class="header" href="#information-storage">Information Storage</a></h2>
 <ul>
@@ -850,7 +848,7 @@
 </tbody></table>
 </div>
 <ul>
-<li>Throughput increases as more instructions complete per unit time, but single instruction latency (The time it takes for each instruction to be executed.) does not decrease and may even increase.</li>
+<li>Throughput increases as more instructions complete per unit time, but single instruction latency does not decrease and may even increase.</li>
 <li>Pipeline rate is limited by the slowest stage.</li>
 <li>Potential/ideal speedup = Number of pipeline stages (number of pipeline steps).</li>
 <li>Need to reduce possible fill and drain (e.g., I-cache misses and branch misprediction)</li>
@@ -882,7 +880,7 @@
 <li><strong>Throughput</strong> The total number of instructions completed <strong>per unit</strong> of time.</li>
 <li>For superscalar implementation, CPI <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.5782em;vertical-align:-0.0391em;"></span><span class="mrel">&lt;</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6444em;"></span><span class="mord">1</span></span></span></span>.</li>
 <li>Single cycle as lower throughput but shorter instruction latency.</li>
-<li>No arithmetic exceptions allow <strong>out‑of‑order retirement</strong>, avoiding stalls for long‑latency instructions.</li>
+<li>No arithmetic exceptions allow <strong>out‑of‑order retirement</strong> (otherwise it should obtain a precise architecture state for program resumption), avoiding stalls for long‑latency instructions.</li>
 </ul>
 <h3 id="pipline-registers"><a class="header" href="#pipline-registers">Pipline Registers</a></h3>
 <p>Without pipeline registers, stages would overwrite each other’s data, causing instruction mix‑ups and loss of control information.</p>
@@ -914,7 +912,7 @@
 </ul>
 </li>
 <li>
-<p><strong>Micro-architecture states</strong> (invisible to the programmer)</p>
+<p><strong>Micro-architecture states</strong> (Invisible to the programmer and not saved during an interrupt, as they can be regenerated once the program resumes.)</p>
 <ul>
 <li><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8889em;vertical-align:-0.1944em;"></span><span class="mord text" style="color:#df0030;"><span class="mord" style="color:#df0030;">Piplined registers</span></span></span></span></span> Pipelined registers hold transient data between stages for a few cycles.</li>
 <li>Branch predictors</li>
@@ -1019,6 +1017,7 @@
 <tr><td style="text-align: center"><code>-O2</code></td><td style="text-align: center">Recommended default: safe, stable, efficient.</td></tr>
 <tr><td style="text-align: center"><code>-O3</code></td><td style="text-align: center">Aggressive (loop unroll, SIMD). May increase code size, compile time, and even hurt performance.</td></tr>
 <tr><td style="text-align: center"><code>-O4</code></td><td style="text-align: center"><code>-O3</code> + Link-Time Optimization (LTO).</td></tr>
+<tr><td style="text-align: center"><code>-Os</code></td><td style="text-align: center">Optimize for size, apply for memory-constrained embedded systems.</td></tr>
 </tbody></table>
 </div>
 <h3 id="general-goals"><a class="header" href="#general-goals">General Goals</a></h3>
@@ -1069,7 +1068,7 @@
 </ol>
 <h3 id="several-optimization-options"><a class="header" href="#several-optimization-options">Several Optimization Options</a></h3>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Flag</th><th style="text-align: center">Description</th></tr></thead><tbody>
-<tr><td style="text-align: center"><code>-O3 -flto</code></td><td style="text-align: center">Link-Time Optimization: enables whole-program optimization.</td></tr>
+<tr><td style="text-align: center"><code>-O3 -flto</code></td><td style="text-align: center">Link-Time Optimization: enables cross-module optimization across file boundaries (e.g., inlining, dead code elimination).</td></tr>
 <tr><td style="text-align: center"><code>-march=native</code></td><td style="text-align: center">Generate code optimized for the current CPU architecture (enables all supported instruction sets).</td></tr>
 <tr><td style="text-align: center"><code>-mtune=native</code></td><td style="text-align: center">Optimize instruction scheduling for the current CPU without breaking compatibility with older CPUs.</td></tr>
 <tr><td style="text-align: center"><code>-fprofile-generate</code></td><td style="text-align: center">Compile instrumented code to generate runtime profiles.</td></tr>
@@ -1078,6 +1077,48 @@
 <tr><td style="text-align: center"><code>-fopt-info-missed</code></td><td style="text-align: center">Report which optimizations were missed and why.</td></tr>
 </tbody></table>
 </div>
+<h2 id="memory-locality-enhancements"><a class="header" href="#memory-locality-enhancements">Memory Locality Enhancements</a></h2>
+<h3 id="loop-interchange"><a class="header" href="#loop-interchange">Loop Interchange</a></h3>
+<p>Loop interchange changes the order of nested loops to improve spatial locality. For example, changing from row-major to column-major access can enhance cache performance.</p>
+<h3 id="loop-fusion--fission"><a class="header" href="#loop-fusion--fission">Loop Fusion / Fission</a></h3>
+<p>Loop fusion combines adjacent loops that iterate over the same range into a single loop, improving temporal locality by accessing data while it is still in cache.</p>
+<p>Loop fission (or loop distribution) splits a single loop into multiple loops if the data dependency chain is too long.</p>
+<h3 id="array-padding"><a class="header" href="#array-padding">Array Padding</a></h3>
+<p>Array padding adds extra space between elements to prevent cache line conflicts.</p>
+<h3 id="tiling"><a class="header" href="#tiling">Tiling</a></h3>
+<p>Tiling for matrix transpose makes the column-wise writes become block-wise contiguous to improve spatial locality. Tiling for matrix multiplication keeps the sub-blocks of A, B, and C in cache simultaneously to maximize data reuse.</p>
+<h3 id="software-prefetching"><a class="header" href="#software-prefetching">Software Prefetching</a></h3>
+<p>Software prefetching inserts instructions to load data into cache before it is actually needed.</p>
+<details><summary> Why do we need a separate prefetch 
+Instruction? Can we use regular loads? </summary>
+<p>Regular loads may cause page faults, read MMIO, or occupy registers. Prefetch instructions are just hints and do not change program semantics.</p>
+</details>
+<details><summary> Why do we need to specify temporal locality? </summary>
+<p>Temporal locality tells the hardware whether to place data in regular cache (temporal) or streaming buffers (non-temporal) to avoid cache pollution.</p>
+</details>
+<details><summary> Why do we need to specify prefetch for read/write? </summary>
+<p>Read prefetch brings data in shared state, while write prefetch must obtain exclusive ownership in advance.</p>
+</details>
+<h3 id="aos-vs-soa"><a class="header" href="#aos-vs-soa">AoS vs. SoA</a></h3>
+<ul>
+<li><strong>Array of Structures (AoS)</strong></li>
+</ul>
+<p>Good for memory locality when multiple fields of the same object are accessed together.</p>
+<pre><code class="language-cpp">struct Point { float x, y; } points[N];
+for (int i = 0; i &lt; N; i++)
+{
+    points[i].x += points[i].vx;
+    points[i].y += points[i].vy;
+}
+</code></pre>
+<ul>
+<li><strong>Structure of Arrays (SoA)</strong></li>
+</ul>
+<p>Good for cache efficiency when only one field is accessed across many objects.</p>
+<pre><code class="language-cpp">struct Points {float x[N], y[N];} pts;
+float sum = 0;
+for (int i = 0; i &lt; N; i++) sum += pts.z[i];
+</code></pre>
 <h1 id="chapter-6-the-memory-hierarchy"><a class="header" href="#chapter-6-the-memory-hierarchy">Chapter 6 The Memory Hierarchy</a></h1>
 <h2 id="storage-technologies"><a class="header" href="#storage-technologies">Storage Technologies</a></h2>
 <p>Access time is the same for all locations.</p>
@@ -1134,7 +1175,8 @@
 </div>
 <p>This gives you Large, Cheap memory, but Fast access.</p>
 <p>Caches provide automatic (transparent) data movement, while local memory requires explicit programmer-controlled data management.</p>
-<img src="pic/24.png" width="60%" height="60%">
+<img src="pic/24.png" width="50%" height="50%">
+<p>Memory hierarchy is combined with <strong>register and local memory</strong> (managed by software), <strong>cache</strong> (managed by hardware) and <strong>main memory</strong> (managed by hardware and OS) to achieve a balance of speed, size, and cost.</p>
 <h2 id="cache-management"><a class="header" href="#cache-management">Cache Management</a></h2>
 <h3 id="general-cache-memory-organization"><a class="header" href="#general-cache-memory-organization">General Cache Memory Organization</a></h3>
 <img src="pic/22.png" width="50%" height="50%">
@@ -1163,16 +1205,15 @@
 </details>
 <h3 id="set-associative-caches"><a class="header" href="#set-associative-caches">Set Associative Caches</a></h3>
 <p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span>-way set-associative has <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span> lines per set while direct-mapped is one way and fully associative is one set.</p>
-<p>Given a cache with total size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span> measured in kilobytes, associativity <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span>, and block size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span> measured in bytes. The number of sets <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span> is calculated as <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2173em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05764em;">BE</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1024</span><span class="mord mathnormal mtight" style="margin-right:0.07153em;">C</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>.</p>
+<p>Given a cache with total size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span> measured in kilobytes, associativity <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span>, and block (line) size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span> measured in bytes. The number of sets <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span> is calculated as <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2173em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05764em;">BE</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1024</span><span class="mord mathnormal mtight" style="margin-right:0.07153em;">C</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>.</p>
 <h3 id="performance-impact-of-cache-parameters"><a class="header" href="#performance-impact-of-cache-parameters">Performance Impact of Cache Parameters</a></h3>
 <img src="pic/25.png" width="60%" height="60%">
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Feature</th><th style="text-align: center">L1 Cache</th><th style="text-align: center">L2 Cache</th></tr></thead><tbody>
-<tr><td style="text-align: center">Primary goal</td><td style="text-align: center">Minimize hit time</td><td style="text-align: center">Minimize miss rate</td></tr>
-<tr><td style="text-align: center">Locality preference</td><td style="text-align: center">Spatial locality</td><td style="text-align: center">Temporal locality</td></tr>
-<tr><td style="text-align: center">Typical write policy</td><td style="text-align: center">Write-through</td><td style="text-align: center">Write-back</td></tr>
-<tr><td style="text-align: center">Reason</td><td style="text-align: center">L1 hit directly affects pipeline</td><td style="text-align: center">L2 miss leads to high memory penalty</td></tr>
-<tr><td style="text-align: center">Associativity</td><td style="text-align: center">Low</td><td style="text-align: center">High</td></tr>
-<tr><td style="text-align: center">Size</td><td style="text-align: center">Small</td><td style="text-align: center">Large</td></tr>
+<tr><td style="text-align: center"><strong>Primary goal</strong></td><td style="text-align: center">Minimize hit time</td><td style="text-align: center">Minimize miss rate</td></tr>
+<tr><td style="text-align: center"><strong>Locality preference</strong></td><td style="text-align: center">Spatial locality</td><td style="text-align: center">Temporal locality</td></tr>
+<tr><td style="text-align: center"><strong>Typical write policy</strong></td><td style="text-align: center">Write-through to L2 (one option)</td><td style="text-align: center">Write-back (more common)</td></tr>
+<tr><td style="text-align: center"><strong>Reason</strong></td><td style="text-align: center">L1 hit directly affects pipeline performance</td><td style="text-align: center">L2 miss leads to high memory penalty, bus traffic, and latency</td></tr>
+<tr><td style="text-align: center"><strong>Size</strong></td><td style="text-align: center">Small</td><td style="text-align: center">Large</td></tr>
 </tbody></table>
 </div>
 <ul>
@@ -1301,7 +1342,7 @@
 <h4 id="inclusive-caches"><a class="header" href="#inclusive-caches">Inclusive caches</a></h4>
 <p>Every line in L1 must be presented in L2 (<span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.8193em;vertical-align:-0.136em;"></span><span class="mord text"><span class="mord">L1</span></span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">⊆</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord text"><span class="mord">L2</span></span></span></span></span>). When L2 evicts a line, it must invalidate the corresponding line in L1, and L2 can have a larger line size than L1.</p>
 <h4 id="exclusive-caches"><a class="header" href="#exclusive-caches">Exclusive caches</a></h4>
-<p>If a line, A, is in L1, it must NOT be presented in L2. AMD had adopted this for L2/L3. When L1 evicts a line, it moves to L2. On an L1 miss that hits in L2, the line migrates from L2 to L1. And L1 and L2 must have the same line size.</p>
+<p>if a line A is in L1, it must not be present in L2. AMD adopted this policy for its L2/L3 hierarchy. When L1 evicts a line, it moves to L2. On an L1 miss that hits in L2, the line migrates from L2 to L1. L1 and L2 must also have the same line size.</p>
 <h4 id="nine-non-inclusive-and-non-exclusive"><a class="header" href="#nine-non-inclusive-and-non-exclusive">NINE (Non-Inclusive and Non-Exclusive)</a></h4>
 <p>More suitable for L2/L3.</p>
 <h3 id="average-memory-access-time-amat"><a class="header" href="#average-memory-access-time-amat">Average Memory Access Time (AMAT)</a></h3>

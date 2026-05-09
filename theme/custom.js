@@ -133,7 +133,7 @@
             <h3 style="margin-top:0; color: #4A90E2; border-bottom: 2px solid #f0f5ff; padding-bottom: 10px;">🖨️ Export PDF Settings</h3>
             <label style="display:flex; align-items:center; gap:10px;">
                 <input type="radio" name="export-mode" value="all" checked>
-                Export entire page
+                Export entire notes
             </label>
             <label style="display:flex; align-items:center; gap:10px;">
                 <input type="radio" name="export-mode" value="selection">
@@ -146,9 +146,9 @@
             </label>
             <label style="display:flex; align-items:center; gap:10px; margin-top:5px;">
                 Print Font Size:
-                <input type="number" id="export-font-size" value="12" min="6" max="72" step="1" style="width: 70px;"> pts
+                <input type="number" id="export-font-size" value="12" min="5" max="20" step="1" style="width: 70px;"> pts
             </label>
-            <div id="export-font-error" style="color: #E74C3C; font-size: 13px; display: none;">Invalid input. Enter an integer (6-72).</div>
+            <div id="export-font-error" style="color: #E74C3C; font-size: 13px; display: none;">Invalid input. Enter an integer (5-20).</div>
             <div class="export-actions">
                 <button id="export-btn-cancel">Cancel</button>
                 <button id="export-btn-confirm">Generate PDF</button>
@@ -162,7 +162,7 @@
     selectToolbar.innerHTML = `
         <span style="font-size:15px; font-weight:bold;">Highlight the content on the page you want to export:</span>
         <button id="my-select-confirm">Confirm Selection</button>
-        <button id="my-select-cancel">Cancel</button>
+        <button id="my-select-cancel">Cancel (Esc)</button>
     `;
     document.body.appendChild(selectToolbar);
 
@@ -179,6 +179,15 @@
         exportModal.style.display = 'none';
         selectToolbar.style.display = 'flex';
         window.getSelection().removeAllRanges();
+    }
+
+    function cancelSelectionMode() {
+        radioAll.checked = true;
+        reselectBtn.style.display = 'none';
+        window.getSelection().removeAllRanges();
+        savedSelectionFragment = null;
+        selectToolbar.style.display = 'none';
+        exportModal.style.display = 'flex';
     }
 
     exportFloatBtn.addEventListener('click', () => {
@@ -206,7 +215,11 @@
     });
 
     radioAll.addEventListener('change', (e) => {
-        if (e.target.checked) reselectBtn.style.display = 'none';
+        if (e.target.checked) {
+            reselectBtn.style.display = 'none';
+            window.getSelection().removeAllRanges();
+            savedSelectionFragment = null;
+        }
     });
 
     document.getElementById('my-select-confirm').addEventListener('click', () => {
@@ -224,13 +237,16 @@
         exportModal.style.display = 'flex';
     });
 
-    document.getElementById('my-select-cancel').addEventListener('click', () => {
-        if (!savedSelectionFragment) {
-            radioAll.checked = true;
-            reselectBtn.style.display = 'none';
+    document.getElementById('my-select-cancel').addEventListener('click', cancelSelectionMode);
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            if (selectToolbar.style.display === 'flex') {
+                cancelSelectionMode();
+            } else if (exportModal.style.display === 'flex') {
+                exportModal.style.display = 'none';
+            }
         }
-        selectToolbar.style.display = 'none';
-        exportModal.style.display = 'flex';
     });
 
     document.getElementById('export-btn-cancel').addEventListener('click', () => {
@@ -241,7 +257,7 @@
         const rawValue = inputFont.value.trim();
         const fontScale = Number(rawValue);
         
-        if (!Number.isInteger(fontScale) || fontScale < 6 || fontScale > 72) {
+        if (!Number.isInteger(fontScale) || fontScale < 5 || fontScale > 20) {
             fontError.style.display = 'block';
             return;
         }
@@ -251,80 +267,81 @@
         
         const isSelectionOnly = radioSelection.checked && savedSelectionFragment;
         const isExpand = checkboxExpand.checked;
-
-        const originalDetailsStates = new Map();
         const originalDisplays = new Map();
-        let printContainer = null;
 
-        if (isExpand) {
-            document.querySelectorAll('details').forEach(d => {
-                originalDetailsStates.set(d, d.hasAttribute('open'));
-                d.setAttribute('open', '');
-            });
+        const todayDate = new Date().toISOString().split('T')[0];
+        const watermarkText = `SUNCHAOYI • ${todayDate}`;
+        
+        let textElements = '';
+        for (let i = 0; i < 2; i++) {
+            const x = Math.floor(Math.random() * 400 + 200); 
+            const y = Math.floor(Math.random() * 800 + 150); 
+            textElements += `<text x="${x}" y="${y}" transform="rotate(-35 ${x} ${y})" fill="rgba(160, 175, 200, 0.18)" font-size="28" font-family="sans-serif" font-weight="bold" text-anchor="middle">${watermarkText}</text>`;
         }
+        const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1120">${textElements}</svg>`;
+        const watermarkBase64 = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgContent)));
 
         const dynamicStyle = document.createElement('style');
         dynamicStyle.id = 'my-print-dynamic-style';
         dynamicStyle.textContent = `
             @media print {
-                .main, .content, main, #my-print-container,
-                .main *, .content *, main *, #my-print-container * {
+                html, body, #my-print-container, #my-print-container *, p, li, td, th, div, span, details {
                     font-size: ${fontScale}pt !important;
+                }
+                h1 { font-size: ${fontScale * 2}pt !important; }
+                h2 { font-size: ${fontScale * 1.5}pt !important; }
+                h3 { font-size: ${fontScale * 1.17}pt !important; }
+                h4 { font-size: ${fontScale}pt !important; }
+                #my-print-container {
+                    background-image: url("${watermarkBase64}") !important;
+                    background-repeat: repeat-y !important;
+                    background-position: top center !important;
+                    background-size: 800px 1120px !important;
                 }
             }
         `;
         document.head.appendChild(dynamicStyle);
 
+        const printContainer = document.createElement('div');
+        printContainer.id = 'my-print-container';
+        printContainer.className = 'main content lfe-marked';
+        
         if (isSelectionOnly) {
-            printContainer = document.createElement('div');
-            printContainer.id = 'my-print-container';
-            
-            const existingMain = document.querySelector('.main, .content, main');
-            if (existingMain) {
-                printContainer.className = existingMain.className;
-            } else {
-                printContainer.className = 'main content lfe-marked';
-            }
-            
             printContainer.appendChild(savedSelectionFragment.cloneNode(true));
-            
-            if (isExpand) {
-                printContainer.querySelectorAll('details').forEach(d => {
-                    d.setAttribute('open', '');
+        } else {
+            const mainContent = document.querySelector('main') || document.querySelector('#content') || document.querySelector('.content');
+            if (mainContent) {
+                Array.from(mainContent.childNodes).forEach(child => {
+                    printContainer.appendChild(child.cloneNode(true));
                 });
             }
-            
-            document.body.appendChild(printContainer);
-
-            document.querySelectorAll('body > *').forEach(child => {
-                if (child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE' && child !== printContainer && child !== dynamicStyle) {
-                    originalDisplays.set(child, child.style.display);
-                    child.style.display = 'none';
-                }
+        }
+        
+        if (isExpand) {
+            printContainer.querySelectorAll('details').forEach(d => {
+                d.setAttribute('open', '');
             });
         }
+        
+        document.body.appendChild(printContainer);
+
+        document.querySelectorAll('body > *').forEach(child => {
+            if (child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE' && child !== printContainer && child !== dynamicStyle) {
+                originalDisplays.set(child, child.style.display);
+                child.style.display = 'none';
+            }
+        });
 
         setTimeout(() => {
             window.print();
 
-            if (isExpand) {
-                document.querySelectorAll('details').forEach(d => {
-                    if (originalDetailsStates.has(d) && !originalDetailsStates.get(d)) {
-                        d.removeAttribute('open');
-                    }
-                });
-            }
-
             if (document.head.contains(dynamicStyle)) {
                 document.head.removeChild(dynamicStyle);
             }
-
-            if (isSelectionOnly && printContainer) {
-                document.body.removeChild(printContainer);
-                originalDisplays.forEach((displayState, element) => {
-                    element.style.display = displayState;
-                });
-            }
+            document.body.removeChild(printContainer);
+            originalDisplays.forEach((displayState, element) => {
+                element.style.display = displayState;
+            });
         }, 150);
     });
 })();

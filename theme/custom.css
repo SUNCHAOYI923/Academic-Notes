@@ -541,16 +541,22 @@ details[open] > :not(summary) {
     html, body { 
         background-color: #ffffff !important; 
         background-image: none !important;
-    }
-
-    .page-wrapper, .main, .content, main, #my-print-container {
-        background-color: #ffffff !important;
-        box-shadow: none !important;
+        height: auto !important;
+        overflow: visible !important;
         margin: 0 !important;
         padding: 0 !important;
-        max-width: none !important;
+    }
+
+    #my-print-container {
+        display: block !important;
+        position: relative !important;
+        height: auto !important;
         width: 100% !important;
-        border-radius: 0 !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        box-shadow: none !important;
+        background-color: #ffffff !important;
     }
 
     * {

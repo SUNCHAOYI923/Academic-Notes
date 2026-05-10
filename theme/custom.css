@@ -554,7 +554,7 @@ details[open] > :not(summary) {
         width: 100% !important;
         max-width: none !important;
         margin: 0 !important;
-        padding: 0 !important;
+        padding: 0 0 50px 0 !important;
         box-shadow: none !important;
         background-color: #ffffff !important;
     }

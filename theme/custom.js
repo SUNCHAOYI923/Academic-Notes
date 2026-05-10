@@ -1,33 +1,6 @@
 (function() {
     if (document.getElementById('my-image-overlay')) return;
 
-    /*
-    function expandAllDetails() {
-        document.querySelectorAll('details:not([open])').forEach(detail => {
-            detail.setAttribute('open', '');
-        });
-    }
-
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', expandAllDetails);
-    } else {
-        expandAllDetails();
-    }
-
-    const observer = new MutationObserver(function(mutations) {
-        let shouldExpand = false;
-        for (const mutation of mutations) {
-            if (mutation.addedNodes.length) {
-                shouldExpand = true;
-                break;
-            }
-        }
-        if (shouldExpand) {
-            expandAllDetails();
-        }
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-    */
     const overlay = document.createElement('div');
     overlay.id = 'my-image-overlay';
 
@@ -121,7 +94,8 @@
             pre.appendChild(label);
         }
     });
-        const exportFloatBtn = document.createElement('button');
+
+    const exportFloatBtn = document.createElement('button');
     exportFloatBtn.id = 'my-floating-export';
     exportFloatBtn.innerHTML = '🖨️ Export PDF';
     document.body.appendChild(exportFloatBtn);
@@ -240,7 +214,10 @@
     document.getElementById('my-select-cancel').addEventListener('click', cancelSelectionMode);
 
     document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
+        if ((e.ctrlKey || e.metaKey) && (e.key === 'p' || e.key === 'P')) {
+            e.preventDefault();
+            exportFloatBtn.click();
+        } else if (e.key === 'Escape') {
             if (selectToolbar.style.display === 'flex') {
                 cancelSelectionMode();
             } else if (exportModal.style.display === 'flex') {
@@ -271,32 +248,35 @@
 
         const todayDate = new Date().toISOString().split('T')[0];
         const watermarkText = `SUNCHAOYI • ${todayDate}`;
-        
-        let textElements = '';
-        for (let i = 0; i < 2; i++) {
-            const x = Math.floor(Math.random() * 400 + 200); 
-            const y = Math.floor(Math.random() * 800 + 150); 
-            textElements += `<text x="${x}" y="${y}" transform="rotate(-35 ${x} ${y})" fill="rgba(160, 175, 200, 0.18)" font-size="28" font-family="sans-serif" font-weight="bold" text-anchor="middle">${watermarkText}</text>`;
-        }
-        const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1120">${textElements}</svg>`;
+
+        const svgContent = `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="2240"><text x="400" y="1120" transform="rotate(-35 400 1120)" fill="rgba(160, 175, 200, 0.18)" font-size="28" font-family="sans-serif" font-weight="bold" text-anchor="middle">${watermarkText}</text></svg>`;
         const watermarkBase64 = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgContent)));
 
         const dynamicStyle = document.createElement('style');
         dynamicStyle.id = 'my-print-dynamic-style';
         dynamicStyle.textContent = `
             @media print {
-                html, body, #my-print-container, #my-print-container *, p, li, td, th, div, span, details {
+                #my-print-container, 
+                #my-print-container p, 
+                #my-print-container li, 
+                #my-print-container td, 
+                #my-print-container th, 
+                #my-print-container details {
                     font-size: ${fontScale}pt !important;
                 }
-                h1 { font-size: ${fontScale * 2}pt !important; }
-                h2 { font-size: ${fontScale * 1.5}pt !important; }
-                h3 { font-size: ${fontScale * 1.17}pt !important; }
-                h4 { font-size: ${fontScale}pt !important; }
+                #my-print-container h1 { font-size: ${fontScale * 2}pt !important; }
+                #my-print-container h2 { font-size: ${fontScale * 1.5}pt !important; }
+                #my-print-container h3 { font-size: ${fontScale * 1.17}pt !important; }
+                #my-print-container h4 { font-size: ${fontScale}pt !important; }
+                #my-print-container pre, 
+                #my-print-container code:not(.katex):not(.math) {
+                    font-size: ${Math.max(5, fontScale - 2)}pt !important;
+                }
                 #my-print-container {
                     background-image: url("${watermarkBase64}") !important;
                     background-repeat: repeat-y !important;
                     background-position: top center !important;
-                    background-size: 800px 1120px !important;
+                    background-size: 800px 2240px !important;
                 }
             }
         `;
@@ -322,8 +302,21 @@
                 d.setAttribute('open', '');
             });
         }
-        
+
+        printContainer.querySelectorAll('iframe').forEach(iframe => {
+            let parent = iframe.parentElement;
+            iframe.remove();
+            while (parent && parent.tagName === 'DIV' && parent.innerHTML.trim() === '') {
+                let nextParent = parent.parentElement;
+                parent.remove();
+                parent = nextParent;
+            }
+        });
+
         document.body.appendChild(printContainer);
+
+        const scrollX = window.scrollX || document.documentElement.scrollLeft;
+        const scrollY = window.scrollY || document.documentElement.scrollTop;
 
         document.querySelectorAll('body > *').forEach(child => {
             if (child.tagName !== 'SCRIPT' && child.tagName !== 'STYLE' && child !== printContainer && child !== dynamicStyle) {
@@ -339,9 +332,12 @@
                 document.head.removeChild(dynamicStyle);
             }
             document.body.removeChild(printContainer);
+
             originalDisplays.forEach((displayState, element) => {
                 element.style.display = displayState;
             });
+
+            window.scrollTo(scrollX, scrollY);
         }, 150);
     });
 })();

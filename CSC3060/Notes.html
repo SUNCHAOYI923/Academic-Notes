@@ -1396,7 +1396,7 @@ void p2() {printf("x = %f\n", x);}
 </details>
 <p>Avoid <strong>global symbols</strong> if possible, otherwise use <code>static</code> to limit scope, initialize globals to make them strong, and reference external globals with <code>extern</code> to avoid linker errors.</p>
 <h4 id="static-libraries"><a class="header" href="#static-libraries">Static Libraries</a></h4>
-<p>Concatenate related relocatable object files into a single file with an index (called an archive). For example, <code>ar rs libfoo.a a.o b.o c.o</code> creates a static library <code>libfoo.a</code> containing <code>a.o</code>, <code>b.o</code>, and <code>c.o</code>.</p>
+<p>Concatenate related relocatable object files into a single file with an index (called an <strong>archive</strong>). For example, <code>ar rs libfoo.a a.o b.o c.o</code> creates a static library <code>libfoo.a</code> containing <code>a.o</code>, <code>b.o</code> and <code>c.o</code>.</p>
 <p>Linkers scan files left to right, maintain an unresolved reference list, and only extract archive members that resolve current entries, so libraries must come at the end of the command line.</p>
 <p>The solution to deal with the order sensitivity and duplicate symbol definitions is to introduce Shared libraries are object files whose code and data are loaded and linked into an application dynamically, either at load time or at run time.</p>
 <h3 id="relocation"><a class="header" href="#relocation">Relocation</a></h3>
@@ -1419,7 +1419,7 @@ void p2() {printf("x = %f\n", x);}
 <tr><td><strong>.rodata</strong></td><td>Read-only data: jump tables, string constants, etc.</td></tr>
 <tr><td><strong>.data</strong></td><td>Initialized <strong>global variables</strong> and <strong>initialized local static variables</strong>.</td></tr>
 <tr><td><strong>.bss</strong></td><td>Uninitialized <strong>global variables</strong> and <strong>uninitialized local static variables</strong>. <br> Has section header but occupies no space.</td></tr>
-<tr><td><strong>.symtab</strong></td><td>Symbol table: <strong>procedure names</strong>, <strong>global variable names</strong>, <strong>static variable names</strong>, <strong>external symbols</strong>, section names, and their locations.</td></tr>
+<tr><td><strong>.symtab</strong></td><td>Symbol table: <strong>procedure names</strong>, <strong>global variable names</strong>, <strong>static variable names</strong>, <strong>external symbols</strong> (with <code>UND</code>), section names, and their locations.</td></tr>
 <tr><td><strong>.rel.text</strong></td><td>Relocation info for <code>.text</code> section: addresses of <strong>instructions</strong> that will need to be modified in the executable, plus instructions for modifying.</td></tr>
 <tr><td><strong>.rel.data</strong></td><td>Relocation info for <code>.data</code> section: addresses of <strong>pointer</strong> data that will need to be modified in the merged executable.</td></tr>
 <tr><td><strong>.debug</strong></td><td>Info for symbolic debugging (generated with <code>gcc -g</code>).</td></tr>
@@ -1457,10 +1457,10 @@ void p2() {printf("x = %f\n", x);}
 <h2 id="position-independent-code-pic"><a class="header" href="#position-independent-code-pic">Position-Independent Code (PIC)</a></h2>
 <p>To exploit the fact that the distance between any instruction in the code segment and any variable in the data segment is a runtime constant, the compiler creates a table called the Global Offset Table (GOT) that holds the absolute addresses of global variables.</p>
 <h3 id="global-offset-table-got"><a class="header" href="#global-offset-table-got">Global Offset Table (GOT)</a></h3>
-<p>Resides in the data segment and stores the actual absolute addresses of external functions and global variables. These addresses are filled in by the dynamic linker at load time or on the first call.</p>
+<p>Residing in the <code>.data</code> segment, the GOT stores the actual absolute addresses of external functions and global variables. These addresses are filled in by the dynamic linker either at load time or upon the first function call, after which the GOT typically becomes read-only to prevent tampering.</p>
+<p>It consists of two parts: the <code>.got</code> section holds addresses of global variables for direct access, while the <code>.got.plt</code> section stores external function addresses specifically used by the PLT stubs.</p>
 <h3 id="procedure-linkage-table-plt"><a class="header" href="#procedure-linkage-table-plt">Procedure Linkage Table (PLT)</a></h3>
-<p>A memory section containing small executable stubs for each external function the program calls. It lives in a read-only code section (<code>.text</code> or <code>.plt</code>), providing a trampoline that jumps through the GOT to the actual function.</p>
-<p><code>.got</code> stores addresses of global variables for direct access, while <code>.got.plt</code> stores addresses of external functions specifically for PLT stubs</p>
+<p>The PLT is located in the read-only <code>.text</code> segment. It contains small executable code stubs for each external function the program calls. Instead of calling an external function directly, the program calls its PLT stub, which acts as a trampoline that safely jumps through the <code>.got.plt</code> (in the <code>.data</code> segment) to reach the actual function address.</p>
 <h3 id="whole-process"><a class="header" href="#whole-process">Whole Process</a></h3>
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Step</th><th style="text-align: center">Stage</th><th style="text-align: center">Action</th></tr></thead><tbody>
 <tr><td style="text-align: center">1</td><td style="text-align: center">Compile (static time)</td><td style="text-align: center">Compiler generates pseudo instruction: call printf</td></tr>
@@ -1468,6 +1468,14 @@ void p2() {printf("x = %f\n", x);}
 <tr><td style="text-align: center">3</td><td style="text-align: center">Link (walk time)</td><td style="text-align: center">Linker creates .plt stub (<code>auipc+ld+jalr</code>)</td></tr>
 <tr><td style="text-align: center">4</td><td style="text-align: center">Link (walk time)</td><td style="text-align: center">Linker allocates GOT entry (44B for 32b, 8B for 64b)</td></tr>
 <tr><td style="text-align: center">5</td><td style="text-align: center">Dynamic Linking (run time)</td><td style="text-align: center">Dynamic linker fills GOT with real printf address</td></tr>
+</tbody></table>
+</div>
+<h2 id="comparsion"><a class="header" href="#comparsion">Comparsion</a></h2>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: left">Tool</th><th style="text-align: left">Input</th><th style="text-align: left">Output</th><th style="text-align: left">Key Responsibility</th><th style="text-align: left">Timing</th></tr></thead><tbody>
+<tr><td style="text-align: left"><strong>Assembler</strong></td><td style="text-align: left">Assembly code (.s)</td><td style="text-align: left">Relocatable object file (.o)</td><td style="text-align: left">Translate assembly → machine code; Generate relocation entries (.rel.text, .rel.data)</td><td style="text-align: left"><strong>Compile-time</strong></td></tr>
+<tr><td style="text-align: left"><strong>Linker</strong> (Static)</td><td style="text-align: left">Multiple .o files + Static libs (.a)</td><td style="text-align: left">Executable file (ELF) / Shared lib (.so)</td><td style="text-align: left">Symbol resolution; Section merging; Relocation (static)</td><td style="text-align: left"><strong>Compile-time / Link-time</strong></td></tr>
+<tr><td style="text-align: left"><strong>Loader</strong></td><td style="text-align: left">Executable file (ELF)</td><td style="text-align: left">Process image in memory</td><td style="text-align: left">Copy executable → RAM; Allocate stack/heap; Transfer control</td><td style="text-align: left"><strong>Program startup</strong></td></tr>
+<tr><td style="text-align: left"><strong>Dynamic Linker</strong></td><td style="text-align: left">Shared libraries (.so) + GOT/PLT</td><td style="text-align: left">Resolved function addresses (in GOT)</td><td style="text-align: left">Load shared libs; Perform runtime relocation; Support lazy binding</td><td style="text-align: left"><strong>Program startup / First call</strong></td></tr>
 </tbody></table>
 </div>
                     </main>

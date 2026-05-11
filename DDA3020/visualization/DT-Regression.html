@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Regression Tree - Single Random Dataset</title>
+    <title>Regression Tree Animation</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         * {
@@ -24,7 +24,7 @@
             border-radius: 16px;
             box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.04);
             padding: 28px;
-            width: 580px;
+            width: 650px;
             max-width: 100%;
         }
         canvas {
@@ -39,7 +39,7 @@
         .stats {
             margin-top: 16px;
             text-align: center;
-            font-size: 0.9rem;
+            font-size: 0.95rem;
             background: #f8fafc;
             padding: 12px 16px;
             border-radius: 10px;
@@ -60,10 +60,13 @@
             font-weight: 500;
             line-height: 1.5;
         }
-        button {
-            display: block;
-            width: 100%;
+        .button-group {
+            display: flex;
+            gap: 12px;
             margin-top: 20px;
+        }
+        button {
+            flex: 1;
             padding: 12px 16px;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -83,21 +86,39 @@
         button:active {
             transform: translateY(0);
         }
+        button.secondary {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            box-shadow: 0 4px 12px rgba(67, 233, 123, 0.4);
+            color: #0b4d24;
+        }
+        button.secondary:hover {
+            box-shadow: 0 6px 16px rgba(67, 233, 123, 0.5);
+        }
     </style>
 </head>
 <body>
 <div class="container">
-    <canvas id="regTreeCanvas" width="500" height="350"></canvas>
-    <div class="stats" id="leafStats">Leaf Nodes: -- | Max Depth: 3 | Min Leaf Size: 5</div>
-    <div class="split-rule">Split Rule: Maximize Reduction in Sum of Squared Errors</div>
-    <button id="refreshBtn">Generate New Random Data</button>
+    <canvas id="regTreeCanvas" width="550" height="350"></canvas>
+    <div class="stats" id="leafStats">Initializing...</div>
+    <div class="split-rule">Recursive Splitting</div>
+    <div class="button-group">
+        <button id="refreshBtn">Generate & Animate</button>
+        <button id="replayBtn" class="secondary">Replay</button>
+    </div>
 </div>
 
 <script>
     (function() {
         let currentChart = null;
+        let animationTimer = null;
+        
+        const MAX_DEPTH = 4;
+        const MIN_LEAF = 4;
+        const ANIMATION_SPEED = 700;
 
-        // pseudo random generator with seed
+        let currentData = [];
+        let currentSnapshots = [];
+
         function rng(seed) {
             return function() {
                 seed = (seed * 9301 + 49297) % 233280;
@@ -109,7 +130,7 @@
             let rand = rng(seed);
             let data = [];
             for (let i = 0; i < n; i++) {
-                let x = 0.5 + rand() * 9.5; // range 0.5 to 10
+                let x = 0.5 + rand() * 9.5; 
                 let y;
                 if (patternType === 'sine') {
                     y = 5 + 3 * Math.sin(x) + (rand() - 0.5) * 1.5;
@@ -155,43 +176,74 @@
             return { splitVal: bestSplitVal, leftSeg: bestLeft, rightSeg: bestRight };
         }
 
-        function fitRegressionTree(data, minLeaf, maxDepth) {
-            let points = data.map(d => ({ x: d.x, y: d.y }));
-            let leaves = [];
-
-            function recurse(seg, depth, xMin, xMax) {
-                if (depth >= maxDepth || seg.length <= minLeaf) {
-                    let mean = seg.reduce((s,p) => s + p.y, 0) / seg.length;
-                    leaves.push({ xMin: xMin, xMax: xMax, yPred: mean, n: seg.length });
-                    return;
-                }
-                let split = bestSplit(seg, minLeaf);
-                if (!split) {
-                    let mean = seg.reduce((s,p) => s + p.y, 0) / seg.length;
-                    leaves.push({ xMin: xMin, xMax: xMax, yPred: mean, n: seg.length });
-                    return;
-                }
-                recurse(split.leftSeg, depth+1, xMin, split.splitVal);
-                recurse(split.rightSeg, depth+1, split.splitVal, xMax);
+        function extractLeaves(node, leavesList = []) {
+            if (!node) return leavesList;
+            if (node.isLeaf) {
+                leavesList.push({ 
+                    xMin: node.xMin, 
+                    xMax: node.xMax, 
+                    yPred: node.yPred 
+                });
+            } else {
+                extractLeaves(node.left, leavesList);
+                extractLeaves(node.right, leavesList);
             }
-            let xMinAll = points[0].x;
-            let xMaxAll = points[points.length-1].x;
-            recurse(points, 0, xMinAll, xMaxAll);
-            leaves.sort((a,b) => a.xMin - b.xMin);
-            return leaves;
+            return leavesList;
         }
 
-        function renderChart(canvasId, data, leaves) {
-            let ctx = document.getElementById(canvasId).getContext('2d');
-            let scatterPoints = data.map(d => ({x: d.x, y: d.y}));
+        function buildTreeSnapshots(data, minLeaf, maxDepth) {
+            let points = data.map(d => ({ x: d.x, y: d.y }));
+            let root = {
+                isLeaf: true,
+                xMin: points[0].x,
+                xMax: points[points.length-1].x,
+                seg: points,
+                yPred: points.reduce((s,p) => s + p.y, 0) / points.length
+            };
 
-            // Build step function points
+            let snapshots = [];
+            snapshots.push(extractLeaves(root));
+
+            function recurse(node, depth) {
+                if (depth >= maxDepth || node.seg.length <= minLeaf) return;
+                
+                let split = bestSplit(node.seg, minLeaf);
+                if (!split) return;
+
+                node.isLeaf = false;
+                
+                let leftMean = split.leftSeg.reduce((s,p) => s + p.y, 0) / split.leftSeg.length;
+                let rightMean = split.rightSeg.reduce((s,p) => s + p.y, 0) / split.rightSeg.length;
+
+                node.left = {
+                    isLeaf: true, xMin: node.xMin, xMax: split.splitVal,
+                    seg: split.leftSeg, yPred: leftMean
+                };
+                
+                node.right = {
+                    isLeaf: true, xMin: split.splitVal, xMax: node.xMax,
+                    seg: split.rightSeg, yPred: rightMean
+                };
+
+                snapshots.push(extractLeaves(root));
+
+                recurse(node.left, depth + 1);
+                recurse(node.right, depth + 1);
+            }
+
+            recurse(root, 0);
+            return snapshots;
+        }
+
+        function updateChart(data, leaves, stepCount, totalSteps) {
+            let scatterPoints = data.map(d => ({x: d.x, y: d.y}));
             let stairPoints = [];
+            
             for (let leaf of leaves) {
                 stairPoints.push({x: leaf.xMin, y: leaf.yPred});
                 stairPoints.push({x: leaf.xMax, y: leaf.yPred});
             }
-            // Remove duplicate consecutive points for clean line
+            
             let filteredStair = [];
             for (let i = 0; i < stairPoints.length; i++) {
                 if (i === 0 || stairPoints[i].x !== stairPoints[i-1].x || stairPoints[i].y !== stairPoints[i-1].y) {
@@ -199,66 +251,92 @@
                 }
             }
 
-            if (currentChart) {
-                currentChart.destroy();
-            }
-            currentChart = new Chart(ctx, {
-                type: 'scatter',
-                data: {
-                    datasets: [
-                        {
-                            label: 'Raw Data',
-                            data: scatterPoints,
-                            backgroundColor: '#3b82f6',
-                            pointRadius: 5,
-                            type: 'scatter',
-                            order: 2
-                        },
-                        {
-                            label: 'Regression Tree Prediction',
-                            data: filteredStair,
-                            type: 'line',
-                            borderColor: '#e11d48',
-                            borderWidth: 3,
-                            fill: false,
-                            pointRadius: 0,
-                            order: 1,
-                            tension: 0
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: true,
-                    plugins: {
-                        legend: { position: 'top' },
-                        tooltip: { enabled: true }
+            if (!currentChart) {
+                let ctx = document.getElementById('regTreeCanvas').getContext('2d');
+                currentChart = new Chart(ctx, {
+                    type: 'scatter',
+                    data: {
+                        datasets: [
+                            {
+                                label: 'Raw Data',
+                                data: scatterPoints,
+                                backgroundColor: '#3b82f6',
+                                pointRadius: 5,
+                                type: 'scatter',
+                                order: 2
+                            },
+                            {
+                                label: 'Tree Prediction',
+                                data: filteredStair,
+                                type: 'line',
+                                borderColor: '#e11d48',
+                                borderWidth: 3,
+                                fill: false,
+                                pointRadius: 0,
+                                order: 1,
+                                tension: 0 
+                            }
+                        ]
                     },
-                    scales: {
-                        x: { title: { display: true, text: 'X Variable' }, min: 0, max: 11 },
-                        y: { title: { display: true, text: 'Y Target' } }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        animation: false,
+                        plugins: {
+                            legend: { position: 'top' },
+                            tooltip: { enabled: true }
+                        },
+                        scales: {
+                            x: { title: { display: true, text: 'X Variable' }, min: 0, max: 11 },
+                            y: { title: { display: true, text: 'Y Target' }, suggestedMin: 0, suggestedMax: 12 }
+                        }
                     }
-                }
-            });
+                });
+            } else {
+                currentChart.data.datasets[0].data = scatterPoints;
+                currentChart.data.datasets[1].data = filteredStair;
+                currentChart.update('none'); 
+            }
+
+            let status = stepCount === totalSteps ? "(Done)" : "(Splitting...)";
+            document.getElementById('leafStats').innerHTML = 
+                `Progress: ${stepCount}/${totalSteps} ${status} | Leaves: ${leaves.length} | Depth: ${MAX_DEPTH}`;
         }
 
-        function updateWithNewRandom() {
-            // Random seed based on current time, and random pattern among three types
+        function playAnimation() {
+            if (animationTimer) clearInterval(animationTimer);
+            if (!currentSnapshots || currentSnapshots.length === 0) return;
+
+            let step = 0;
+            let totalSteps = currentSnapshots.length;
+
+            updateChart(currentData, currentSnapshots[step], step + 1, totalSteps);
+            step++;
+
+            animationTimer = setInterval(() => {
+                if (step >= totalSteps) {
+                    clearInterval(animationTimer);
+                    return;
+                }
+                updateChart(currentData, currentSnapshots[step], step + 1, totalSteps);
+                step++;
+            }, ANIMATION_SPEED);
+        }
+
+        function createNewModel() {
             let patternIdx = Math.floor(Math.random() * 3);
             let patternType = ['sine', 'step', 'linear'][patternIdx];
             let seed = Date.now() + Math.random() * 10000;
-            let data = generateRandomData(60, seed, patternType);
-            let leaves = fitRegressionTree(data, 5, 3);
-            renderChart('regTreeCanvas', data, leaves);
-            document.getElementById('leafStats').innerHTML = `Leaf Nodes: ${leaves.length} | Max Depth: 3 | Min Leaf Size: 5`;
+            
+            currentData = generateRandomData(80, seed, patternType); 
+            currentSnapshots = buildTreeSnapshots(currentData, MIN_LEAF, MAX_DEPTH);
+            playAnimation();
         }
 
-        // initial load
-        updateWithNewRandom();
+        document.getElementById('refreshBtn').addEventListener('click', createNewModel);
+        document.getElementById('replayBtn').addEventListener('click', playAnimation);
 
-        document.getElementById('refreshBtn').addEventListener('click', () => {
-            updateWithNewRandom();
-        });
+        createNewModel();
     })();
 </script>
 </body>

@@ -203,7 +203,7 @@
 <p>Virtual address space canve greater than the  physical memory.</p>
 </li>
 <li>
-<p>Memory serves as a cache for virtaul memory.</p>
+<p>Memory serves as a cache for virtual memory.</p>
 </li>
 <li>
 <p>Support multiprogramming.</p>
@@ -1206,6 +1206,9 @@ for (int i = 0; i &lt; N; i++) sum += pts.z[i];
 <h3 id="set-associative-caches"><a class="header" href="#set-associative-caches">Set Associative Caches</a></h3>
 <p><span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span>-way set-associative has <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span></span></span></span> lines per set while direct-mapped is one way and fully associative is one set.</p>
 <p>Given a cache with total size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span></span></span></span> measured in kilobytes, associativity <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span></span></span></span>, and block (line) size <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05017em;">B</span></span></span></span> measured in bytes. The number of sets <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span></span></span></span> is calculated as <span class="katex"><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:0.6833em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">S</span><span class="mspace" style="margin-right:0.2778em;"></span><span class="mrel">=</span><span class="mspace" style="margin-right:0.2778em;"></span></span><span class="base"><span class="strut" style="height:1.2173em;vertical-align:-0.345em;"></span><span class="mord"><span class="mopen nulldelimiter"></span><span class="mfrac"><span class="vlist-t vlist-t2"><span class="vlist-r"><span class="vlist" style="height:0.8723em;"><span style="top:-2.655em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mathnormal mtight" style="margin-right:0.05764em;">BE</span></span></span></span><span style="top:-3.23em;"><span class="pstrut" style="height:3em;"></span><span class="frac-line" style="border-bottom-width:0.04em;"></span></span><span style="top:-3.394em;"><span class="pstrut" style="height:3em;"></span><span class="sizing reset-size6 size3 mtight"><span class="mord mtight"><span class="mord mtight">1024</span><span class="mord mathnormal mtight" style="margin-right:0.07153em;">C</span></span></span></span></span><span class="vlist-s">​</span></span><span class="vlist-r"><span class="vlist" style="height:0.345em;"><span></span></span></span></span></span><span class="mclose nulldelimiter"></span></span></span></span></span>.</p>
+<ul>
+<li>TLB and victim cache are typically fully associative to maximize hit rate with small size.</li>
+</ul>
 <h3 id="performance-impact-of-cache-parameters"><a class="header" href="#performance-impact-of-cache-parameters">Performance Impact of Cache Parameters</a></h3>
 <img src="pic/25.png" width="60%" height="60%">
 <div class="table-wrapper"><table><thead><tr><th style="text-align: center">Feature</th><th style="text-align: center">L1 Cache</th><th style="text-align: center">L2 Cache</th></tr></thead><tbody>
@@ -1431,6 +1434,34 @@ void p2() {printf("x = %f\n", x);}
   </div>
 </div>
 <ul>
+<li><details> <summary> Example Problem </summary>
+<pre><code class="language-c">extern int buf[];        
+int *bufp0 = &amp;buf[0]; 
+static int *bufp1;
+static void incr() {
+    static int count = 0;
+    count++;
+}
+void swap() {   
+    int temp;
+    incr();
+    bufp1 = &amp;buf[1];
+    temp = *bufp0;
+    *bufp0 = *bufp1;
+    *bufp1 = temp;
+}
+</code></pre>
+<div class="table-wrapper"><table><thead><tr><th style="text-align: center">Symbol</th><th style="text-align: center"><code>swap.o</code> .symtab entry?</th><th style="text-align: center">Symbol type</th><th style="text-align: center">Module where defined</th><th style="text-align: center">Section</th></tr></thead><tbody>
+<tr><td style="text-align: center"><code>buf</code></td><td style="text-align: center">Yes</td><td style="text-align: center">extern</td><td style="text-align: center"><code>m.o</code></td><td style="text-align: center"><code>UND</code></td></tr>
+<tr><td style="text-align: center"><code>bufp0</code></td><td style="text-align: center">Yes</td><td style="text-align: center">global</td><td style="text-align: center"><code>swap.o</code></td><td style="text-align: center"><code>.data</code></td></tr>
+<tr><td style="text-align: center"><code>bufp1</code></td><td style="text-align: center">Yes</td><td style="text-align: center">local</td><td style="text-align: center"><code>swap.o</code></td><td style="text-align: center"><code>.bss</code></td></tr>
+<tr><td style="text-align: center"><code>swap</code></td><td style="text-align: center">Yes</td><td style="text-align: center">global</td><td style="text-align: center"><code>swap.o</code></td><td style="text-align: center"><code>.text</code></td></tr>
+<tr><td style="text-align: center"><code>temp</code></td><td style="text-align: center">No</td><td style="text-align: center">—</td><td style="text-align: center">—</td><td style="text-align: center">—</td></tr>
+<tr><td style="text-align: center"><code>incr</code></td><td style="text-align: center">Yes</td><td style="text-align: center">local</td><td style="text-align: center"><code>swap.o</code></td><td style="text-align: center"><code>.text</code></td></tr>
+<tr><td style="text-align: center"><code>count</code></td><td style="text-align: center">Yes</td><td style="text-align: center">local</td><td style="text-align: center"><code>swap.o</code></td><td style="text-align: center"><code>.bss</code></td></tr>
+</tbody></table>
+</div>  </details>
+</li>
 <li>
 <p>Using the command <code>readelf -s &lt;file&gt;</code> to view the symbol table of an
 <strong>Executable and Linkable Format</strong> (ELF) file.</p>

@@ -3,13 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Weather Decision Tree - Optimized</title>
+    <title>Weather Decision Tree - Compact & Animated</title>
     <script src="https://d3js.org/d3.v7.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js" id="MathJax-script" async></script>
     <style>
-        * {
-            box-sizing: border-box;
-        }
+        * { box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;
             background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
@@ -72,9 +70,7 @@
             margin-bottom: 24px;
             transition: all 0.3s ease;
         }
-        .table-area:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        }
+        .table-area:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); }
         .table-header {
             font-weight: 600;
             font-size: 1rem;
@@ -93,27 +89,19 @@
             font-size: 0.85rem;
         }
         .weather-table th {
-            background: transparent;
             padding: 10px 8px;
             text-align: center;
             font-weight: 600;
             border-bottom: 2px solid #e8eef5;
             color: #2c5aa0;
-            font-size: 0.9rem;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         }
         .weather-table td {
             padding: 10px 8px;
             text-align: center;
             border-bottom: 1px solid #f0f4f8;
-            font-size: 0.9rem;
             font-weight: 500;
-            color: #2c3e50;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
         }
-        .weather-table tbody tr:hover td {
-            background-color: #f8fafc;
-        }
+        .weather-table tbody tr:hover td { background-color: #f8fafc; }
         .badge-yes, .badge-no {
             display: inline-block;
             padding: 3px 12px;
@@ -122,14 +110,8 @@
             font-size: 0.75rem;
             letter-spacing: 0.3px;
         }
-        .badge-yes {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .badge-no {
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            color: white;
-        }
+        .badge-yes { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        .badge-no { background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white; }
         .tree-area {
             width: 100%;
             background: #ffffff;
@@ -138,9 +120,7 @@
             padding: 14px;
             transition: all 0.3s ease;
         }
-        .tree-area:hover {
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        }
+        .tree-area:hover { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06); }
         .tree-header {
             font-weight: 600;
             font-size: 1rem;
@@ -154,11 +134,12 @@
             overflow-y: auto;
             background: linear-gradient(135deg, #fafbfc 0%, #f0f4f8 100%);
             border-radius: 10px;
-            min-height: 480px;
-            max-height: 60vh;
+            /* 缩小容器的高度，避免占用过多垂直空间 */
+            min-height: 380px;
+            max-height: 50vh;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center;
             border: 1px solid #e8eef5;
             margin-top: 12px;
         }
@@ -167,53 +148,51 @@
             background: transparent;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             width: 100%;
-            height: auto;
-            min-width: 700px;
+            height: 100%;
         }
+        /* 缩小连线和节点的线条粗细 */
         .tree-node circle {
-            stroke: #667eea !important;
-            stroke-width: 1.5px !important;
-            fill: #e8f1ff !important;
-            r: 12px !important;
-            transition: all 0.2s ease;
+            stroke: #667eea;
+            stroke-width: 1.5px;
+            fill: #e8f1ff;
+            transition: fill 0.2s ease, stroke-width 0.2s ease;
         }
         .tree-node:hover circle {
-            fill: #d0e0ff !important;
-            stroke-width: 2px !important;
+            fill: #d0e0ff;
+            stroke-width: 2.5px;
         }
         .tree-node text {
-            font-size: 5px !important;
-            font-weight: 700 !important;
-            fill: #1a3a52 !important;
+            font-size: 10.5px; /* 字体缩小 */
+            font-weight: 700;
+            fill: #1a3a52;
             dominant-baseline: middle;
             text-anchor: middle;
         }
         .leaf-node circle {
-            fill: #d0f5f7 !important;
-            stroke: #06c !important;
-            stroke-width: 1.5px !important;
-            r: 12px !important;
+            fill: #d0f5f7;
+            stroke: #06c;
         }
-        .leaf-node:hover circle {
-            fill: #b0ebef !important;
-            stroke-width: 2px !important;
-        }
+        .leaf-node:hover circle { fill: #b0ebef; }
         .leaf-node text {
-            font-weight: 800 !important;
-            fill: #003366 !important;
-            font-size: 5px !important;
+            font-weight: 800;
+            fill: #003366;
+            font-size: 10.5px;
         }
         .link {
             fill: none;
-            stroke: #cbd5e0;
-            stroke-width: 2px;
-            opacity: 0.8;
+            stroke: #a0aec0;
+            stroke-width: 1.8px; /* 连线变细 */
+            stroke-linecap: round;
         }
         .edge-label {
-            font-size: 8px;
-            fill: #667eea;
+            font-size: 9.5px; /* 条件字体缩小 */
+            fill: #5a67d8;
             font-weight: 700;
-            background: white;
+            paint-order: stroke;
+            stroke: #f0f4f8;
+            stroke-width: 3px;
+            stroke-linecap: round;
+            stroke-linejoin: round;
         }
         .info-panel {
             margin-top: 16px;
@@ -233,20 +212,10 @@
             font-size: 0.8rem;
             line-height: 1.5;
         }
-        .latex-render {
-            font-size: 0.8rem;
-        }
         @media (max-width: 700px) {
-            body {
-                padding: 16px;
-            }
-            .dashboard-wrapper {
-                padding: 16px;
-            }
-            .tree-canvas-container {
-                min-height: 350px;
-                max-height: 50vh;
-            }
+            body { padding: 16px; }
+            .dashboard-wrapper { padding: 16px; }
+            .tree-canvas-container { min-height: 300px; max-height: 45vh; }
         }
     </style>
 </head>
@@ -271,9 +240,9 @@
             </div>
         </div>
         <div class="tree-area">
-            <div class="tree-header">Decision Tree</div>
+            <div class="tree-header">Decision Tree (Animated)</div>
             <div id="treeVisualization" class="tree-canvas-container">
-                <svg width="100%" height="100%"></svg>
+                <svg></svg>
             </div>
         </div>
     </div>
@@ -299,9 +268,7 @@
             return 'No';
         }
         
-        function randomInt(min, max) {
-            return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
+        function randomInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
         
         function generateRandomSample(idx) {
             const outlook = OUTLOOK_VALS[Math.floor(Math.random() * OUTLOOK_VALS.length)];
@@ -396,13 +363,7 @@
             const yesTotal = labelsAll.filter(l => l === 'Yes').length;
             const noTotal = total - yesTotal;
             const totalEnt = entropy(labelsAll);
-            
-            const domains = {
-                Outlook: OUTLOOK_VALS,
-                Temperature: TEMP_VALS,
-                Humidity: HUMIDITY_VALS,
-                Windy: [true, false]
-            };
+            const domains = { Outlook: OUTLOOK_VALS, Temperature: TEMP_VALS, Humidity: HUMIDITY_VALS, Windy: [true, false] };
             
             const lines = [];
             lines.push(`\\text{Dataset: } ${total} \\text{ samples, } ${yesTotal} \\text{ Yes, } ${noTotal} \\text{ No.}`);
@@ -410,42 +371,30 @@
             lines.push(``);
             
             const gains = {};
-            
             for (const feat of ['Outlook', 'Temperature', 'Humidity', 'Windy']) {
-                const values = domains[feat];
                 let remainder = 0;
                 const termStrings = [];
-                
-                for (const val of values) {
+                for (const val of domains[feat]) {
                     const subset = examples.filter(ex => ex.features[feat] === val);
                     if (subset.length === 0) continue;
                     const subLabels = subset.map(ex => ex.label);
                     const subYes = subLabels.filter(l => l === 'Yes').length;
                     const subNo = subset.length - subYes;
-                    const subEnt = entropy(subLabels);
                     const weight = subset.length / total;
-                    remainder += weight * subEnt;
+                    remainder += weight * entropy(subLabels);
                     
                     let entFormula = '';
-                    if (subYes === 0 && subNo === 0) {
-                        entFormula = '0';
-                    } else if (subYes === 0) {
-                        entFormula = 'H(0, 1)';
-                    } else if (subNo === 0) {
-                        entFormula = 'H(1, 0)';
-                    } else {
-                        entFormula = `H\\left(\\frac{${subYes}}{${subset.length}}, \\frac{${subNo}}{${subset.length}}\\right)`;
-                    }
+                    if (subYes === 0 && subNo === 0) entFormula = '0';
+                    else if (subYes === 0) entFormula = 'H(0, 1)';
+                    else if (subNo === 0) entFormula = 'H(1, 0)';
+                    else entFormula = `H\\left(\\frac{${subYes}}{${subset.length}}, \\frac{${subNo}}{${subset.length}}\\right)`;
                     termStrings.push(`\\frac{${subset.length}}{${total}} \\cdot ${entFormula}`);
                 }
-                
                 const infoGiven = remainder.toFixed(4);
                 const gain = totalEnt - remainder;
                 gains[feat] = gain;
-                
                 let infoExpr = termStrings.join(' + ');
                 if (infoExpr === '') infoExpr = '0';
-                
                 lines.push(`\\text{Info}(S \\mid \\text{${feat}}) = ${infoExpr} = ${infoGiven}`);
                 lines.push(`\\text{Gain}(\\text{${feat}}) = H(S) - \\text{Info}(S \\mid \\text{${feat}}) = ${totalEnt.toFixed(4)} - ${infoGiven} = ${gain.toFixed(4)}`);
                 lines.push(``);
@@ -454,14 +403,9 @@
             let bestFeat = 'Outlook';
             let bestGainVal = -1;
             for (const [feat, gain] of Object.entries(gains)) {
-                if (gain > bestGainVal) {
-                    bestGainVal = gain;
-                    bestFeat = feat;
-                }
+                if (gain > bestGainVal) { bestGainVal = gain; bestFeat = feat; }
             }
-            
             lines.push(`\\boxed{\\text{Best attribute: } \\mathbf{${bestFeat}} \\text{ (Gain = ${bestGainVal.toFixed(4)})}}`);
-            
             const latex = `\\begin{align*}\n` + lines.map(l => `& ${l}`).join(`\\\\\n`) + `\n\\end{align*}`;
             return { latex, bestFeature: bestFeat };
         }
@@ -479,95 +423,105 @@
             return { name: displayFeature, isLeaf: false, edgeLabel: edgeValue, children: childrenList, gain: node.gain };
         }
         
-        let currentSvg = null;
-        function renderVerticalTree(treeRoot, containerId) {
+        function renderAnimatedTree(treeRoot, containerId) {
             const container = document.getElementById(containerId);
             if (!container) return;
-            let svgElement = container.querySelector("svg");
-            if (!svgElement) {
-                const newSvg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-                newSvg.setAttribute("width", "100%");
-                newSvg.setAttribute("height", "100%");
-                container.innerHTML = "";
-                container.appendChild(newSvg);
-                currentSvg = d3.select(newSvg);
-            } else {
-                currentSvg = d3.select(svgElement);
-                currentSvg.selectAll("*").remove();
-            }
-            const svg = currentSvg;
+            let svg = d3.select(container).select("svg");
+            svg.selectAll("*").remove(); 
             
-            if (!treeRoot || (!treeRoot.children && treeRoot.isLeaf === undefined)) {
-                svg.append("text").attr("x", 100).attr("y", 100).text("Press 'Generate New Data' to build tree");
-                return;
-            }
+            if (!treeRoot || (!treeRoot.children && treeRoot.isLeaf === undefined)) return;
             
             const root = d3.hierarchy(treeRoot, d => d.children ? d.children : null);
-            const treeLayout = d3.tree().nodeSize([45, 80]);
-            const treeData = treeLayout(root);
             
-            // 动态计算 viewBox，留出足够边距
+            // 间距调小，使树看起来更紧凑
+            const treeLayout = d3.tree().nodeSize([80, 95]); 
+            const treeData = treeLayout(root);
             const allNodes = treeData.descendants();
+            
             const minX = d3.min(allNodes, d => d.x);
             const maxX = d3.max(allNodes, d => d.x);
             const minY = d3.min(allNodes, d => d.y);
             const maxY = d3.max(allNodes, d => d.y);
-            const padding = 50;
-            svg.attr("viewBox", `${minY - padding} ${minX - padding} ${maxY - minY + 2 * padding} ${maxX - minX + 2 * padding}`);
             
-            // 连线样式优化：实线，更柔和
-            svg.selectAll(".link").data(treeData.links()).enter().append("path")
+            // 留白稍微增加，视觉上有整体缩小的效果
+            const padX = 50; 
+            const padY = 50;
+            svg.attr("viewBox", `${minX - padX} ${minY - padY} ${maxX - minX + 2 * padX} ${maxY - minY + 2 * padY}`);
+            
+            const ANIM_SPEED = 650; 
+
+            // 1. 画连线
+            const linksGroup = svg.append("g").attr("class", "links");
+            const linkPaths = linksGroup.selectAll(".link").data(treeData.links()).enter()
+                .append("path")
                 .attr("class", "link")
-                .attr("d", d3.linkVertical().x(d => d.y).y(d => d.x))
-                .attr("fill", "none")
-                .attr("stroke", "#92b0c0")
-                .attr("stroke-width", 1.8);
-            
-            // 边上的文字（分裂条件）
-            const edgeGroup = svg.append("g").attr("class", "edge-labels");
-            treeData.links().forEach(link => {
-                let edgeVal = link.target.data.edgeLabel;
-                if (edgeVal === undefined) edgeVal = "";
-                if (typeof edgeVal === "boolean") edgeVal = edgeVal ? "True" : "False";
-                const midX = (link.source.y + link.target.y) / 2;
-                const midY = (link.source.x + link.target.x) / 2 - 5;
-                edgeGroup.append("text")
-                    .attr("x", midX)
-                    .attr("y", midY)
-                    .attr("text-anchor", "middle")
-                    .attr("font-size", "5px")
-                    .attr("fill", "#667eea")
-                    .attr("font-weight", "700")
-                    .text(edgeVal);
+                .attr("d", d3.linkVertical().x(d => d.x).y(d => d.y));
+
+            linkPaths.each(function(d) {
+                const path = d3.select(this);
+                const length = this.getTotalLength();
+                path.attr("stroke-dasharray", `${length} ${length}`)
+                    .attr("stroke-dashoffset", length)
+                    .transition()
+                    .duration(ANIM_SPEED)
+                    .delay(d.source.depth * ANIM_SPEED + ANIM_SPEED * 0.4) 
+                    .ease(d3.easeCubicInOut)
+                    .attr("stroke-dashoffset", 0);
             });
+
+            // 2. 边上的分裂条件文字
+            const edgeGroup = svg.append("g").attr("class", "edge-labels");
+            edgeGroup.selectAll(".edge-label").data(treeData.links()).enter()
+                .append("text")
+                .attr("class", "edge-label")
+                .attr("x", d => (d.source.x + d.target.x) / 2)
+                .attr("y", d => (d.source.y + d.target.y) / 2)
+                .attr("text-anchor", "middle")
+                .text(d => {
+                    let val = d.target.data.edgeLabel;
+                    return typeof val === "boolean" ? (val ? "True" : "False") : (val || "");
+                })
+                .attr("opacity", 0)
+                .transition()
+                .duration(ANIM_SPEED * 0.5)
+                .delay(d => d.source.depth * ANIM_SPEED + ANIM_SPEED * 0.8) 
+                .attr("opacity", 1);
             
-            // 画节点
+            // 3. 画节点
             const nodesGroup = svg.append("g").attr("class", "nodes");
             const nodeGroups = nodesGroup.selectAll(".tree-node").data(treeData.descendants()).enter()
                 .append("g")
                 .attr("class", d => d.data.isLeaf ? "tree-node leaf-node" : "tree-node")
-                .attr("transform", d => `translate(${d.y}, ${d.x})`);
-            
+                .attr("transform", d => `translate(${d.x}, ${d.y})`)
+                .attr("opacity", 0);
+
+            nodeGroups.transition()
+                .duration(ANIM_SPEED * 0.5)
+                .delay(d => d.depth * ANIM_SPEED)
+                .attr("opacity", 1);
+
             nodeGroups.append("circle")
-                .attr("r", 12)
-                .attr("stroke", d => d.data.isLeaf ? "#06c" : "#667eea")
-                .attr("fill", d => d.data.isLeaf ? "#d0f5f7" : "#e8f1ff")
-                .attr("stroke-width", 1.5);
+                .attr("r", 0)
+                .transition()
+                .duration(ANIM_SPEED * 0.8)
+                .delay(d => d.depth * ANIM_SPEED)
+                .ease(d3.easeBackOut.overshoot(1.5))
+                .attr("r", 18); // 圆圈半径缩小到18
             
             nodeGroups.append("text")
-                .attr("dy", "2")
-                .attr("text-anchor", "middle")
-                .attr("font-size", "4.5px")
-                .attr("font-weight", "700")
-                .attr("fill", d => d.data.isLeaf ? "#003366" : "#1a3a52")
-                .text(d => d.data.isLeaf ? d.data.labelShort : d.data.name);
+                .attr("dy", "1")
+                .text(d => d.data.isLeaf ? d.data.labelShort : d.data.name)
+                .attr("opacity", 0)
+                .transition()
+                .duration(ANIM_SPEED * 0.5)
+                .delay(d => d.depth * ANIM_SPEED + 200)
+                .attr("opacity", 1);
             
             nodeGroups.append("title")
                 .text(d => !d.data.isLeaf && d.data.gain !== undefined ? `Gain: ${d.data.gain.toFixed(4)}` : d.data.name);
         }
         
         let currentDataset = [];
-        
         function updateTableUI(dataset) {
             const tbody = document.getElementById("tableDynamicBody");
             if (!tbody) return;
@@ -592,15 +546,14 @@
             const examples = currentDataset.map(s => ({ features: s.features, label: s.label }));
             const treeModel = buildID3Tree(examples, ['Outlook', 'Temperature', 'Humidity', 'Windy'], majorityLabel(examples));
             const d3Compatible = buildD3Hierarchy(treeModel);
-            renderVerticalTree(d3Compatible, "treeVisualization");
+            
+            renderAnimatedTree(d3Compatible, "treeVisualization");
             
             const gainAnalysis = computeGainLatex(currentDataset);
             const latexDiv = document.getElementById("latexExplanation");
             if (latexDiv) {
                 latexDiv.innerHTML = `<div class="latex-render">\\[ ${gainAnalysis.latex} \\]</div>`;
-                if (window.MathJax) {
-                    MathJax.typesetPromise([latexDiv]).catch(console.log);
-                }
+                if (window.MathJax) MathJax.typesetPromise([latexDiv]).catch(console.log);
             }
         }
         

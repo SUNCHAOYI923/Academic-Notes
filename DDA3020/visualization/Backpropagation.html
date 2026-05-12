@@ -284,21 +284,21 @@
                         <th class="param-label">Layer</th>
                         <th>$\mathbf{w}$ (Weight)</th>
                         <th>$\mathbf{b}$ (Bias)</th>
-                        <th>$C$ (Loss)</th>
+                        <th>$\nabla$ (Avg Gradient)</th>
                     </tr>
                 </thead>
                 <tbody id="paramsTableBody">
-                    <tr><td class="param-label">L1</td><td id="w1">-</td><td id="b1">-</td><td id="c1">-</td></tr>
-                    <tr><td class="param-label">L2</td><td id="w2">-</td><td id="b2">-</td><td id="c2">-</td></tr>
-                    <tr><td class="param-label">L3</td><td id="w3">-</td><td id="b3">-</td><td id="c3">-</td></tr>
-                    <tr><td class="param-label">Output</td><td id="w4">-</td><td id="b4">-</td><td id="c4">-</td></tr>
+                    <tr><td class="param-label">L1</td><td id="w1">-</td><td id="b1">-</td><td id="g1">-</td></tr>
+                    <tr><td class="param-label">L2</td><td id="w2">-</td><td id="b2">-</td><td id="g2">-</td></tr>
+                    <tr><td class="param-label">L3</td><td id="w3">-</td><td id="b3">-</td><td id="g3">-</td></tr>
+                    <tr><td class="param-label">Output</td><td id="w4">-</td><td id="b4">-</td><td id="g4">-</td></tr>
                 </tbody>
             </table>
         </div>
 
         <div class="stats-grid">
             <div class="stat-box">
-                <div class="stat-label">Loss $C_i^{(n+1)}$</div>
+                <div class="stat-label">Global Loss $C_i^{(n+1)}$</div>
                 <div class="stat-value" id="loss">-</div>
             </div>
             <div class="stat-box">
@@ -306,7 +306,7 @@
                 <div class="stat-value" id="avgActivation">-</div>
             </div>
             <div class="stat-box">
-                <div class="stat-label">Avg Gradient $\overline{v}_i$</div>
+                <div class="stat-label">Net Avg Gradient</div>
                 <div class="stat-value" id="avgGradient">-</div>
             </div>
             <div class="stat-box">
@@ -410,7 +410,7 @@
                         if (l === this.layers.length - 1) {
                             this.layers[l].nodes[i].value = 1 / (1 + Math.exp(-sum));
                         } else {
-                            this.layers[l].nodes[i].value = Math.max(0.05, Math.max(0, sum));
+                            this.layers[l].nodes[i].value = Math.max(0, sum);
                         }
                     }
                 }
@@ -433,17 +433,17 @@
                 const outputLayer = this.layers.length - 1;
                 for (let i = 0; i < 10; i++) {
                     const target = i === this.targetDigit ? 1 : 0;
-                    this.layers[outputLayer].nodes[i].gradient = 
-                        this.layers[outputLayer].nodes[i].value - target;
+                    const val = this.layers[outputLayer].nodes[i].value;
+                    this.layers[outputLayer].nodes[i].gradient = (val - target) * val * (1 - val);
                 }
 
-                for (let l = this.layers.length - 2; l >= 0; l--) {
+                for (let l = this.layers.length - 2; l > 0; l--) {
                     for (let j = 0; j < this.layers[l].size; j++) {
                         let grad = 0;
                         for (let i = 0; i < this.layers[l + 1].size; i++) {
                             grad += this.weights[l][i][j] * this.layers[l + 1].nodes[i].gradient;
                         }
-                        grad *= this.layers[l].nodes[j].value > 0.04 ? 1 : 0;
+                        grad *= this.layers[l].nodes[j].value > 0 ? 1 : 0;
                         this.layers[l].nodes[j].gradient = grad;
                     }
                 }
@@ -598,7 +598,6 @@
             const pred = network.getPrediction();
             document.getElementById('prediction').textContent = pred.digit;
 
-            // Update parameters table
             for (let l = 0; l < network.weights.length; l++) {
                 let wSum = 0, bSum = 0, wCount = 0, bCount = 0;
                 
@@ -610,20 +609,25 @@
                     bSum += Math.abs(network.biases[l][i]);
                     bCount++;
                 }
+
+                let gradSum = 0, gradCount = 0;
+                for (let i = 0; i < network.layers[l + 1].size; i++) {
+                    gradSum += Math.abs(network.layers[l + 1].nodes[i].gradient);
+                    gradCount++;
+                }
                 
                 const wAvg = wCount > 0 ? wSum / wCount : 0;
                 const bAvg = bCount > 0 ? bSum / bCount : 0;
-                const loss = network.loss;
+                const gradAvg = gradCount > 0 ? gradSum / gradCount : 0;
                 
                 const layerIdx = l + 1;
                 document.getElementById(`w${layerIdx}`).textContent = wAvg.toFixed(3);
                 document.getElementById(`b${layerIdx}`).textContent = bAvg.toFixed(3);
-                document.getElementById(`c${layerIdx}`).textContent = loss.toFixed(4);
+                document.getElementById(`g${layerIdx}`).textContent = gradAvg.toFixed(5);
             }
 
             updateOutputBars();
             
-            // Re-render MathJax for table headers
             if (window.MathJax && window.MathJax.typesetPromise) {
                 MathJax.typesetPromise([document.querySelector('.params-table')]).catch(err => console.log(err));
             }
@@ -636,7 +640,6 @@
             trainingState.shouldStop = false;
             document.getElementById('trainBtn').disabled = true;
             
-            // Re-initialize network for fresh training
             network = new DigitNetwork(trainingState.targetDigit);
             
             trainingState.currentIteration = 0;
@@ -703,11 +706,10 @@
             document.getElementById('statusText').textContent = 'Ready';
             document.getElementById('lossDisplay').textContent = '-';
             
-            // Reset all display values to '-'
             for (let i = 1; i <= 4; i++) {
                 document.getElementById(`w${i}`).textContent = '-';
                 document.getElementById(`b${i}`).textContent = '-';
-                document.getElementById(`c${i}`).textContent = '-';
+                document.getElementById(`g${i}`).textContent = '-';
             }
             document.getElementById('loss').textContent = '-';
             document.getElementById('avgActivation').textContent = '-';
@@ -724,11 +726,10 @@
         drawDigitImage(trainingState.targetDigit);
         drawNetwork();
         
-        // Reset parameters table on initial load
         for (let i = 1; i <= 4; i++) {
             document.getElementById(`w${i}`).textContent = '-';
             document.getElementById(`b${i}`).textContent = '-';
-            document.getElementById(`c${i}`).textContent = '-';
+            document.getElementById(`g${i}`).textContent = '-';
         }
         
         document.getElementById('loss').textContent = '-';
